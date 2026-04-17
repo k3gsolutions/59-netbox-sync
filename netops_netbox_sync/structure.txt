@@ -1,0 +1,27 @@
+netops_netbox_sync/
+├── app/
+│   ├── drivers/
+│   │   ├── huawei_netmiko.py
+│   │   └── huawei_scrapli.py
+│   ├── collectors/
+│   │   └── huawei_ne8000.py
+│   ├── parsers/
+│   │   ├── interfaces.py
+│   │   ├── vlans.py
+│   │   ├── vrfs.py
+│   │   ├── bgp.py
+│   │   └── ipaddr.py
+│   ├── normalizers/
+│   │   └── netbox_mapper.py
+│   ├── netbox/
+│   │   ├── client.py
+│   │   └── planner.py
+│   ├── schemas/
+│   │   └── models.py
+│   ├── workflow/
+│   │   └── sync_device.py
+│   └── cli.py
+├── templates/
+├── requirements.txt
+├── .env
+└── README.md

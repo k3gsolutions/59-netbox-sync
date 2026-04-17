@@ -1,0 +1,12 @@
+netmiko
+scrapli
+scrapli-community
+textfsm
+ntc-templates
+pynetbox
+pydantic
+python-dotenv
+rich
+requests
+fastapi
+uvicorn[standard]

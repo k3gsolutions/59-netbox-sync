@@ -1,0 +1,15 @@
+{
+  "device": {
+    "host":     "172.30.0.1",
+    "port":     51212,
+    "username": "admin",
+    "password": "secret"
+  },
+  "netbox": {
+    "url":        "http://172.30.0.112:8080",
+    "token":      "ojnVy4NsPIDIC0HCyKfejdp7UU1ugmynZ1FrstUO",
+    "device_id":  5,
+    "verify_ssl": false
+  },
+  "action": "update"
+}

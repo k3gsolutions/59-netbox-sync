@@ -1,0 +1,22 @@
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.secret
+credentials.json
+secrets.yml
+.DS_Store
+Thumbs.db
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/ .venv/ env/
+dist/ build/ .next/ .nuxt/
+target/
+*.log
+*.sqlite *.sqlite3 *.db
+data/ tmp/
+*.zip *.tar.gz
+.claude/ .specstory/ .cursor/
