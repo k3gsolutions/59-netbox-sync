@@ -286,6 +286,84 @@ NETBOX_WRITE_TOKEN="token-here" python3 tools/local/apply_staged_netbox_object.p
 - Relatório em approvals/applied/apply-result-*.md
 - Exit code 0 = sucesso, 1 = falha
 
+### build_batch_staged_apply_plan.py
+
+Gerar BatchApplyPlan a partir de múltiplos ApplyPlans individuais (FASE 2.3).
+
+```bash
+python3 tools/local/build_batch_staged_apply_plan.py \
+  --plans \
+    approvals/approved/apply-plan-ITEM1.json \
+    approvals/approved/apply-plan-ITEM2.json \
+  --output approvals/approved/batch-apply-plan-<timestamp>.json \
+  --max-items 3
+```
+
+**Validações:**
+- total_items <= max_items
+- todos object_type=interface
+- todos category=base_inventory
+- approval_ids únicos
+- object_keys únicos
+- sem secrets
+
+### validate_batch_staged_apply_plan.py
+
+Validar BatchApplyPlan contra gates.
+
+```bash
+python3 tools/local/validate_batch_staged_apply_plan.py \
+  --plan approvals/approved/batch-apply-plan-<timestamp>.json
+```
+
+Exit code: 0 (válido) / 1 (inválido)
+
+### render_batch_staged_apply_plan.py
+
+Renderizar BatchApplyPlan em Markdown.
+
+```bash
+python3 tools/local/render_batch_staged_apply_plan.py \
+  --plan approvals/approved/batch-apply-plan-<timestamp>.json \
+  --output approvals/approved/batch-apply-plan-<batch_id>.md
+```
+
+Output: Markdown com readiness status, gates, itens, política
+
+### apply_batch_staged_netbox_objects.py
+
+Aplicar batch staged (múltiplos objetos, até 3 neste piloto).
+
+**Dry-run (padrão, zero writes):**
+```bash
+python3 tools/local/apply_batch_staged_netbox_objects.py \
+  --batch-plan approvals/approved/batch-apply-plan-<timestamp>.json \
+  --netbox-url https://docs.k3gsolutions.com.br \
+  --confirm-batch-id <batch_id> \
+  --operator "seu-nome"
+```
+
+**Real write (com --confirm-real-write-batch):**
+```bash
+NETBOX_WRITE_TOKEN="..." python3 tools/local/apply_batch_staged_netbox_objects.py \
+  --batch-plan approvals/approved/batch-apply-plan-<timestamp>.json \
+  --netbox-url https://docs.k3gsolutions.com.br \
+  --confirm-batch-id <batch_id> \
+  --operator "seu-nome" \
+  --confirm-real-write-batch
+```
+
+**Validações:**
+- All-or-none preflight
+- Item-by-item execution
+- Token via env var
+- Máximo 2 itens (piloto)
+- Nenhum PATCH/DELETE
+
+**Output:**
+- Relatório em approvals/applied/batch-apply-result-<batch_id>.md
+- Exit code 0 = sucesso, 1 = falha
+
 ## Integração CI
 
 Futuro: rodar `archive_compliance_report.py` após cada `/compliance/analyze/report`.
