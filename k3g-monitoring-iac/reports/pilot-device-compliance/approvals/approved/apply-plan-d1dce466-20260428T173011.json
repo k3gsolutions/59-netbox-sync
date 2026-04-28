@@ -3,7 +3,7 @@
   "approval_id": "d1dce466-edaeefe9-1f54-4165-ada7-fd9ff7fc8f6a",
   "import_plan_id": "54ad4ef6-a8e6-46cf-8bc7-0b624ad353db",
   "device": "4WNET-MNS-KTG-RX",
-  "device_id": 18,
+  "device_id": 1890,
   "object_type": "interface",
   "object_key": "GigabitEthernet0/5/0",
   "action": "safe_create_staged",
@@ -12,7 +12,7 @@
   "target_endpoint": "/api/dcim/interfaces/",
   "method": "POST",
   "staged_payload": {
-    "device": 18,
+    "device": 1890,
     "name": "GigabitEthernet0/5/0",
     "type": "1000base-t",
     "enabled": true,

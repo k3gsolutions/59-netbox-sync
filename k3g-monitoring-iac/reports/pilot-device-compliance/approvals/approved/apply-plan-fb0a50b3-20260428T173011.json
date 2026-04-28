@@ -3,7 +3,7 @@
   "approval_id": "fb0a50b3-c780d1e9-1338-42c4-acfc-b8ca4f49ea9d",
   "import_plan_id": "84c3921a-ced7-4d0d-8051-948e3b62f190",
   "device": "4WNET-MNS-KTG-RX",
-  "device_id": 18,
+  "device_id": 1890,
   "object_type": "interface",
   "object_key": "Eth-Trunk1",
   "action": "safe_create_staged",
@@ -12,7 +12,7 @@
   "target_endpoint": "/api/dcim/interfaces/",
   "method": "POST",
   "staged_payload": {
-    "device": 18,
+    "device": 1890,
     "name": "Eth-Trunk1",
     "type": "1000base-t",
     "enabled": true,

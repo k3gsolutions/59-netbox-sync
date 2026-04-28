@@ -39,6 +39,85 @@ def load_apply_plan(file_path: str) -> Dict:
         raise ValueError(f"Invalid JSON: {e}")
 
 
+def validate_batch_plan_for_apply(
+    batch_plan: Dict,
+    expected_device: str,
+    expected_device_id: int,
+    allowed_object_keys: List[str],
+) -> Tuple[bool, List[str]]:
+    """Validate batch plan before applying."""
+    errors: List[str] = []
+
+    if batch_plan.get("device") != expected_device:
+        errors.append(
+            f"Batch device mismatch: expected {expected_device}, got {batch_plan.get('device')}"
+        )
+    if batch_plan.get("device_id") != expected_device_id:
+        errors.append(
+            f"Batch device_id mismatch: expected {expected_device_id}, got {batch_plan.get('device_id')}"
+        )
+
+    items = batch_plan.get("items", [])
+    if not items:
+        errors.append("Batch has no items")
+
+    for i, item in enumerate(items):
+        object_key = item.get("object_key")
+        if not object_key:
+            errors.append(f"Item {i}: CRITICAL missing object_key")
+            continue
+
+        if object_key not in allowed_object_keys:
+            errors.append(f"Item {i}: object_key not in allowlist: {object_key}")
+
+        # Check critical fields
+        critical_fields = ["method", "target_endpoint", "device_id"]
+        for field in critical_fields:
+            if item.get(field) is None:
+                errors.append(f"Item {i}: CRITICAL missing '{field}'")
+
+        # Check method and endpoint values
+        if item.get("method") != "POST":
+            errors.append(f"Item {i}: method must be POST (got: {item.get('method')})")
+        if item.get("target_endpoint") != "/api/dcim/interfaces/":
+            errors.append(f"Item {i}: unexpected target_endpoint: {item.get('target_endpoint')}")
+
+        if item.get("device") != expected_device:
+            errors.append(
+                f"Item {i}: device mismatch: {item.get('device')} vs expected {expected_device}"
+            )
+
+        if item.get("device_id") != expected_device_id:
+            errors.append(
+                f"Item {i}: device_id mismatch: {item.get('device_id')} vs expected {expected_device_id}"
+            )
+
+        staged_payload = item.get("staged_payload")
+        if not isinstance(staged_payload, dict) or not staged_payload:
+            errors.append(f"Item {i}: CRITICAL missing or empty staged_payload")
+            continue
+
+        # Validate payload completeness
+        payload_required = ["device", "name", "type"]
+        for field in payload_required:
+            if staged_payload.get(field) is None:
+                errors.append(f"Item {i}: payload.{field} is None or missing")
+
+        payload_device = staged_payload.get("device")
+        payload_name = staged_payload.get("name")
+
+        if payload_device != expected_device_id:
+            errors.append(
+                f"Item {i}: staged_payload.device mismatch: {payload_device} vs expected {expected_device_id}"
+            )
+        if payload_name != object_key:
+            errors.append(
+                f"Item {i}: staged_payload.name mismatch: {payload_name} vs object_key {object_key}"
+            )
+
+    return len(errors) == 0, errors
+
+
 def check_token_provided() -> Tuple[bool, str]:
     """Check write token from environment."""
     token = os.environ.get("NETBOX_WRITE_TOKEN")
@@ -236,6 +315,14 @@ def main():
         action="store_true",
         help="EXPLICIT confirmation for real write",
     )
+    parser.add_argument("--expected-device", required=True, help="Expected device name for this batch")
+    parser.add_argument("--expected-device-id", required=True, type=int, help="Expected device ID for this batch")
+    parser.add_argument(
+        "--allowed-object-keys",
+        nargs="+",
+        required=True,
+        help="Explicit allowlist of object_key values permitted in this batch",
+    )
     parser.add_argument("--output-dir", help="Output directory for result")
     args = parser.parse_args()
 
@@ -250,6 +337,19 @@ def main():
                 f"plan={batch_plan.get('batch_id')[:8]}, "
                 f"confirmed={args.confirm_batch_id[:8]}"
             )
+
+        # Validate batch plan device identity and allowlist
+        valid_batch, batch_errors = validate_batch_plan_for_apply(
+            batch_plan,
+            expected_device=args.expected_device,
+            expected_device_id=args.expected_device_id,
+            allowed_object_keys=args.allowed_object_keys,
+        )
+        if not valid_batch:
+            print("❌ Batch plan validation failed:")
+            for error in batch_errors:
+                print(f"  - {error}")
+            return 1
 
         # Determine dry-run or real write
         dry_run = not args.confirm_real_write_batch
@@ -281,9 +381,42 @@ def main():
         for i, item in enumerate(items, 1):
             object_key = item.get("object_key")
             device_id = batch_plan.get("device_id")
+            staged_payload = item.get("staged_payload", {})
+
+            # Payload consistency validation before any POST
+            payload_device = staged_payload.get("device")
+            payload_name = staged_payload.get("name")
+            print(f"[{i}/{len(items)}] {object_key}: payload.name={payload_name}, payload.device={payload_device}")
+
+            if object_key not in args.allowed_object_keys:
+                results.append({
+                    "object_key": object_key,
+                    "status": "blocked",
+                    "message": "object_key not in allowlist",
+                })
+                batch_status = "batch_blocked"
+                break
+
+            if payload_name != object_key:
+                results.append({
+                    "object_key": object_key,
+                    "status": "blocked",
+                    "message": "Payload name does not match object_key",
+                })
+                batch_status = "batch_blocked"
+                break
+
+            if payload_device != args.expected_device_id:
+                results.append({
+                    "object_key": object_key,
+                    "status": "blocked",
+                    "message": "Payload device ID does not match expected device_id",
+                })
+                batch_status = "batch_blocked"
+                break
 
             if not dry_run:
-                print(f"[{i}/{len(items)}] {object_key}:")
+                print(f"  Validated staged_payload, now running preflight...")
 
                 try:
                     # Check if object exists
@@ -303,10 +436,6 @@ def main():
                         })
                         batch_status = "batch_blocked"
                         break
-
-                    # Check tags (if available)
-                    # Note: we don't have the full ApplyPlan here, so we skip this in batch
-                    # The individual apply-staged script already validated tags
 
                     print(f"  ✓ Preflight passed")
                     results.append({

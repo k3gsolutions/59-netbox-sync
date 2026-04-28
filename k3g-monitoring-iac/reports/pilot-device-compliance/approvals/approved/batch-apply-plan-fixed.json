@@ -1,0 +1,101 @@
+{
+  "batch_id": "4340469f-f73c-431f-853d-59355b32c54c",
+  "generated_at": "2026-04-28T19:20:01.030110+00:00",
+  "max_items": 3,
+  "total_items": 2,
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 1890,
+  "items": [
+    {
+      "apply_plan_id": "ea6a7fd8-4136-4b0a-9071-e910ebc6d9ab",
+      "approval_id": "fb0a50b3-c780d1e9-1338-42c4-acfc-b8ca4f49ea9d",
+      "object_key": "Eth-Trunk1",
+      "object_type": "interface",
+      "action": "safe_create_staged",
+      "category": "base_inventory",
+      "device": "4WNET-MNS-KTG-RX",
+      "device_id": 1890,
+      "method": "POST",
+      "target_endpoint": "/api/dcim/interfaces/",
+      "staged_payload": {
+        "device": 1890,
+        "name": "Eth-Trunk1",
+        "type": "1000base-t",
+        "enabled": true,
+        "mtu": 1500,
+        "tags": [
+          {
+            "name": "discovery:netops_netbox_sync"
+          },
+          {
+            "name": "discovery:staged"
+          },
+          {
+            "name": "source:device"
+          },
+          {
+            "name": "approval:fb0a50b3"
+          }
+        ],
+        "custom_fields": {
+          "discovery_source": "device_inventory",
+          "discovery_status": "staged",
+          "discovery_confidence": "exact",
+          "import_plan_id": "84c3921a-ced7-4d0d-8051-948e3b62f190",
+          "approval_id": "fb0a50b3-c780d1e9-1338-42c4-acfc-b8ca4f49ea9d"
+        }
+      },
+      "payload_hash": "sha256:b2d59b1ae29facc16d6debe238b63ba6eea1bc84ed8f1b1945d318440676a566",
+      "readiness_status": "ready"
+    },
+    {
+      "apply_plan_id": "d06c06d7-c62d-4a7d-8d96-a33def26de45",
+      "approval_id": "d1dce466-edaeefe9-1f54-4165-ada7-fd9ff7fc8f6a",
+      "object_key": "GigabitEthernet0/5/0",
+      "object_type": "interface",
+      "action": "safe_create_staged",
+      "category": "base_inventory",
+      "device": "4WNET-MNS-KTG-RX",
+      "device_id": 1890,
+      "method": "POST",
+      "target_endpoint": "/api/dcim/interfaces/",
+      "staged_payload": {
+        "device": 1890,
+        "name": "GigabitEthernet0/5/0",
+        "type": "1000base-t",
+        "enabled": true,
+        "mtu": 1500,
+        "tags": [
+          {
+            "name": "discovery:netops_netbox_sync"
+          },
+          {
+            "name": "discovery:staged"
+          },
+          {
+            "name": "source:device"
+          },
+          {
+            "name": "approval:d1dce466"
+          }
+        ],
+        "custom_fields": {
+          "discovery_source": "device_inventory",
+          "discovery_status": "staged",
+          "discovery_confidence": "exact",
+          "import_plan_id": "54ad4ef6-a8e6-46cf-8bc7-0b624ad353db",
+          "approval_id": "d1dce466-edaeefe9-1f54-4165-ada7-fd9ff7fc8f6a"
+        }
+      },
+      "payload_hash": "sha256:5ce0444a55d6aaa879a18d680de3a1241e350d1ace5603d049066ead3e651ef4",
+      "readiness_status": "ready"
+    }
+  ],
+  "readiness_status": "ready",
+  "blocked_reasons": [],
+  "write_policy": {
+    "real_apply_enabled": false,
+    "write_token_provided": false,
+    "max_items": 3
+  }
+}

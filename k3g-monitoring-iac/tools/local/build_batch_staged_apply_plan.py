@@ -21,14 +21,29 @@ def load_apply_plan(file_path: str) -> Dict:
         raise ValueError(f"Invalid JSON in {file_path}: {e}")
 
 
-def validate_apply_plan(plan: Dict) -> Tuple[bool, List[str]]:
+def validate_apply_plan(
+    plan: Dict,
+    expected_device: Optional[str],
+    expected_device_id: Optional[int],
+    allowed_object_keys: Optional[List[str]],
+) -> Tuple[bool, List[str]]:
     """Validate ApplyPlan before including in batch."""
     errors = []
 
     # Check required fields
-    required = ["approval_id", "object_type", "object_key", "action", "method", "readiness_status"]
+    required = [
+        "approval_id",
+        "object_type",
+        "object_key",
+        "action",
+        "method",
+        "readiness_status",
+        "device",
+        "device_id",
+        "staged_payload",
+    ]
     for field in required:
-        if not plan.get(field):
+        if not plan.get(field) and plan.get(field) != 0:
             errors.append(f"Missing required field: {field}")
 
     # Check values
@@ -49,7 +64,8 @@ def validate_apply_plan(plan: Dict) -> Tuple[bool, List[str]]:
         errors.append(f"ApplyPlan has blocked_reasons: {', '.join(plan.get('blocked_reasons'))}")
 
     # Check payload for secrets
-    payload_str = json.dumps(plan.get("staged_payload", {})).lower()
+    payload = plan.get("staged_payload", {})
+    payload_str = json.dumps(payload).lower()
     forbidden = ["password", "token", "secret", "api_key", "ssh"]
     if any(p in payload_str for p in forbidden):
         errors.append("Payload contains forbidden patterns (secrets)")
@@ -58,6 +74,32 @@ def validate_apply_plan(plan: Dict) -> Tuple[bool, List[str]]:
     object_key = plan.get("object_key", "").lower()
     if object_key == "eth-trunk0":
         errors.append("Eth-Trunk0 already created in FASE 2.0, cannot include in batch")
+
+    # Device consistency checks
+    if expected_device and plan.get("device") != expected_device:
+        errors.append(
+            f"Plan device mismatch: expected {expected_device}, got {plan.get('device')}"
+        )
+
+    if expected_device_id is not None and plan.get("device_id") != expected_device_id:
+        errors.append(
+            f"Plan device_id mismatch: expected {expected_device_id}, got {plan.get('device_id')}"
+        )
+
+    if payload.get("device") != plan.get("device_id"):
+        errors.append(
+            f"Payload.device mismatch: staged_payload.device={payload.get('device')} vs plan.device_id={plan.get('device_id')}"
+        )
+
+    if payload.get("name") != plan.get("object_key"):
+        errors.append(
+            f"Payload.name mismatch: staged_payload.name={payload.get('name')} vs object_key={plan.get('object_key')}"
+        )
+
+    if allowed_object_keys and plan.get("object_key") not in allowed_object_keys:
+        errors.append(
+            f"Object key not allowed: {plan.get('object_key')}"
+        )
 
     return len(errors) == 0, errors
 
@@ -95,12 +137,51 @@ def build_batch_apply_plan(
         approval_ids.add(approval_id)
         object_keys.add(object_key)
 
-        items.append({
+        # Embed complete ApplyPlan data in batch item
+        item = {
             "apply_plan_id": plan.get("apply_plan_id"),
             "approval_id": approval_id,
             "object_key": object_key,
             "object_type": plan.get("object_type"),
-        })
+            "action": plan.get("action"),
+            "category": plan.get("category"),
+            "device": plan.get("device"),
+            "device_id": plan.get("device_id"),
+            "method": plan.get("method"),
+            "target_endpoint": plan.get("target_endpoint"),
+            "staged_payload": plan.get("staged_payload", {}),
+            "payload_hash": plan.get("payload_hash"),
+            "readiness_status": plan.get("readiness_status"),
+        }
+
+        # Validate no null critical fields
+        critical = ["device_id", "method", "target_endpoint", "staged_payload"]
+        for field in critical:
+            if item.get(field) is None:
+                raise ValueError(f"ApplyPlan missing critical field '{field}': {object_key}")
+
+        # Validate payload has device and name
+        payload = item.get("staged_payload", {})
+        if payload.get("device") is None:
+            raise ValueError(f"Payload missing 'device' field: {object_key}")
+        if payload.get("name") is None:
+            raise ValueError(f"Payload missing 'name' field: {object_key}")
+
+        # Validate payload.device matches batch.device_id
+        if payload.get("device") != device_id:
+            raise ValueError(
+                f"Payload device mismatch: {object_key} has device={payload.get('device')}, "
+                f"batch expects device_id={device_id}"
+            )
+
+        # Validate payload.name matches object_key
+        if payload.get("name") != object_key:
+            raise ValueError(
+                f"Payload name mismatch: {object_key} has payload.name='{payload.get('name')}', "
+                f"expected name='{object_key}'"
+            )
+
+        items.append(item)
 
     # Check total items
     if len(items) > max_items:
@@ -134,8 +215,14 @@ def main():
     )
     parser.add_argument("--output", required=True, help="Output file for BatchApplyPlan")
     parser.add_argument("--max-items", type=int, default=3, help="Maximum items in batch")
-    parser.add_argument("--device", help="Device name (auto-detect if omitted)")
-    parser.add_argument("--device-id", type=int, help="Device ID (auto-detect if omitted)")
+    parser.add_argument("--device", required=True, help="Expected device name for the batch")
+    parser.add_argument("--device-id", required=True, type=int, help="Expected device ID for the batch")
+    parser.add_argument(
+        "--allowed-object-keys",
+        nargs="+",
+        required=True,
+        help="Explicit allowlist of object_key values permitted in this batch",
+    )
     args = parser.parse_args()
 
     try:
@@ -143,7 +230,12 @@ def main():
         apply_plans = []
         for plan_file in args.plans:
             plan = load_apply_plan(plan_file)
-            valid, errors = validate_apply_plan(plan)
+            valid, errors = validate_apply_plan(
+                plan,
+                expected_device=args.device,
+                expected_device_id=args.device_id,
+                allowed_object_keys=args.allowed_object_keys,
+            )
             if not valid:
                 print(f"❌ Validation failed for {plan_file}:")
                 for error in errors:
