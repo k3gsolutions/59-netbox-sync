@@ -1,0 +1,80 @@
+{
+  "approval_id": "c9363dfb-af3d-4a75-80c2-6936c36e4ecd",
+  "import_plan_id": "8ffbabe3-ca0b-457d-920f-b960a073b62d",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 1890,
+  "generated_at": "2026-04-28T10:36:18.299444+00:00Z",
+  "proposal": {
+    "object_type": "interface",
+    "object_key": "Eth-Trunk0",
+    "code": "INTERFACE_MISSING_IN_NETBOX",
+    "action": "safe_create_staged",
+    "category": "base_inventory",
+    "confidence": "exact",
+    "naming_compliant": true,
+    "reason": "Base LAG interface, part of core infrastructure",
+    "preferred_next_step": "Revisar payload sugerido e aplicar staged import"
+  },
+  "evidence": {
+    "applied": 1,
+    "documented": 0,
+    "status": "up"
+  },
+  "review": {
+    "status": "dry_run_passed",
+    "reviewed_by": "pilot-tester",
+    "reviewed_at": "2026-04-28T10:42:22.771415+00:00",
+    "decision": "approve",
+    "comment": "Aprovado para validação de fluxo FASE 1.7",
+    "changes_requested": [],
+    "expected_netbox_payload": null,
+    "dry_run_by": "dry-run-validator",
+    "dry_run_at": "2026-04-28T10:42:39.151751+00:00"
+  },
+  "audit": {
+    "created_at": "2026-04-28T10:36:18.299444+00:00Z",
+    "updated_at": "2026-04-28T10:36:18.299444+00:00Z",
+    "created_by": "approval-engine",
+    "report_path": "reports/pilot-device-compliance/import-plan-4WNET-MNS-KTG-RX.md",
+    "report_timestamp": "2026-04-28T06:23:28Z",
+    "evidence_hash": "sha256:243eb021033a20ed1de46ef0e86acbaac04442ce4b67193c4189c23c851f7ce6",
+    "import_plan_hash": null,
+    "dry_run_report": "k3g-monitoring-iac/reports/pilot-device-compliance/approvals/pending/dry-run-c9363dfb.md"
+  },
+  "future_staging": {
+    "dry_run_id": null,
+    "dry_run_status": null,
+    "dry_run_passed_at": null,
+    "applied_at": null,
+    "applied_by": null,
+    "staged_import_id": null,
+    "deployment_timestamp": null
+  },
+  "metadata": {
+    "version": "1.0",
+    "source": "ImportPlan",
+    "priority": "normal",
+    "requires_2fa": false,
+    "requires_2_approvers": false,
+    "sla_hours": 24,
+    "ttl_days": 90
+  },
+  "state_history": [
+    {
+      "from": "proposed",
+      "to": "approved",
+      "by": "pilot-tester",
+      "at": "2026-04-28T10:42:22.771778+00:00",
+      "tool_version": "1.0",
+      "reason": "Aprovado para validação de fluxo FASE 1.7"
+    },
+    {
+      "from": "approved",
+      "to": "dry_run_passed",
+      "by": "dry-run-validator",
+      "at": "2026-04-28T10:42:39.152061+00:00",
+      "tool_version": "1.0",
+      "reason": "k3g-monitoring-iac/reports/pilot-device-compliance/approvals/pending/dry-run-c9363dfb.md"
+    }
+  ]
+}

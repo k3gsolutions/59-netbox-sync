@@ -161,6 +161,41 @@ python3 tools/local/dry_run_netbox_payload.py \
 
 **Output:** Dry-run report em `approvals/pending/dry-run-*.md`
 
+### manage_approval_state.py
+
+Gerenciar transição de estado de ApprovalRecord (local, sem API).
+
+```bash
+# Aprovar
+python3 tools/local/manage_approval_state.py approve \
+  --approval approvals/pending/approval-*.json \
+  --by "nome-operador" \
+  --comment "Aprovado"
+
+# Rejeitar
+python3 tools/local/manage_approval_state.py reject \
+  --approval approvals/pending/approval-*.json \
+  --by "nome-operador" \
+  --reason "Motivo rejeição"
+
+# Solicitar mudanças
+python3 tools/local/manage_approval_state.py request-changes \
+  --approval approvals/pending/approval-*.json \
+  --by "nome-operador" \
+  --reason "Motivo mudanças"
+
+# Marcar dry-run como passado
+python3 tools/local/manage_approval_state.py mark-dry-run-passed \
+  --approval approvals/approved/approval-*.json \
+  --by "nome-operador" \
+  --dry-run-report approvals/pending/dry-run-*.md
+```
+
+**Output:**
+- Move arquivo entre approvals/{pending,approved,rejected,changes_requested}/
+- Atualiza status, reviewed_by, state_history
+- Cria backup automático
+
 ## Integração CI
 
 Futuro: rodar `archive_compliance_report.py` após cada `/compliance/analyze/report`.

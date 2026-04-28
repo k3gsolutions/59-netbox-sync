@@ -106,7 +106,25 @@
 - Arquivo: reports/pilot-device-compliance/approvals/pending/PILOT-FASE-1-6-RESULT.md
 - Workflow completo: create_approval_record → render_approval_summary → dry_run_netbox_payload
 
-### Planned (FASE 1.7+)
+### Completed — FASE 1.7
+
+**Approval State Management (Local)**
+- Script `tools/local/manage_approval_state.py` com 4 comandos
+- Comando approve: proposed → approved (com validação strict)
+- Comando reject: proposed → rejected
+- Comando request-changes: proposed → changes_requested
+- Comando mark-dry-run-passed: approved → dry_run_passed
+- State machine com transições válidas
+- File movement automático: pending/ → approved/ / rejected/ / changes_requested/
+- state_history append-only audit trail (from/to/by/at/reason/tool_version)
+- Backup automático antes de cada save
+- Validações rigorosas: action, naming_compliant, confidence, forbidden patterns
+- Documentação: `docs/26-approval-state-management.md`
+- Testes completos: approve, reject, request-changes, mark-dry-run-passed
+- Piloto c9363dfb: proposed → approved → dry_run_passed (PASSOU)
+- Zero API calls, zero NetBox writes, zero secrets
+
+### Planned (FASE 1.7.1+)
 - `/compliance/approve` endpoint com state management
 - Batch generation script para ApprovalRecords
 - CI integration para gerar approvals automaticamente

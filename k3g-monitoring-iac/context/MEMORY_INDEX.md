@@ -1,5 +1,5 @@
 # Memory Index
-Gerado em: 2026-04-28 10:32:26 UTC
+Gerado em: 2026-04-28 10:45:03 UTC
 ## Arquivos de contexto
 | Arquivo | Finalidade provável |
 | --- | --- |
@@ -8,9 +8,9 @@ Gerado em: 2026-04-28 10:32:26 UTC
 | ROADMAP.md | Planejamento faseado |
 | PHASE0_BASELINE.md | Checklist operacional da fase |
 | AGENTS.md | Regras de atuação para agentes de IA |
-| context/CURRENT_STATE.md | Current State — FASE 1.5 (Complete) |
+| context/CURRENT_STATE.md | Current State — FASE 1.7 (State Management Complete) |
 | context/GLOSSARY.md | GLOSSARY |
-| context/NEXT_ACTIONS.md | Next Actions — Roadmap |
+| context/NEXT_ACTIONS.md | Next Actions — FASE 1.7+ |
 | context/OPEN_QUESTIONS.md | OPEN_QUESTIONS |
 | context/PHASE_1_ROADMAP.md | FASE 1 Roadmap — Report Tooling |
 | context/SYSTEM_MAP.md | SYSTEM_MAP |
@@ -44,6 +44,7 @@ Gerado em: 2026-04-28 10:32:26 UTC
 | docs/23-approval-workflow-design.md | Approval Workflow Design — FASE 1.4 |
 | docs/24-approval-record-schema.md | ApprovalRecord Schema — FASE 1.4 |
 | docs/25-approval-dry-run.md | Approval Dry-Run — FASE 1.5 |
+| docs/26-approval-state-management.md | Approval State Management — FASE 1.7 |
 | docs/FASE_0_8_1_NETBOX_DEEP_MAPPING.md | Objetivo |
 | docs/adr/0001-netbox-as-single-sot.md | ADR 0001 — NetBox como single source of truth técnico |
 | docs/adr/0002-n8n-as-orchestrator.md | ADR 0002 — N8N como orquestrador principal |
@@ -119,9 +120,9 @@ Gerado em: 2026-04-28 10:32:26 UTC
 ## Índice detalhado (auto)
 | Arquivo | Título | Seções (H2) | Linhas |
 | --- | --- | --- | --- |
-| context/CURRENT_STATE.md | Current State — FASE 1.6 (Pilot Complete) | Completed; In Progress; Blocked; Known Limitations; Metrics | 186 |
+| context/CURRENT_STATE.md | Current State — FASE 1.7 (State Management Complete) | Completed; In Progress; Blocked; Known Limitations; Metrics | 198 |
 | context/GLOSSARY.md | GLOSSARY | - | 12 |
-| context/NEXT_ACTIONS.md | Next Actions — FASE 1.7+ | FASE 1.6 Complete ✅; FASE 1.7 — `/compliance/approve` Endpoint; FASE 1.7.1 — Batch Generation Script; FASE 1.8 — CI Integration; FASE 1.9 — Web UI (Basic) | 177 |
+| context/NEXT_ACTIONS.md | Next Actions — FASE 1.7+ | FASE 1.6 Complete ✅; FASE 1.7 Complete ✅; FASE 1.7.1 — `/compliance/approve` HTTP Endpoint; FASE 1.7.1 — Batch Generation Script; FASE 1.8 — CI Integration | 170 |
 | context/OPEN_QUESTIONS.md | OPEN_QUESTIONS | - | 20 |
 | context/PHASE_1_ROADMAP.md | FASE 1 Roadmap — Report Tooling | FASE 1.0 ✅ Core Analysis; FASE 1.1 ✅ Report History; FASE 1.2 ✅ Report Comparison & Cleanup; FASE 1.3 ✅ ImportPlan Read-Only; FASE 1.4 Web UI Prototype | 103 |
 | context/SYSTEM_MAP.md | SYSTEM_MAP | - | 29 |
@@ -151,6 +152,7 @@ Gerado em: 2026-04-28 10:32:26 UTC
 | docs/23-approval-workflow-design.md | Approval Workflow Design — FASE 1.4 | 1. Princípio; 2. Objetivo; 3. Estados da proposta; 4. Ações permitidas; 5. Campos mínimos do ApprovalRecord | 398 |
 | docs/24-approval-record-schema.md | ApprovalRecord Schema — FASE 1.4 | Modelo JSON completo; Estrutura por seção; Exemplos; Campos obrigatórios; Campos PROIBIDOS | 529 |
 | docs/25-approval-dry-run.md | Approval Dry-Run — FASE 1.5 | Visão geral; Ferramenta 1: create_approval_record.py; Ferramenta 2: render_approval_summary.py; 1. Proposta; 2. Evidência | 364 |
+| docs/26-approval-state-management.md | Approval State Management — FASE 1.7 | Estados e Transições; Movimentação de Arquivos; Script: manage_approval_state.py; Estrutura de ApprovalRecord; Validações | 318 |
 | docs/FASE_0_8_1_NETBOX_DEEP_MAPPING.md | Fase 0 8 1 Netbox Deep Mapping | Objetivo; Componentes coletados; Core obrigatório; Plugin BGP; Limitações atuais | 30 |
 | docs/adr/0001-netbox-as-single-sot.md | ADR 0001 — NetBox como single source of truth técnico | Status; Contexto; Decisão; Consequências; Referências | 19 |
 | docs/adr/0002-n8n-as-orchestrator.md | ADR 0002 — N8N como orquestrador principal | Status; Contexto; Decisão; Consequências; Referências | 19 |

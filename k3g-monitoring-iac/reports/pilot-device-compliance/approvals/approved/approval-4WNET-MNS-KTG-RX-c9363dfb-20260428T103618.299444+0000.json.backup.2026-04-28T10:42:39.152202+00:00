@@ -21,11 +21,11 @@
     "status": "up"
   },
   "review": {
-    "status": "proposed",
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "decision": null,
-    "comment": null,
+    "status": "approved",
+    "reviewed_by": "pilot-tester",
+    "reviewed_at": "2026-04-28T10:42:22.771415+00:00",
+    "decision": "approve",
+    "comment": "Aprovado para validação de fluxo FASE 1.7",
     "changes_requested": [],
     "expected_netbox_payload": null
   },
@@ -55,5 +55,15 @@
     "requires_2_approvers": false,
     "sla_hours": 24,
     "ttl_days": 90
-  }
+  },
+  "state_history": [
+    {
+      "from": "proposed",
+      "to": "approved",
+      "by": "pilot-tester",
+      "at": "2026-04-28T10:42:22.771778+00:00",
+      "tool_version": "1.0",
+      "reason": "Aprovado para validação de fluxo FASE 1.7"
+    }
+  ]
 }

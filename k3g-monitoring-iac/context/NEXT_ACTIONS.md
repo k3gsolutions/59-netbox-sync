@@ -14,14 +14,29 @@ Arquivo: `reports/pilot-device-compliance/approvals/pending/PILOT-FASE-1-6-RESUL
 
 ---
 
-## FASE 1.7 — `/compliance/approve` Endpoint
+## FASE 1.7 Complete ✅
+
+**Estado Management implementado:**
+- Script manage_approval_state.py com 4 comandos
+- State machine: proposed → approved/rejected/changes_requested
+- File movement automático entre approvals/{pending,approved,rejected,changes_requested}/
+- state_history imutável com audit trail (from/to/by/at/reason)
+- Backup automático antes de cada save
+- Validações rigorosas para approve (action, naming, confidence)
+- Testes completos: approve, reject, request-changes, mark-dry-run-passed
+- Documentação: docs/26-approval-state-management.md
+- Piloto FASE 1.6 atualizado: c9363dfb em approved/ com status=dry_run_passed
+
+---
+
+## FASE 1.7.1 — `/compliance/approve` HTTP Endpoint
 
 ### Objective
-Implementar endpoint para aceitar decisões de aprovação, com state management local.
+Expor state management via HTTP endpoint para integração com UIs/workflows.
 
 ### Tasks
 
-**1. Create `/compliance/approve` endpoint**
+**1. Create `/compliance/approve` endpoint (netops_netbox_sync)**
 - POST /compliance/approve
 - Request body:
   ```json
@@ -33,40 +48,18 @@ Implementar endpoint para aceitar decisões de aprovação, com state management
   }
   ```
 - Response: ApprovalRecord com status atualizado
+- Call manage_approval_state.py via subprocess
 - No NetBox writes
-- Move arquivo de pending/ para approved/ ou rejected/
 - Return status (proposed → approved) e próximo passo
 
-**2. ApprovalRecord state machine**
-- proposed → approved (via /compliance/approve + decision=approve)
-- proposed → rejected (via /compliance/approve + decision=reject)
-- proposed → needs_review (via /compliance/approve + decision=request_changes)
-- Validação: apenas decision approve move para approved/
-- Auditoria: reviewed_by, reviewed_at, decision, comment
-
-**3. Directory structure**
-```
-reports/pilot-device-compliance/approvals/
-├── pending/
-│   ├── approval-*.json
-│   ├── approval-summary.md
-│   └── dry-run-*.md
-├── approved/
-│   └── approval-*.json (moved after approval)
-├── rejected/
-│   └── approval-*.json (moved after rejection)
-└── applied/
-    └── approval-*.json (moved after staged import execution, FASE 1.8)
-```
-
-**4. Tests**
+**2. Tests**
 - POST /compliance/approve with valid approval_id → 200
 - Move file to approved/ on decision=approve
-- Keep file in pending/ on decision=request_changes
-- Update review.status = "approved" | "rejected" | "needs_review"
-- Validation: reject if approval_id not found
+- Return updated ApprovalRecord
+- Validation: reject if approval_id not found, decision invalid
+- Ensure state_history recorded correctly
 
-**5. Security**
+**3. Security**
 - No write tokens used
 - No NetBox API calls
 - Audit trail: reviewed_by + timestamp + comment
