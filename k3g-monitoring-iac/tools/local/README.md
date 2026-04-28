@@ -364,8 +364,38 @@ NETBOX_WRITE_TOKEN="..." python3 tools/local/apply_batch_staged_netbox_objects.p
 - Relatório em approvals/applied/batch-apply-result-<batch_id>.md
 - Exit code 0 = sucesso, 1 = falha
 
+### analyze_service_candidate_readiness.py
+
+Analisar readiness de service candidates (read-only, FASE 2.4).
+
+```bash
+python3 tools/local/analyze_service_candidate_readiness.py \
+  --import-plan reports/pilot-device-compliance/import-plan-4WNET.md \
+  --output reports/pilot-device-compliance/service-candidate-readiness.md \
+  --device 4WNET-MNS-KTG-RX
+```
+
+Classificações:
+- ready_for_review: pronto para enriquecimento/aprovação
+- missing_metadata: faltam campos obrigatórios
+- naming_failed: naming convention inválido
+- ambiguous: múltiplas interpretações
+- blocked: impossível prosseguir
+- ignored: não é service candidate
+
+Output: Markdown com tabelas e resumo
+
+**Validações:**
+- object_type: interface, bgp_peer, ip_address
+- campos obrigatórios por tipo
+- base_inventory excluded (ignored)
+- nenhuma API write
+- nenhum token write
+- nenhum equipamento
+
 ## Integração CI
 
 Futuro: rodar `archive_compliance_report.py` após cada `/compliance/analyze/report`.
 
 Integração com approval: rodar scripts acima antes de staged import real (FASE 2.0).
+Integração com batch: rodar `build_batch_staged_apply_plan.py` → `validate_batch_staged_apply_plan.py` → `apply_batch_staged_netbox_objects.py`.
