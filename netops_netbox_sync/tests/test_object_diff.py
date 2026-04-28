@@ -60,16 +60,60 @@ def test_interface_description_mismatch():
     assert any(d.object_key == "eth0" for d in divergences)
 
 
-def test_description_non_compliant():
+def test_description_non_compliant_service_interface():
+    """Service interfaces must follow naming convention."""
     applied = DeviceInventory(
-        interfaces=[InterfaceModel(name="eth0", description="not-compliant description")],
+        interfaces=[InterfaceModel(name="Eth-Trunk0.1580", description="not-compliant description")],
     )
-    netbox = NetBoxInventory(device=NetBoxDevice(), interfaces=[NetBoxInterface(name="eth0", description="not-compliant description")])
+    netbox = NetBoxInventory(device=NetBoxDevice(), interfaces=[NetBoxInterface(name="Eth-Trunk0.1580", description="not-compliant description")])
 
     divergences = build_object_diff(applied, netbox)
 
     assert any(d.code == "DESCRIPTION_NON_COMPLIANT" for d in divergences)
     assert any(d.preferred_action == "fix_device" for d in divergences)
+
+
+def test_base_interface_no_description_non_compliant():
+    """Base inventory interfaces should NOT trigger DESCRIPTION_NON_COMPLIANT."""
+    test_cases = [
+        ("Eth-Trunk0", "some description"),
+        ("GigabitEthernet0/5/0", "not-compliant"),
+        ("Ethernet0/0/0", "any text"),
+        ("Management", "mgmt interface"),
+        ("10GE0/0/1", "ten gig"),
+    ]
+
+    for iface_name, description in test_cases:
+        applied = DeviceInventory(
+            interfaces=[InterfaceModel(name=iface_name, description=description)],
+        )
+        netbox = NetBoxInventory(
+            device=NetBoxDevice(),
+            interfaces=[NetBoxInterface(name=iface_name, description=description)]
+        )
+
+        divergences = build_object_diff(applied, netbox)
+
+        # Should NOT have DESCRIPTION_NON_COMPLIANT for base interfaces
+        assert not any(d.code == "DESCRIPTION_NON_COMPLIANT" for d in divergences), \
+            f"Base interface {iface_name} should not trigger DESCRIPTION_NON_COMPLIANT"
+
+
+def test_base_interface_still_detects_mismatch():
+    """Base interfaces should still detect description mismatch (review only)."""
+    applied = DeviceInventory(
+        interfaces=[InterfaceModel(name="Eth-Trunk0", description="desc-a")],
+    )
+    netbox = NetBoxInventory(
+        device=NetBoxDevice(),
+        interfaces=[NetBoxInterface(name="Eth-Trunk0", description="desc-b")]
+    )
+
+    divergences = build_object_diff(applied, netbox)
+
+    # Should have MISMATCH but NOT DESCRIPTION_NON_COMPLIANT
+    assert any(d.code == "INTERFACE_DESCRIPTION_MISMATCH" for d in divergences)
+    assert not any(d.code == "DESCRIPTION_NON_COMPLIANT" for d in divergences)
 
 
 def test_ip_missing_in_netbox():

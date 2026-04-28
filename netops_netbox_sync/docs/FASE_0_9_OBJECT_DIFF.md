@@ -11,6 +11,35 @@ Comparar apenas os seguintes objetos:
 - VLANs por `vid`
 - Sessões BGP por `remote_address` / `peer_ip` + `address_family`
 
+## Discriminação: Base Inventory vs Service Interfaces
+
+### Base Inventory Interfaces
+Não exigem `DESCRIPTION_NON_COMPLIANT` validation:
+- Eth-Trunk0, Eth-Trunk1, etc (LAG)
+- GigabitEthernet0/0/0, Ethernet0/0/0, etc (physical)
+- 10GE, 25GE, 40GE, 100GE (high-speed)
+- Management, mgmt, mgt (management)
+- LoopBack0, LoopBack1 (loopback inventory)
+- ae0, bundle-ether0 (Juniper/other LAG)
+
+Regra: Se interface é base inventory, não gera `DESCRIPTION_NON_COMPLIANT` mesmo que description não siga padrão.
+Pode gerar `INTERFACE_DESCRIPTION_MISMATCH` se houver divergência com NetBox (action: review).
+
+### Service Candidate Interfaces
+Exigem `DESCRIPTION_NON_COMPLIANT` validation:
+- Subinterfaces com dot: Eth-Trunk0.1580 (válida se base.vlan_id padrão)
+- Interfaces com keywords: "customer", "operator", "service", "vpn", etc
+- Interfaces com IP/VRF/VLAN aplicado
+- Qualquer interface com dot que não siga padrão base.number
+
+Regra: Se interface é service, description deve seguir SERVICE_SLUG_PATTERN:
+```
+^(customer-internet|customer-l2vpn|customer-l3vpn|customer-transport|carrier-transit|carrier-peering|
+  ix-public|cdn-cache|infra-backbone|infra-management):[a-z0-9-]{2,32}:NB-[0-9]+(:[\w-]+)?$
+```
+
+Caso contrário, gera `DESCRIPTION_NON_COMPLIANT` com action: fix_device.
+
 ## Limitações
 - Não compara `route-policies` profundamente.
 - Não compara `prefix-lists` linha a linha.

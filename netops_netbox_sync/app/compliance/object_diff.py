@@ -32,6 +32,44 @@ def is_compliant_service_slug(description: Optional[str]) -> bool:
     return bool(SERVICE_SLUG_PATTERN.match(description.strip()))
 
 
+def _is_base_interface_name(interface_name: str) -> bool:
+    """Check if interface is base infrastructure (not subinterface/service).
+
+    Base interfaces:
+    - Physical interfaces: Ethernet, GigabitEthernet, 10GE, 100GE, etc
+    - LAGs: Eth-Trunk, ae, bundle-ether
+    - Management: Management, mgmt, mgt
+    - Loopback: LoopBack (only as pure inventory, not service)
+
+    NOT base:
+    - Subinterfaces (contain dot): Eth-Trunk0.1580
+    - Virtual: Vlan, irb, etc (service-oriented)
+    - NULL/NULL0 (ignored)
+    """
+    if not interface_name:
+        return False
+
+    # Exclude subinterfaces (contain dot)
+    if "." in interface_name:
+        return False
+
+    # Exclude virtual service interfaces
+    if re.match(r"^(Vlan|Virtual|irb|lo\d|null|NULL)", interface_name, re.IGNORECASE):
+        return False
+
+    # Include base physical/management
+    # Patterns: Eth-Trunk0, GigabitEthernet0/0/0, Ethernet0/0/0, etc
+    base_patterns = [
+        r"^(Eth-Trunk|Ethernet|GigabitEthernet|FastEthernet|TenGigabitEthernet)",
+        r"^(10GE|25GE|40GE|100GE)",
+        r"^(ae|bundle-ether)",
+        r"^(Management|mgmt|mgt)",
+        r"^LoopBack\d+$",  # LoopBack only if pure inventory (bare number)
+    ]
+
+    return any(re.match(pattern, interface_name, re.IGNORECASE) for pattern in base_patterns)
+
+
 def _normalize_string(value: Optional[str]) -> str:
     return (value or "").strip()
 
@@ -208,7 +246,10 @@ def build_object_diff(
                         object_key=name,
                     )
                 )
-            if applied_iface.description and not is_compliant_service_slug(applied_iface.description):
+            # DESCRIPTION_NON_COMPLIANT only for service interfaces, not base inventory
+            if (applied_iface.description and
+                not is_compliant_service_slug(applied_iface.description) and
+                not _is_base_interface_name(name)):
                 divergences.append(
                     _build_divergence(
                         code="DESCRIPTION_NON_COMPLIANT",
