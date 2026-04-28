@@ -207,11 +207,52 @@
 - Validações: 11 critérios agora incluem tag check
 - Mensagem clara: "Create missing tags in NetBox or execute future controlled tag bootstrap phase"
 
-### Planned (FASE 2.1+)
-- Batch apply (múltiplos objetos com gatekeeping)
+### Added — FASE 2.0
+- Primeiro staged apply real executado no NetBox
+- Approval ID: `c9363dfb`
+- Objeto: `Eth-Trunk0`
+- Método: `POST`
+- Resultado: `201 Created`
+- NetBox object ID: `18228`
+- Escopo: 1 objeto
+- Nenhum `PATCH`
+- Nenhum `DELETE`
+- Nenhum `/sync`
+- Nenhuma configuração em equipamento
+- Token não exposto
+- Tags verificadas antes do POST
+- Relatório `apply-result` gerado
+- Compliance pós-apply gerado
+- Comparação antes/depois gerada
+
+### Planned — FASE 2.2 (Design)
+- ✅ Documentação: docs/31-controlled-batch-staged-apply.md (design e gates)
+- ✅ Documentação: docs/32-batch-apply-runbook.md (runbook operacional)
+- Batch limitado a máximo 3 objetos
+- Somente base_inventory interfaces
+- All-or-none preflight
+- Item-by-item execution
+- Estados do lote: planned, preflight_passed, apply_started, applied, partial_failed, blocked
+- Gates por item e por lote definidos (15+ critérios)
+- Zero código de escrita em FASE 2.2 (design only)
+- Zero API calls (design only)
+
+### Planned — FASE 2.3 (Implementação)
+- Script: tools/local/build_batch_staged_apply_plan.py
+- Script: tools/local/validate_batch_staged_apply_plan.py
+- Script: tools/local/render_batch_staged_apply_plan.py
+- Script: tools/local/apply_batch_staged_netbox_objects.py
+- Batch apply com 2-3 interfaces base_inventory
+- Dry-run test
+- Real write test (com verificação de tags)
+- Compliance pós-batch gerado
+- Comparação antes/depois gerada
+
+### Planned (FASE 2.4+)
 - `/compliance/approve` endpoint com state management
 - CI integration para gerar approvals automaticamente
 - Web UI básica para revisão
+- Service candidate batch readiness (sem escrita)
 - Trend analysis & alertas
 - Scheduled apply (time-based execution)
 

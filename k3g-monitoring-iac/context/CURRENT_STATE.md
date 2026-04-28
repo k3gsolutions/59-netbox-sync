@@ -158,11 +158,25 @@
 - ✅ Tested in dry-run: script validates, generates result report, no write
 - ✅ Token not exposed: verified approval_id validation works
 - ✅ Documentation: docs/30-first-staged-netbox-write.md
-- ✅ Ready for authorized real write (requires NETBOX_WRITE_TOKEN + --confirm-real-write)
+- ✅ First staged apply real executed: Approval ID c9363dfb, object Eth-Trunk0, method POST, result 201 Created, NetBox object ID 18228, scope 1 object
+- ✅ Tags verified before POST
+- ✅ Compliance pós-apply generated
+- ✅ Correção base/service aplicada no netops_netbox_sync
+- ✅ Total de divergências pós-ajuste: 161
+- ✅ Eth-Trunk0 não aparece mais como INTERFACE_MISSING_IN_NETBOX
+- ✅ Eth-Trunk0 não aparece mais como DESCRIPTION_NON_COMPLIANT
+- ✅ Eth-Trunk0 aparece apenas como INTERFACE_DESCRIPTION_MISMATCH (ação review)
+- ✅ Next recommended: FASE 2.2 — política para múltiplos staged applies em lote controlado, ainda limitado a base_inventory
 
 ## In Progress
 
-None
+### FASE 2.2 — Controlled Batch Staged Apply Design
+- ✅ docs/31-controlled-batch-staged-apply.md created
+- ✅ docs/32-batch-apply-runbook.md created
+- Design phase: gates, policies, states
+- Zero code implementation (design only)
+- Zero API calls
+- Ready for FASE 2.3 implementation
 
 ## Blocked
 
@@ -213,10 +227,24 @@ POST /compliance/import-plan/report (FASE 1.3)
 - cleanup_compliance_history.py — Retention policy (keep-days + keep-count)
 - export_compliance_csv.py — CSV export with optional metadata
 
-**Approval Workflow (FASE 1.5):**
+**Approval Workflow (FASE 1.5-1.7):**
 - create_approval_record.py — Generate ApprovalRecord JSON locally
 - render_approval_summary.py — Markdown review checklist with risk assessment
 - dry_run_netbox_payload.py — Validate NetBox payload schema without writes
+- manage_approval_state.py — Approve/reject/mark-dry-run-passed
+
+**Staged Apply (FASE 1.9-2.0):**
+- build_staged_apply_plan.py — Generate ApplyPlan from ApprovalRecord
+- validate_staged_apply_plan.py — Validate ApplyPlan against 13 checks
+- render_staged_apply_plan.py — Render ApplyPlan as Markdown
+- simulate_staged_apply.py — Simulate staged apply result (no API)
+- apply_staged_netbox_object.py — First real NetBox write (POST interface, dry-run by default)
+
+**Batch Staged Apply (FASE 2.2-2.3, planned):**
+- build_batch_staged_apply_plan.py — Generate BatchApplyPlan from multiple ApplyPlans
+- validate_batch_staged_apply_plan.py — Validate BatchApplyPlan against gates
+- render_batch_staged_apply_plan.py — Render BatchApplyPlan as Markdown
+- apply_batch_staged_netbox_objects.py — Execute batch staged apply (max 3 items)
 
 **Documentation & Validation:**
 - check_docs_links.py — Validate all documentation links
@@ -224,17 +252,30 @@ POST /compliance/import-plan/report (FASE 1.3)
 - generate_phase_report.py — Generate phase completion report
 - summarize_repo.py — Summarize repository structure
 
-## Next Phase (FASE 1.7)
+## Next Phase (FASE 2.2 — Design) → FASE 2.3 (Impl)
 
-- Implement `/compliance/approve` endpoint (approval state management, no writes)
-  - Accept approval_id in request body
-  - Accept decision (approve, reject, request_changes)
-  - Move ApprovalRecord to approvals/approved/ or /rejected/
-  - Return status and next_step
-  - Zero NetBox writes
-- CI integration para arquivar ImportPlans automaticamente
-- Gerar ApprovalRecords em lote (batch generation script)
-- Web UI básica para visualizar approvals/pending/ e renderizar approval-summary.md
-- Staged import real com execution de aprovações (com token write separado, FASE 1.8)
+### FASE 2.2 — Controlled Batch Staged Apply Design
+- ✅ docs/31-controlled-batch-staged-apply.md
+- ✅ docs/32-batch-apply-runbook.md
+- Gates and policies defined
+- Zero code (design only)
+
+### FASE 2.3 — Controlled Batch Staged Apply Implementation
+- build_batch_staged_apply_plan.py
+- validate_batch_staged_apply_plan.py
+- render_batch_staged_apply_plan.py
+- apply_batch_staged_netbox_objects.py
+- Pilot: 2-3 interfaces base_inventory
+- Dry-run tests
+- Real write tests
+- Compliance pós-batch
+- Comparação antes/depois
+
+### FASE 2.4+ — Future Directions
+- `/compliance/approve` endpoint (approval state management, no writes)
+- Service candidate batch readiness (sem escrita)
+- CI integration para gerar approvals automaticamente
+- Web UI básica para visualizar approvals/pending/
 - Trend analysis & alertas baseado em histórico
 - Audit log persistence com immutability guarantees
+- Scheduled apply (time-based execution)
