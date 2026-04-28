@@ -29,9 +29,61 @@ Arquivo: `reports/pilot-device-compliance/approvals/pending/PILOT-FASE-1-6-RESUL
 
 ---
 
-## FASE 1.7.1 — `/compliance/approve` HTTP Endpoint
+## FASE 1.8 Complete ✅
+
+**Staged Apply Design documentado:**
+- docs/27-staged-apply-design.md (segurança, objetos permitidos, design futuro)
+- docs/28-staged-apply-contract.md (contratos, schemas, exemplos)
+- ApplyPlan schema definido
+- StagedPayload format definido
+- Error/blocking codes definidos
+- Dry-run requirements claros
+- Audit trail design
+
+---
+
+## FASE 1.9 — Staged Apply Dry-Run Engine
 
 ### Objective
+Implementar engine local para gerar, validar e simular ApplyPlan.
+
+### Scripts
+
+**1. build_staged_apply_plan.py**
+- Ler ApprovalRecord status=dry_run_passed
+- Validar prerequisites
+- Gerar ApplyPlan com readiness_checks
+- Output: JSON
+
+**2. validate_staged_apply_plan.py**
+- Validar ApplyPlan
+- 14 checks definidos
+- Exit code: 0 (válido) | 1 (bloqueado)
+- Output: validation result JSON
+
+**3. render_staged_apply_plan.py**
+- Renderizar ApplyPlan em Markdown
+- Output: readable summary com bloqueios
+
+**4. simulate_staged_apply.py**
+- Simular resultado de apply
+- Zero API calls
+- Output: simulation result JSON + Markdown
+
+### Testing
+
+- Use pilot c9363dfb (dry_run_passed)
+- Gerar ApplyPlan
+- Validar
+- Renderizar
+- Simular
+- Confirmar: zero API, zero writes, real_apply_enabled=false
+
+---
+
+## FASE 1.7.1 — `/compliance/approve` HTTP Endpoint
+
+### Objective (Futuro, depois FASE 1.9)
 Expor state management via HTTP endpoint para integração com UIs/workflows.
 
 ### Tasks

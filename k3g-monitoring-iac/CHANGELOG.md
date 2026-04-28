@@ -124,7 +124,22 @@
 - Piloto c9363dfb: proposed → approved → dry_run_passed (PASSOU)
 - Zero API calls, zero NetBox writes, zero secrets
 
-### Planned (FASE 1.7.1+)
+### Completed — FASE 1.8
+
+**Staged Apply Design (Design Only, No Implementation)**
+- Documento `docs/27-staged-apply-design.md`: princípios, objetos permitidos/bloqueados, regras segurança
+- Documento `docs/28-staged-apply-contract.md`: contratos de entrada/saída, schemas, exemplos
+- ApplyPlan schema: readiness_checks, write_policy, validation
+- StagedPayload format: com tags staged e custom_fields
+- Error/blocking codes: 11 códigos definidos
+- Dry-run requirements: obrigatório antes de apply futuro
+- Audit trail design: approval_id, applied_by, applied_at, payload_hash, result
+- Objetos permitidos (inicial): interface base_inventory apenas
+- Objetos bloqueados: IP, VRF, VLAN, BGP, UPDATE, DELETE
+- Write policy: real_apply_enabled=false, write_token_provided=false
+- Zero API, zero NetBox writes, design only
+
+### Planned (FASE 1.9+)
 - `/compliance/approve` endpoint com state management
 - Batch generation script para ApprovalRecords
 - CI integration para gerar approvals automaticamente

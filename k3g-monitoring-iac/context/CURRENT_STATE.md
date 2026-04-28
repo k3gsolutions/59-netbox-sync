@@ -1,4 +1,4 @@
-# Current State — FASE 1.7 (State Management Complete)
+# Current State — FASE 1.8 (Design Complete)
 
 ## Completed
 
@@ -117,6 +117,19 @@
 - ✅ Documentation: docs/26-approval-state-management.md
 - ✅ Zero API calls, zero NetBox writes, zero secrets
 - ✅ Pilot approval c9363dfb: proposed → approved → dry_run_passed (PASSED)
+
+### Staged Apply Design (FASE 1.8)
+- ✅ Design documented: docs/27-staged-apply-design.md (objectives, principles, prerequisites)
+- ✅ Objects permitted/blocked clearly defined (interface base_inventory only in FASE 1.9)
+- ✅ Security rules documented (no secrets, no DELETE, no UPDATE of active)
+- ✅ Dry-run requirements specified (mandatory before apply)
+- ✅ Audit trail design: who, when, what, how, result, rollback
+- ✅ Contract documented: docs/28-staged-apply-contract.md
+- ✅ ApplyPlan schema with readiness checks
+- ✅ StagedPayload format with tags and custom_fields
+- ✅ Error/blocking codes defined (APPROVAL_NOT_DRY_RUN_PASSED, etc)
+- ✅ Write policy: real_apply_enabled=false, write_token_provided=false
+- ✅ Zero API, zero NetBox writes, design only
 
 ## In Progress
 
