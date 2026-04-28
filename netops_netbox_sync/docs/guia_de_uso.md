@@ -451,7 +451,60 @@ print(f"Criados: {totals['created']} | Atualizados: {totals['updated']} | Já ex
 
 ---
 
-### 5.3 `POST /netbox/sessions` — Consultar sessões BGP no NetBox
+### 5.3 `POST /compliance/analyze` — Analisar dispositivo em modo read-only
+
+Coleta dados via SSH e retorna um resumo de inventário aplicado sem escrever no NetBox.
+
+```bash
+curl -X POST http://localhost:8888/compliance/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device": {
+      "host": "138.219.128.1",
+      "port": 50022,
+      "username": "keslley",
+      "password": "#100784KyK_"
+    },
+    "device_id": 2647
+  }'
+```
+
+**Resposta:**
+```json
+{
+  "hostname": "device-1",
+  "device_id": 2647,
+  "mode": "read-only",
+  "netbox_loaded": false,
+  "compliance_enabled": false,
+  "applied_summary": {
+    "interfaces": 98,
+    "ip_addresses": 56,
+    "vrfs": 2,
+    "vlans": 23,
+    "bgp_sessions": 57,
+    "route_policies": 139,
+    "prefix_lists": 97,
+    "as_path_filters": 36,
+    "communities": 190,
+    "community_lists": 8
+  },
+  "warnings": [
+    {
+      "code": "NETBOX_NOT_LOADED",
+      "severity": "medium",
+      "message": "NetBox inventory ainda não foi carregado nesta fase."
+    }
+  ],
+  "next_steps": [
+    "Implementar NetBoxInventory read-only.",
+    "Comparar DeviceInventory vs NetBoxInventory.",
+    "Gerar relatório de compliance."
+  ]
+}
+```
+
+### 5.4 `POST /netbox/sessions` — Consultar sessões BGP no NetBox
 
 ```bash
 curl -X POST http://localhost:8888/netbox/sessions \

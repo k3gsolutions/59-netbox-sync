@@ -1,0 +1,7 @@
+
+# Local pilot secrets
+reports/pilot-device-compliance/payload.local.json
+reports/pilot-device-compliance/*payload*.local.json
+reports/pilot-device-compliance/*raw*.json
+.env
+.env.local

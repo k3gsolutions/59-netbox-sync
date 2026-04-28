@@ -1,0 +1,11 @@
+type: object
+title: Tag Taxonomy Schema
+properties:
+  allowed_tags:
+    type: object
+    description: "Mapa de tags permitidas e suas restrições."
+required:
+  - allowed_tags
+additionalProperties: true
+description: >
+  Schema inicial para validar taxonomia de tags. Detalhar conforme evolução.

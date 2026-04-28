@@ -1,0 +1,18 @@
+type: choice
+required: false
+applies_to:
+  - circuit
+  - interface
+  - l2vpn
+choices:
+  - customer-internet
+  - customer-l2vpn
+  - customer-l3vpn
+  - customer-transport
+  - carrier-transit
+  - carrier-peering
+  - ix-public
+  - cdn-cache
+  - infra-backbone
+  - infra-management
+description: "Tipo de serviço usado na taxonomia NetBox/Zabbix/Grafana. Deve ser preenchido quando monitoring_enabled=true."

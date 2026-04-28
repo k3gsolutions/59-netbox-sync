@@ -1,0 +1,7 @@
+type: string
+required: false
+applies_to:
+  - tenant
+  - circuit
+  - l2vpn
+description: "SLA alvo do serviço. Pode ser um valor decimal ou string conforme padrão do projeto."

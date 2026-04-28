@@ -1,0 +1,12 @@
+type: choice
+required: false
+applies_to:
+  - device
+  - circuit
+  - l2vpn
+choices:
+  - platinum
+  - gold
+  - silver
+  - bronze
+description: "Perfil de criticidade para monitoramento e alertas. Deve ser preenchido quando monitoring_enabled=true."

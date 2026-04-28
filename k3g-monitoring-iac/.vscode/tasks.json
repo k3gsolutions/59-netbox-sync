@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Docs: check links",
+      "type": "shell",
+      "command": "python tools/local/check_docs_links.py --root docs --context context",
+      "problemMatcher": []
+    },
+    {
+      "label": "Context: update memory index",
+      "type": "shell",
+      "command": "python tools/local/update_context_index.py --root .",
+      "problemMatcher": []
+    },
+    {
+      "label": "Project: summarize repo",
+      "type": "shell",
+      "command": "python tools/local/summarize_repo.py --root .",
+      "problemMatcher": []
+    },
+    {
+      "label": "Phase: generate report",
+      "type": "shell",
+      "command": "python tools/local/generate_phase_report.py --phase 0 --output context/CURRENT_STATE.md",
+      "problemMatcher": []
+    }
+  ]
+}

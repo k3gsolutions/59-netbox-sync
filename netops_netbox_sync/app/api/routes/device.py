@@ -76,6 +76,8 @@ async def collect_device(req: CollectRequest):
             route_policies=len(inventory.route_policies),
             prefix_lists=len(inventory.prefix_lists),
             as_path_filters=len(inventory.as_path_filters),
+            communities=len(inventory.communities),
+            community_lists=len(inventory.community_lists),
         ),
         bgp_sessions=sessions,
     )

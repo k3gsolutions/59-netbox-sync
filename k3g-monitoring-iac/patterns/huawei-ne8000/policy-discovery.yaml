@@ -1,0 +1,43 @@
+vendor: huawei
+platform: ne8000
+domain: routing-policy
+commands:
+  - display route-policy
+  - display ip ip-prefix
+  - display ip as-path-filter
+  - display current-configuration
+extract:
+  route_policy:
+    fields:
+      name:
+      node:
+      action:
+      if_match:
+      apply:
+  prefix_list:
+    fields:
+      name:
+      index:
+      action:
+      prefix:
+  as_path_filter:
+    fields:
+      name:
+      index:
+      action:
+      regex:
+  community_list:
+    fields:
+      name:
+      action:
+      community:
+dependencies:
+  - prefix_list
+  - as_path_filter
+  - community_list
+  - extcommunity
+divergences:
+  - PREFIX_LIST_MISSING
+  - AS_PATH_FILTER_MISSING
+  - COMMUNITY_LIST_MISSING
+  - ROUTE_POLICY_MISMATCH

@@ -1,0 +1,14 @@
+# Raw payloads with credentials (SSH, NetBox tokens)
+payload*.json
+*raw*.json
+*secret*.json
+*.local.json
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Keep only Markdown reports and index
+# .md files tracked
+# index.json tracked

@@ -1,0 +1,168 @@
+# Local Tools
+
+Scripts Python standard library para compliance report archiving, comparação, limpeza.
+
+## Scripts
+
+### archive_compliance_report.py
+
+Arquivar relatório novo para histórico e atualizar current.
+
+```bash
+python3 tools/local/archive_compliance_report.py \
+  --report <file.md> \
+  --device <DEVICE-NAME> \
+  [--device-id <ID>] \
+  [--root .]
+```
+
+**Args:**
+- `--report` (required) — caminho a relatório .md
+- `--device` (optional) — nome device (auto-detecta de título se omitido)
+- `--device-id` (optional) — ID para index.json
+- `--root` (optional) — diretório raiz (default: .)
+
+**Output:**
+- Arquivo em `history/{DEVICE}/{TIMESTAMP}-compliance-report.md`
+- Atualiza `current/{DEVICE}-compliance-report.md`
+- Atualiza `index.json`
+
+### compare_compliance_reports.py
+
+Comparar dois relatórios, mostrar divergências novas/resolvidas/recorrentes.
+
+```bash
+python3 tools/local/compare_compliance_reports.py \
+  --old <report-antigo.md> \
+  --new <report-novo.md> \
+  --output <comparison.md> \
+  [--device <DEVICE-NAME>]
+```
+
+**Args:**
+- `--old` (required) — relatório anterior
+- `--new` (required) — relatório novo
+- `--output` (optional) — arquivo saída (stdout se omitido)
+- `--device` (optional) — nome device (auto-detecta se omitido)
+
+**Output:**
+- Tabela: evolução por severidade (antes/agora/delta)
+- Tabela: novas divergências
+- Tabela: divergências resolvidas
+- Tabela: divergências recorrentes
+- Comparação baseada em Markdown, sem API real
+
+### cleanup_compliance_history.py
+
+Remover relatórios antigos conforme política de retenção (keep-days + keep-count).
+
+```bash
+python3 tools/local/cleanup_compliance_history.py \
+  [--root .] \
+  [--keep-days 90] \
+  [--keep-count 100] \
+  [--apply]
+```
+
+**Args:**
+- `--root` (optional) — diretório raiz (default: .)
+- `--keep-days` (optional) — manter últimos N dias (default: 90)
+- `--keep-count` (optional) — manter últimas N execuções por device (omit para sem limite)
+- `--apply` (optional) — executar deletion (default: dry-run apenas lista)
+
+**Comportamento:**
+- Dry-run (padrão): lista relatórios que seriam deletados
+- Atualiza `index.json` com novos `reports_count` após deletion
+- Nunca deleta `current/`, `comparisons/`, `index.json`
+
+### export_compliance_csv.py
+
+Exportar histórico em CSV para análise, BI tools, Grafana.
+
+```bash
+python3 tools/local/export_compliance_csv.py \
+  [--root .] \
+  [--output compliance-history.csv] \
+  [--include-metadata]
+```
+
+**Args:**
+- `--root` (optional) — diretório raiz (default: .)
+- `--output` (optional) — arquivo saída (default: compliance-history.csv)
+- `--include-metadata` (optional) — incluir total_divergences, highest_severity, status, netbox_loaded
+
+**Output CSV:**
+- `device` — device name
+- `device_id` — NetBox ID
+- `last_report` — timestamp ISO8601
+- `reports_count` — número de execuções
+- (se --include-metadata) `total_divergences`, `highest_severity`, `status`, `netbox_loaded`
+
+## Standard Library Only
+
+Sem dependências externas. Compatível com Python 3.8+.
+
+- `json` — index.json
+- `pathlib` — file ops
+- `re` — parse titles
+- `datetime` — timestamps ISO8601
+- `shutil` — copy files
+- `argparse` — CLI
+
+### create_approval_record.py
+
+Criar ApprovalRecord local a partir de item do ImportPlan.
+
+```bash
+python3 tools/local/create_approval_record.py \
+  --device 4WNET-MNS-KTG-RX \
+  --device-id 123 \
+  --object-type interface \
+  --object-key Eth-Trunk0 \
+  --action safe_create_staged \
+  --code INTERFACE_MISSING_IN_NETBOX \
+  --category base_inventory \
+  --reason "Base interface inventory" \
+  --confidence exact \
+  --naming-compliant \
+  --evidence '{"interface": "Eth-Trunk0", "status": "up"}' \
+  --report-path reports/.../compliance-report.md \
+  --report-timestamp 2026-04-28T09:45:00Z
+```
+
+**Output:** ApprovalRecord JSON em `approvals/pending/`
+
+### render_approval_summary.py
+
+Gerar Markdown resumido de ApprovalRecord para revisão.
+
+```bash
+python3 tools/local/render_approval_summary.py \
+  approval-record.json \
+  --output approval-summary.md
+```
+
+**Output:** Markdown com checklist de aprovação
+
+### dry_run_netbox_payload.py
+
+Validar payload NetBox futuro (sem escrita).
+
+```bash
+python3 tools/local/dry_run_netbox_payload.py \
+  --approval-id abc123 \
+  --device 4WNET-MNS-KTG-RX \
+  --object-type interface \
+  --object-key Eth-Trunk0 \
+  --action safe_create_staged \
+  --evidence '{"status": "up"}' \
+  --category base_inventory
+```
+
+**Output:** Dry-run report em `approvals/pending/dry-run-*.md`
+
+## Integração CI
+
+Futuro: rodar `archive_compliance_report.py` após cada `/compliance/analyze/report`.
+
+Integração com approval: rodar scripts acima antes de staged import real.

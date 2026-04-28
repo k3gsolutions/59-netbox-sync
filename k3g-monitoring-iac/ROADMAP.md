@@ -1,0 +1,152 @@
+# Roadmap — NetBox Sync Compliance
+
+## Vision
+
+Automated, read-only compliance analysis for network devices. Local report history, trend tracking, minimal secrets exposure.
+
+## Timeline
+
+### ✅ FASE 1.0 — Core Read-Only Analysis (2026-04-28)
+
+Device compliance analysis:
+- SSH device collection (HuaweiNE8000)
+- NetBox inventory loading with safe handling
+- Automatic device_id resolution
+- Object-level divergence detection
+- Markdown report generation
+- 58 unit tests, 100% mock
+
+### ✅ FASE 1.1 — Report History & Versioning (2026-04-28)
+
+Local report archiving:
+- Structured directory layout (current/history)
+- ISO8601 timestamps for audit trail
+- index.json with metadata
+- .gitignore to exclude raw JSON credentials
+- archive_compliance_report.py script
+- Documentation & examples
+
+### FASE 1.2 — ImportPlan read-only (Q2 2026)
+
+Gerar plano de enriquecimento do NetBox sem escrever nada.
+- ImportPlan JSON com propostas de ação
+- Relatório Markdown com propostas classificadas
+- Classificação: safe_create_staged / needs_review / blocked / ignore
+- Seção "Revisão humana obrigatória" no relatório
+- Validação de naming convention para propostas
+
+**Critério de aceite:**
+- nenhum write no NetBox
+- objeto fora da naming convention vira needs_review
+- relatório indica por que não pode importar
+
+**Estimated effort:** 2 semanas
+
+### FASE 1.3 — NetBox Staged Import com aprovação humana (Q2-Q3 2026)
+
+Permitir criação staged/planned no NetBox somente para objetos aprovados e conformes.
+- Propostas de importação controladas e auditáveis
+- `safe_create_staged` para casos conformes
+- `needs_review` para objetos sem naming convention ou com dados incompletos
+- `blocked` para casos ambíguos ou perigosos
+- `ignore` para objetos temporários ou fora da política
+- ImportPlan diferencia `base_inventory` vs `service`
+- Interfaces base podem ser `safe_create_staged` sem naming de serviço
+- Interfaces de serviço/subinterfaces só podem ser `safe_create_staged` com naming válido
+- Subinterfaces inválidas viram `needs_review`
+- BGP peers continuam `needs_review`
+- IPs sem associação/naming continuam `needs_review`
+- Escrita futura com token separado e fluxo de aprovação humana
+
+**Critério de aceite:**
+- exige aprovação humana
+- exige dry-run anterior
+- exige token de escrita separado
+- não importa objeto fora da naming convention
+- não sobrescreve objeto existente automaticamente
+- não deleta objetos
+
+**Estimated effort:** 4 semanas
+
+### FASE 1.4 — UI/CLI de aprovação (Q3 2026)
+
+Permitir que humano revise o ImportPlan, aprove/rejeite propostas e baixe relatórios.
+- Lista de propostas com evidências
+- Destaque de naming inválido e problemas de tenant/service_type
+- Aprovação/rejeição de propostas
+- Auditoria de quem aprovou e quando
+- Download de relatório Markdown e JSON sanitizado
+
+**Critério de aceite:**
+- lista propostas
+- mostra evidências
+- destaca naming inválido
+- permite aprovar apenas objetos conformes
+- registra auditoria
+
+**Estimated effort:** 3 semanas
+
+### FASE 1.5 — Advanced Analytics (Q3 2026)
+
+Dashboard & alerts:
+- Compliance scoring (% divergences resolved)
+- Severity trends over time
+- Device comparison
+- Email/Slack alerts for new divergences
+- Scheduled daily/weekly analysis
+- Report scheduling API
+
+**Estimated effort:** 4 semanas
+
+### FASE 2.0 — Multi-Device Sync (Q3-Q4 2026)
+
+Read-write mode (POST /sync):
+- Bulk device collection
+- Recommended fixes to NetBox
+- Device configuration changes (with approval)
+- Multi-device dashboard
+- Backup/rollback procedures
+
+**Estimated effort:** 8 weeks
+
+## Current Status
+
+**FASE 1.2 COMPLETE** ✅
+
+- core analysis working
+- report history structure live
+- ImportPlan read-only implemented
+- local scripts tested
+- documentation complete
+
+**Next:** FASE 1.3 NetBox Staged Import com aprovação humana
+
+## Blockers/Risks
+
+- None current
+- BGP plugin: optional best-effort (marked in warnings)
+- Circuits: availability varies by NetBox version (marked partial)
+
+## Dependencies
+
+- Python 3.8+ (standard library only for local scripts)
+- FastAPI (existing)
+- Pynetbox (existing)
+- Netmiko (existing)
+- No additional dependencies planned for FASE 1.x
+
+## Success Metrics
+
+- [ ] FASE 1.0: 58 tests passing, 100% read-only
+- [ ] FASE 1.1: Archive script tested, no secrets in Git
+- [ ] FASE 1.2: Compare script working, CSV export tested
+- [ ] FASE 1.3: Web UI loads, shows timeline
+- [ ] FASE 1.4: Alerts working, compliance score calculated
+- [ ] FASE 2.0: Sync working on test device, rollback tested
+
+## Notes
+
+- Keep all local scripts in Python standard library (no pip)
+- Maintain read-only compliance through FASE 1.3
+- FASE 2.0 introduces write capability (requires approval workflow)
+- Web UI designed to work without backend changes (read-only data)

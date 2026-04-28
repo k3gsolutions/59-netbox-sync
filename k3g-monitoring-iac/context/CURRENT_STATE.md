@@ -1,0 +1,168 @@
+# Current State — FASE 1.5 (Complete)
+
+## Completed
+
+### Core Functionality (FASE 1.0)
+- ✅ Device compliance analysis (read-only SSH)
+- ✅ NetBox inventory loading with safe int/dict/None handling
+- ✅ Automatic device_id resolution (by name, by IP/primary_ip4)
+- ✅ Object-level divergence detection (INTERFACE_MISSING_IN_NETBOX, etc)
+- ✅ Markdown compliance report generation
+- ✅ 58 unit tests (100% mock, no real calls)
+
+### Report Quality (FASE 1.0.1)
+- ✅ Hostname fallback: inventory → NetBox device.name → driver.host → unknown
+- ✅ Divergences separated: aggregated (§5) vs object-level (§6)
+- ✅ 9 report sections in correct order
+- ✅ Action grouping (fix_netbox, fix_device, review)
+
+### Report History (FASE 1.1)
+- ✅ Directory structure: `reports/pilot-device-compliance/{current,history,comparisons}`
+- ✅ Index.json with metadata (device_id, last_report, reports_count)
+- ✅ ISO8601 timestamps for history tracking
+- ✅ `.gitignore` excludes raw JSON (payload*.json, *raw*.json, *secret*.json)
+- ✅ `archive_compliance_report.py` script (auto-detect device name, archive, update index)
+- ✅ `init_report_structure.py` script (initialize directories)
+- ✅ Documentation: `docs/20-report-history-standard.md`
+- ✅ Tools README with usage examples
+
+### Report Comparison (FASE 1.2)
+- ✅ Directory structure: `reports/pilot-device-compliance/comparisons/`
+- ✅ `compare_compliance_reports.py` script (parse Markdown, identify changes)
+- ✅ Tables: severity evolution, new/resolved/recurring divergences
+- ✅ Parseamento local, sem API real
+- ✅ Documentation updated in README files
+
+### History Maintenance (FASE 1.2.1)
+- ✅ `cleanup_compliance_history.py` script (keep-days + keep-count retention policy)
+- ✅ Dry-run mode (default) and --apply for actual deletion
+- ✅ `export_compliance_csv.py` script (CSV export with optional metadata extraction)
+- ✅ Documentation: `docs/22-compliance-history-maintenance.md`
+- ✅ Tools README updated with complete signatures and examples
+
+### ImportPlan Read-Only (FASE 1.3)
+- ✅ `/compliance/import-plan` implemented
+- ✅ `/compliance/import-plan/report` implemented
+- ✅ ImportPlan classification: `safe_create_staged` / `needs_review` / `blocked` / `ignore`
+- ✅ ImportPlan diferencia `base_inventory` vs `service`
+- ✅ Markdown separa `Base Inventory` e `Service Candidates`
+- ✅ Base Inventory representa inventário físico/lógico base
+- ✅ Service Candidates representa itens que dependem de regra de serviço/naming
+- ✅ Total de itens no ImportPlan: 161
+- ✅ Safe create staged: 59
+- ✅ Needs review: 92
+- ✅ Blocked: 0
+- ✅ Ignored: 10
+- ✅ Interfaces base podem ser `safe_create_staged` sem naming de serviço
+- ✅ Interfaces de serviço/subinterfaces só podem ser `safe_create_staged` com naming válido
+- ✅ Subinterfaces inválidas são `needs_review`
+- ✅ BGP peers continuam `needs_review`
+- ✅ IPs sem associação/naming continuam `needs_review`
+- ✅ Naming inválido nunca vira `safe_create_staged`
+- ✅ Nunca gera delete
+- ✅ Sem escrita no NetBox
+- ✅ Sem `/sync`
+- ✅ Sem alteração em equipamento
+- ✅ ImportPlan real gerado para `4WNET-MNS-KTG-RX`
+- ✅ Netops_netbox_sync tests: 32 passing
+
+### Approval Workflow Design (FASE 1.4)
+- ✅ Approval workflow documented (states, decisions, rules)
+- ✅ ApprovalRecord JSON schema with examples
+- ✅ Base inventory approval rules (relaxed: no tenant/service_type required)
+- ✅ Service candidate approval rules (strict: tenant, service_type, naming required)
+- ✅ Dry-run pattern specified (validation before any write)
+- ✅ Audit log requirements defined
+- ✅ Directory structure created: reports/.../approvals/{pending,approved,rejected,applied}/
+- ✅ Approval review prompt created (reutilizável)
+- ✅ Approval workflow skill documented
+- ✅ Security rules enforced: read-only, no secrets, no deletes
+- ✅ NO implementation of approval logic
+- ✅ NO NetBox writes
+- ✅ NO endpoint apply created
+
+### ApprovalRecord + Dry-run (FASE 1.5)
+- ✅ create_approval_record.py (generates ApprovalRecord JSON locally)
+- ✅ render_approval_summary.py (Markdown review checklist)
+- ✅ dry_run_netbox_payload.py (validates payload without writes)
+- ✅ Approval record validation (blocks secrets, invalid naming, etc)
+- ✅ Dry-run schema validation per object type
+- ✅ Documentation: docs/25-approval-dry-run.md
+- ✅ Evidence hash for auditability
+- ✅ Approval ID + timestamp for tracking
+- ✅ Zero API calls
+- ✅ Zero NetBox writes
+- ✅ Zero secrets in records
+
+## In Progress
+
+None
+
+## Blocked
+
+None
+
+## Known Limitations
+
+- No Web UI yet (placeholder for future FASE 1.2)
+- BGP plugin: best-effort (marked with NETBOX_BGP_PLUGIN_PARTIAL warnings when unavailable)
+- Circuits: marked NETBOX_CIRCUIT_PARTIAL if availability varies
+- Primary IP resolution: may miss some cases if NetBox mapping differs from device
+
+## Metrics
+
+- Code: 7 modified files (analyze_device.py, markdown_compliance.py, schemas_analyze.py, routes/compliance.py, + import_plan.py, reports/import_plan_markdown.py, schemas/import_plan.py)
+- Tests: 90+ passing (netops_netbox_sync: 32 passing import_plan tests)
+- Tests: 0 failures
+- Coverage: core modules tested via mocks, no real API calls
+- Tools: 9 local tools (archive, compare, cleanup, export, create_approval_record, render_approval_summary, dry_run_netbox_payload, check_docs_links, generate_phase_report)
+- Documentation: 25+ docs (from FASE 1.0-1.5)
+- Read-only compliance: 100% (no /sync, no device config, no NetBox writes)
+
+## API Endpoints (Read-only)
+
+```
+POST /compliance/analyze
+  Request: device, device_id?, device_name?, netbox?
+  Response: AnalyzeResult with warnings, divergences, recommendations
+
+POST /compliance/analyze/report
+  Request: same as /compliance/analyze
+  Response: Markdown text/plain (no secrets)
+
+POST /compliance/import-plan (FASE 1.3)
+  Request: device, device_id?, device_name?, netbox?
+  Response: ImportPlan JSON with classifications (safe_create_staged, needs_review, blocked, ignore)
+
+POST /compliance/import-plan/report (FASE 1.3)
+  Request: same as /compliance/import-plan
+  Response: Markdown text/plain with Base Inventory vs Service Candidates separation
+```
+
+## Local Tools (k3g-monitoring-iac/tools/local/)
+
+**Report Management:**
+- archive_compliance_report.py — Archive reports to history, update current/index.json
+- compare_compliance_reports.py — Compare two reports, show new/resolved/recurring divergences
+- cleanup_compliance_history.py — Retention policy (keep-days + keep-count)
+- export_compliance_csv.py — CSV export with optional metadata
+
+**Approval Workflow (FASE 1.5):**
+- create_approval_record.py — Generate ApprovalRecord JSON locally
+- render_approval_summary.py — Markdown review checklist with risk assessment
+- dry_run_netbox_payload.py — Validate NetBox payload schema without writes
+
+**Documentation & Validation:**
+- check_docs_links.py — Validate all documentation links
+- update_context_index.py — Update context/MEMORY_INDEX.md
+- generate_phase_report.py — Generate phase completion report
+- summarize_repo.py — Summarize repository structure
+
+## Next Phase (FASE 1.6)
+
+- Implement `/compliance/approve` endpoint (approval state management, no writes)
+- Web UI para visualizar histórico e timelines
+- CI integration para arquivar relatórios automaticamente
+- Staged import real com execution de aprovações aprovadas (com token write separado)
+- Trend analysis & alertas baseado em histórico
+- Audit log persistence com immutability guarantees

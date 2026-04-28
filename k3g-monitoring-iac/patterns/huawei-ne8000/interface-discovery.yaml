@@ -1,0 +1,31 @@
+vendor: huawei
+platform: ne8000
+domain: interface
+commands:
+  - display current-configuration
+  - display interface description
+  - display interface brief
+  - display ip interface brief
+naming_regex: "<regex oficial>"
+extract:
+  interface_block:
+    start: "^interface\\s+(?P<name>\\S+)"
+    fields:
+      description: "^\\s*description\\s+(?P<description>.+)"
+      vrf: "^\\s*ip binding vpn-instance\\s+(?P<vrf>\\S+)"
+      ipv4: "^\\s*ip address\\s+(?P<ip>\\S+)\\s+(?P<mask>\\S+)"
+      dot1q: "^\\s*vlan-type dot1q\\s+(?P<vlan>\\d+)"
+      mtu: "^\\s*mtu\\s+(?P<mtu>\\d+)"
+      dependencies:
+        - vrf
+        - vlan
+        - ip
+        - netbox_id
+        - tenant_slug
+        - service_type
+        divergences:
+          - DESCRIPTION_NON_COMPLIANT
+          - VRF_MISMATCH
+          - VLAN_MISMATCH
+          - IP_MISMATCH
+          - MTU_MISMATCH

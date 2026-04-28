@@ -18,7 +18,7 @@ from fastapi.security.api_key import APIKeyHeader
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import device, netbox, sync
+from app.api.routes import compliance, device, netbox, sync
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Logging
@@ -126,6 +126,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 app.include_router(device.router)
 app.include_router(netbox.router)
 app.include_router(sync.router)
+app.include_router(compliance.router)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

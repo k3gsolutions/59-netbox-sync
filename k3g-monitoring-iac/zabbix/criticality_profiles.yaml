@@ -1,0 +1,32 @@
+profiles:
+  platinum:
+    poll_interval: 30s
+    trigger_severity: disaster
+    sla_target_pct: 99.99
+    alert_channels:
+      - whatsapp_noc_senior
+      - phone_call
+      - email_engineering
+    escalation_minutes: [0, 5, 15]
+  gold:
+    poll_interval: 60s
+    trigger_severity: high
+    sla_target_pct: 99.95
+    alert_channels:
+      - whatsapp_noc
+      - email_noc
+    escalation_minutes: [0, 15, 60]
+  silver:
+    poll_interval: 120s
+    trigger_severity: average
+    sla_target_pct: 99.5
+    alert_channels:
+      - whatsapp_noc_group
+    escalation_minutes: [0, 60]
+  bronze:
+    poll_interval: 300s
+    trigger_severity: warning
+    sla_target_pct: 99.0
+    alert_channels:
+      - email_noc_batch
+    escalation_minutes: []

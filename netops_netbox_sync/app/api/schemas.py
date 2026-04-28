@@ -2,7 +2,7 @@
 Schemas Pydantic para request e response da API FastAPI.
 """
 from typing import Optional, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -13,7 +13,7 @@ class DeviceParams(BaseModel):
     host:     str = Field(..., description="IP ou hostname do dispositivo")
     port:     int = Field(22, description="Porta SSH")
     username: str = Field(..., description="Usuário SSH")
-    password: str = Field(..., description="Senha SSH")
+    password: SecretStr = Field(..., description="Senha SSH")
 
     model_config = {"json_schema_extra": {
         "example": {

@@ -1,0 +1,32 @@
+roles:
+  pe:
+    templates:
+      - vendor:huawei/base
+      - role:core-routing
+    macros:
+      environment: "{{ environment }}"
+      criticality: "{{ criticality }}"
+  p:
+    templates:
+      - vendor:huawei/base
+      - role:backbone-routing
+    macros:
+      environment: "{{ environment }}"
+  rr:
+    templates:
+      - vendor:huawei/base
+      - role:route-reflector
+    macros:
+      environment: "{{ environment }}"
+  sw-access:
+    templates:
+      - vendor:datacom/base
+      - role:access-switching
+    macros:
+      environment: "{{ environment }}"
+  olt:
+    templates:
+      - vendor:huawei/base
+      - service:ftth-olt
+    macros:
+      environment: "{{ environment }}"

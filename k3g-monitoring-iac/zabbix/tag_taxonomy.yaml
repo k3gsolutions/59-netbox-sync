@@ -1,0 +1,34 @@
+allowed_tags:
+  environment:
+    choices: [prod, staging, lab]
+  tenant:
+    type: slug
+    source: netbox.tenant.slug
+  service_type:
+    source: netbox.custom_fields.service_type
+  criticality:
+    choices: [platinum, gold, silver, bronze]
+  pop:
+    type: slug
+    source: netbox.site.slug
+  device_role:
+    choices: [pe, p, rr, olt, sw-access, sw-core, cgnat, bng, mgmt]
+  vendor:
+    choices: [huawei, juniper, mikrotik, cisco, datacom, raisecom, zte]
+  netbox_id:
+    type: integer
+  circuit_id:
+    type: string
+    max_length: 32
+  alert_class:
+    choices: [service, infra, governance, security]
+  owner:
+    choices: [noc, engineering, backbone, corporativo]
+  compliant:
+    choices: ["true", "false"]
+  vc_id:
+    type: integer
+  asn_remote:
+    type: integer
+  address_family:
+    choices: [ipv4, ipv6]

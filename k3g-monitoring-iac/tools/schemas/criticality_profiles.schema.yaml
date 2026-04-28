@@ -1,0 +1,11 @@
+type: object
+title: Criticality Profiles Schema
+properties:
+  profiles:
+    type: object
+    description: "Configurações por nível de criticidade."
+required:
+  - profiles
+additionalProperties: true
+description: >
+  Schema base para validar `zabbix/criticality_profiles.yaml`.

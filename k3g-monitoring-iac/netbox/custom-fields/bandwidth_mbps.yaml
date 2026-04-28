@@ -1,0 +1,7 @@
+type: integer
+required: false
+applies_to:
+  - interface
+  - circuit
+  - l2vpn
+description: "Largura de banda do serviço em Mbps. Opcional, mas recomendado para serviços monitoráveis."

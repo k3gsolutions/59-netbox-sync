@@ -1,0 +1,14 @@
+{
+  "device": {
+    "host": "104.234.244.255",
+    "port": 51212,
+    "username": "keslley",
+    "password": "#100784KyK_"
+  },
+  "device_id": 1890,
+  "netbox": {
+    "url": "https://docs.k3gsolutions.com.br/",
+    "token": "https://docs.k3gsolutions.com.br/",
+    "verify_ssl": false
+  }
+}

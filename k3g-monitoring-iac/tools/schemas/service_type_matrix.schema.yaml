@@ -1,0 +1,49 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+title: Service Type Dependency Matrix Schema
+type: object
+properties:
+  service_types:
+    type: object
+    patternProperties:
+      "^[a-z0-9_-]+$":
+        type: object
+        properties:
+          description:
+            type: string
+          netbox_objects:
+            type: array
+            items:
+              type: string
+          required_fields:
+            type: array
+            items:
+              type: string
+          device_expectations:
+            type: array
+            items:
+              type: string
+          discovery_dependencies:
+            type: array
+            items:
+              type: string
+          zabbix_tags:
+            type: array
+            items:
+              type: string
+          grafana_dashboards:
+            type: array
+            items:
+              type: string
+          common_divergences:
+            type: array
+            items:
+              type: string
+        required:
+          - description
+          - netbox_objects
+          - required_fields
+          - zabbix_tags
+    additionalProperties: false
+required:
+  - service_types
+additionalProperties: false

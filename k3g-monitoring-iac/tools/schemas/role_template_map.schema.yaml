@@ -1,0 +1,11 @@
+type: object
+title: Role Template Map Schema
+properties:
+  roles:
+    type: object
+    description: "Mapeamento de roles para templates e macros."
+required:
+  - roles
+additionalProperties: true
+description: >
+  Estrutura inicial para validar `zabbix/role_template_map.yaml`.

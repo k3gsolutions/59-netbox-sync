@@ -1,0 +1,9 @@
+type: boolean
+required: true
+default: false
+applies_to:
+  - device
+  - circuit
+  - interface
+  - l2vpn
+description: "Flag de monitoramento. Quando true, o objeto passa a exigir service_type/criticality e outros campos de auditoria."

@@ -1,0 +1,7 @@
+type: string
+required: false
+applies_to:
+  - tenant
+  - circuit
+  - l2vpn
+description: "Perfil de escalonamento usado em caso de alertas. Pode ser um canal ou nome de política de resposta."

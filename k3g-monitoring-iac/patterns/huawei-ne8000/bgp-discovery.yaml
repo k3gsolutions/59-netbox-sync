@@ -1,0 +1,34 @@
+vendor: huawei
+platform: ne8000
+domain: bgp
+commands:
+  - display bgp all summary
+  - display bgp peer verbose
+  - display bgp ipv6 peer verbose
+  - display bgp vpnv4 vpn-instance <vrf> peer verbose
+  - display bgp vpnv6 vpn-instance <vrf> peer verbose
+  - display current-configuration configuration bgp
+extract:
+  peer:
+    fields:
+      remote_address:
+      remote_asn:
+      description:
+      connect_interface:
+      import_policy:
+      export_policy:
+      vrf:
+      address_family:
+dependencies:
+  - vrf
+  - remote_asn
+  - import_policy
+  - export_policy
+  - prefix_list
+  - community_list
+  - as_path_filter
+divergences:
+  - BGP_PEER_MISSING
+  - BGP_ASN_MISMATCH
+  - BGP_AF_MISMATCH
+  - ROUTE_POLICY_MISMATCH

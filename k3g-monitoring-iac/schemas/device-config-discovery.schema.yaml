@@ -1,0 +1,45 @@
+title: Device Config Discovery Standard
+version: 1.0.0
+description: Especifica o padrão de descoberta do estado aplicado nas configurações dos dispositivos de rede.
+
+type: object
+properties:
+  vendor:
+    type: string
+    description: O vendor do equipamento (ex: "huawei").
+  platform:
+    type: string
+    description: A plataforma do dispositivo (ex: "ne8000").
+  domain:
+    type: string
+    description: O domínio de configuração (ex: "interface").
+  commands:
+    type: array
+    items:
+      type: string
+      description: Comandos utilizados para discovery.
+  naming_regex:
+    type: string
+    description: Regex usado para validar nomenclatura de serviços.
+  extract:
+    type: object
+    description: Campos extraídos das configurações.
+  dependencies:
+    type: array
+    items:
+      type: string
+      description: Campos que dependem um do outro na estrutura de configuração.
+  divergences:
+    type: array
+    items:
+      type: string
+      description: Tipos de divergências identificadas durante a validação.
+required:
+  - vendor
+  - platform
+  - domain
+  - commands
+  - naming_regex
+  - extract
+  - dependencies
+  - divergences
