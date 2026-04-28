@@ -1,4 +1,4 @@
-# Current State — FASE 1.9 (Dry-Run Engine Complete)
+# Current State — FASE 2.0 (First Real Write Ready)
 
 ## Completed
 
@@ -145,6 +145,20 @@
 - ✅ Zero API, zero NetBox writes, simulation only
 - ✅ real_apply_enabled=false, write_token_provided=false confirmed
 - ✅ Piloto generated files: apply-plan-c9363dfb-*.json, apply-plan-*.md, apply-simulation-*.md
+
+### First Real NetBox Write (FASE 2.0)
+- ✅ apply_staged_netbox_object.py script created (first real POST to NetBox)
+- ✅ Safety checks: approval_id confirmation, preflight GET, payload validation
+- ✅ Dry-run mode (default): no write, all validations executed
+- ✅ Real write mode (--confirm-real-write): requires NETBOX_WRITE_TOKEN env var
+- ✅ Token handling: env var only (never in args, never in output)
+- ✅ Preflight check: GET /api/dcim/interfaces/ before POST
+- ✅ Abort conditions: object exists, validation fails, token missing, approval_id mismatch
+- ✅ One object at a time policy: script aborts if >1 object in ApplyPlan
+- ✅ Tested in dry-run: script validates, generates result report, no write
+- ✅ Token not exposed: verified approval_id validation works
+- ✅ Documentation: docs/30-first-staged-netbox-write.md
+- ✅ Ready for authorized real write (requires NETBOX_WRITE_TOKEN + --confirm-real-write)
 
 ## In Progress
 

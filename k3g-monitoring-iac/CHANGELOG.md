@@ -170,13 +170,33 @@
 - real_apply_enabled=false, write_token_provided=false confirmados
 - Arquivos gerados em approvals/approved/: apply-plan-*.json, apply-plan-*.md, apply-simulation-*.md
 
-### Planned (FASE 2.0+)
+### Completed — FASE 2.0
+
+**First Real NetBox Write (Staged Apply)**
+- Script `tools/local/apply_staged_netbox_object.py` — primeira escrita real controlada
+  - Dry-run mode (padrão): validações sem escrita
+  - Real write mode: requer --confirm-real-write + NETBOX_WRITE_TOKEN env var
+  - Validações obrigatórias: approval_id, readiness_status=ready, action=safe_create_staged
+  - Preflight GET: verifica se objeto existe antes de POST
+  - Abort conditions: 10 critérios de parada (nenhum token, approval divergente, objeto existe, >1 item, etc)
+  - Payload validation: detecta secrets (password, token, secret, api_key, ssh)
+  - Token security: env var apenas (nunca em args, nunca em output)
+  - One object at a time: aborta se ApplyPlan tem >1 objeto
+  - Resultado: relatório Markdown em approvals/applied/apply-result-*.md
+  - Exit code: 0 (sucesso) / 1 (falha)
+- Documentação: `docs/30-first-staged-netbox-write.md`
+- Teste dry-run com piloto c9363dfb: PASSED (nenhuma escrita real)
+- Pronto para escrita autorizada com NETBOX_WRITE_TOKEN
+- Zero API calls (até --confirm-real-write)
+- Zero NetBox writes (até autorização)
+
+### Planned (FASE 2.1+)
+- Batch apply (múltiplos objetos com gatekeeping)
 - `/compliance/approve` endpoint com state management
-- Batch generation script para ApprovalRecords
 - CI integration para gerar approvals automaticamente
 - Web UI básica para revisão
-- Staged import real com execution (FASE 2.0)
 - Trend analysis & alertas
+- Scheduled apply (time-based execution)
 
 ### Fixed
 

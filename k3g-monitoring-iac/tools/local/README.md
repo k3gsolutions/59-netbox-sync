@@ -243,6 +243,40 @@ python3 tools/local/simulate_staged_apply.py \
 
 **Output:** Markdown com resultado simulado (would_create_staged)
 
+### apply_staged_netbox_object.py
+
+Aplicar interface staged real no NetBox (primeira escrita controlada).
+
+**Dry-run (padrão, sem escrita):**
+```bash
+python3 tools/local/apply_staged_netbox_object.py \
+  --plan approvals/approved/apply-plan-*.json \
+  --netbox-url https://docs.k3gsolutions.com.br \
+  --confirm-approval-id <approval_id> \
+  --operator "seu-nome"
+```
+
+**Real write (com --confirm-real-write):**
+```bash
+NETBOX_WRITE_TOKEN="token-here" python3 tools/local/apply_staged_netbox_object.py \
+  --plan approvals/approved/apply-plan-*.json \
+  --netbox-url https://docs.k3gsolutions.com.br \
+  --confirm-approval-id <approval_id> \
+  --operator "seu-nome" \
+  --confirm-real-write
+```
+
+**Validações:**
+- Approval_id confirmation
+- Preflight GET (objeto não existe)
+- Payload validation (nenhum secret)
+- Token via env var (nunca em args)
+- Only 1 object at a time
+
+**Output:**
+- Relatório em approvals/applied/apply-result-*.md
+- Exit code 0 = sucesso, 1 = falha
+
 ## Integração CI
 
 Futuro: rodar `archive_compliance_report.py` após cada `/compliance/analyze/report`.
