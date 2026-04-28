@@ -178,7 +178,7 @@
   - Real write mode: requer --confirm-real-write + NETBOX_WRITE_TOKEN env var
   - Validações obrigatórias: approval_id, readiness_status=ready, action=safe_create_staged
   - Preflight GET: verifica se objeto existe antes de POST
-  - Abort conditions: 10 critérios de parada (nenhum token, approval divergente, objeto existe, >1 item, etc)
+  - Abort conditions: 11 critérios de parada (nenhum token, approval divergente, objeto existe, >1 item, tag missing, etc)
   - Payload validation: detecta secrets (password, token, secret, api_key, ssh)
   - Token security: env var apenas (nunca em args, nunca em output)
   - One object at a time: aborta se ApplyPlan tem >1 objeto
@@ -189,6 +189,23 @@
 - Pronto para escrita autorizada com NETBOX_WRITE_TOKEN
 - Zero API calls (até --confirm-real-write)
 - Zero NetBox writes (até autorização)
+
+### Hotfix — FASE 2.0 (Tag Preflight Check)
+- Erro real encontrado: tags não existem no NetBox (400 Bad Request)
+- **Solução:** adicionar preflight check para tags antes do POST
+  - GET /api/extras/tags/?name=<tag> para cada tag no payload
+  - Se tag não existir: aborta antes do POST
+  - Gera apply-result com reason=TAG_MISSING
+  - Lista tags ausentes para criação manual
+  - Não cria tags automaticamente (fase futura)
+- Script `tools/local/apply_staged_netbox_object.py` atualizado:
+  - Nova função `extract_tags_from_payload(payload)`
+  - Nova função `check_tags_exist(netbox_url, token, tag_names)`
+  - Tag check no fluxo real write (depois preflight GET, antes POST)
+  - Render melhorado para TAG_MISSING com instruções
+- Documentação atualizada: docs/30, tools/local/README.md, CHANGELOG.md
+- Validações: 11 critérios agora incluem tag check
+- Mensagem clara: "Create missing tags in NetBox or execute future controlled tag bootstrap phase"
 
 ### Planned (FASE 2.1+)
 - Batch apply (múltiplos objetos com gatekeeping)

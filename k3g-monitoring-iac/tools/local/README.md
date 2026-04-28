@@ -269,9 +269,18 @@ NETBOX_WRITE_TOKEN="token-here" python3 tools/local/apply_staged_netbox_object.p
 **Validações:**
 - Approval_id confirmation
 - Preflight GET (objeto não existe)
+- Tag existence check (GET /api/extras/tags/ para cada tag)
 - Payload validation (nenhum secret)
 - Token via env var (nunca em args)
 - Only 1 object at a time
+
+**Tag Check (2.0-hotfix):**
+- Extrai tags do staged_payload
+- Para cada tag: GET /api/extras/tags/?name=<tag>
+- Se tag não existir: aborta antes do POST
+- Gera apply-result com reason=TAG_MISSING
+- Lista tags ausentes para criação manual
+- Mensagem: "Create missing tags in NetBox or execute future controlled tag bootstrap phase"
 
 **Output:**
 - Relatório em approvals/applied/apply-result-*.md

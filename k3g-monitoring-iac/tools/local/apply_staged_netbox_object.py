@@ -70,6 +70,60 @@ def check_token_provided() -> Tuple[bool, str]:
     return True, token
 
 
+def extract_tags_from_payload(payload: Dict) -> list:
+    """Extract tag names from staged payload."""
+    tags = payload.get("tags", [])
+    if isinstance(tags, list):
+        # Tags can be dicts with 'name' or just strings
+        tag_names = []
+        for tag in tags:
+            if isinstance(tag, dict):
+                tag_names.append(tag.get("name", ""))
+            elif isinstance(tag, str):
+                tag_names.append(tag)
+        return [t for t in tag_names if t]  # Filter empty
+    return []
+
+
+def check_tags_exist(
+    netbox_url: str,
+    token: str,
+    tag_names: list
+) -> Tuple[bool, list]:
+    """Check if tags exist in NetBox. Returns (all_exist, missing_tags)."""
+    if not tag_names:
+        return True, []
+
+    missing = []
+    for tag_name in tag_names:
+        try:
+            endpoint = f"{netbox_url}/api/extras/tags/?name={tag_name}"
+            req = urllib.request.Request(
+                endpoint,
+                headers={
+                    "Authorization": f"Token {token}",
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            )
+            req.get_method = lambda: "GET"
+
+            with urllib.request.urlopen(req) as response:
+                data = json.loads(response.read().decode())
+                results = data.get("results", [])
+                if not results:
+                    missing.append(tag_name)
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                missing.append(tag_name)
+            else:
+                raise ValueError(f"Tag check failed for '{tag_name}' ({e.code}): {e.reason}")
+        except Exception as e:
+            raise ValueError(f"Tag check failed for '{tag_name}': {e}")
+
+    return len(missing) == 0, missing
+
+
 def preflight_check(
     netbox_url: str,
     token: str,
@@ -186,6 +240,7 @@ def render_apply_result(
 
     # Result
     status_code = result.get("status_code")
+    reason = result.get("reason", "")
     lines.append("## Result")
     lines.append("")
     if dry_run:
@@ -194,8 +249,29 @@ def render_apply_result(
         lines.append("🟢 **SUCCESS** (201 Created)")
         lines.append(f"- NetBox ID: {result.get('id')}")
         lines.append(f"- Message: {result.get('message')}")
+    elif status_code == 400 and reason == "TAG_MISSING":
+        lines.append("❌ **BLOCKED** (Missing Tags)")
+        lines.append(f"- Reason: {reason}")
+        missing = result.get("missing_tags", [])
+        if missing:
+            lines.append(f"- Missing tags: {', '.join(missing)}")
+        lines.append(f"- Message: {result.get('message')}")
+        lines.append("")
+        lines.append("### Action Required")
+        lines.append("")
+        lines.append("Create missing tags in NetBox manually:")
+        lines.append("")
+        for tag in missing:
+            lines.append(f"1. NetBox > Extras > Tags > Create")
+            lines.append(f"   - Name: `{tag}`")
+            lines.append(f"   - Color: (choose as needed)")
+            break  # Just show once
+        lines.append("")
+        lines.append("Or execute future controlled tag bootstrap phase.")
     else:
         lines.append(f"❌ **FAILED** ({status_code})")
+        if reason:
+            lines.append(f"- Reason: {reason}")
         lines.append(f"- Message: {result.get('message')}")
     lines.append("")
 
@@ -211,6 +287,9 @@ def render_apply_result(
         lines.append("2. ✅ Requires manual activation")
         lines.append("3. Re-run compliance to validate")
         lines.append("4. Compare before/after")
+    elif reason == "TAG_MISSING":
+        lines.append("1. Create missing tags (see Action Required above)")
+        lines.append("2. Re-run this script with --confirm-real-write")
     else:
         lines.append("1. ❌ Apply failed")
         lines.append("2. Review error message above")
@@ -287,6 +366,39 @@ def main():
                 return 1
 
             print("✓ Preflight check passed")
+            print("")
+
+            # Tag preflight check
+            print("Checking tags...")
+            payload = plan.get("staged_payload", {})
+            tag_names = extract_tags_from_payload(payload)
+            if tag_names:
+                tags_ok, missing_tags = check_tags_exist(
+                    args.netbox_url,
+                    token,
+                    tag_names
+                )
+                if not tags_ok:
+                    print(f"❌ Missing tags: {', '.join(missing_tags)}")
+                    result = {
+                        "status_code": 400,
+                        "reason": "TAG_MISSING",
+                        "missing_tags": missing_tags,
+                        "message": f"Tags missing in NetBox: {', '.join(missing_tags)}",
+                        "dry_run": False
+                    }
+                    markdown = render_apply_result(plan, result, args.operator, dry_run=False)
+                    output_dir = Path(args.output_dir) if args.output_dir else Path("reports/pilot-device-compliance/approvals/applied")
+                    output_dir.mkdir(parents=True, exist_ok=True)
+                    approval_id = plan.get("approval_id", "unknown")[:8]
+                    result_file = output_dir / f"apply-result-{approval_id}.md"
+                    with open(result_file, "w", encoding="utf-8") as f:
+                        f.write(markdown)
+                    print(f"✓ Result saved: {result_file}")
+                    print("")
+                    print(markdown)
+                    return 1
+                print("✓ All tags exist in NetBox")
             print("")
 
             # Apply

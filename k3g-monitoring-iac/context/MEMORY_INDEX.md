@@ -122,7 +122,7 @@ Gerado em: 2026-04-28 14:41:21 UTC
 ## Índice detalhado (auto)
 | Arquivo | Título | Seções (H2) | Linhas |
 | --- | --- | --- | --- |
-| context/CURRENT_STATE.md | Current State — FASE 1.9 (Dry-Run Engine Complete) | Completed; In Progress; Blocked; Known Limitations; Metrics | 226 |
+| context/CURRENT_STATE.md | Current State — FASE 2.0 (First Real Write Ready) | Completed; In Progress; Blocked; Known Limitations; Metrics | 240 |
 | context/GLOSSARY.md | GLOSSARY | - | 12 |
 | context/NEXT_ACTIONS.md | Next Actions — FASE 1.7+ | FASE 1.6 Complete ✅; FASE 1.7 Complete ✅; FASE 1.8 Complete ✅; FASE 1.9 — Staged Apply Dry-Run Engine; FASE 1.7.1 — `/compliance/approve` HTTP Endpoint | 222 |
 | context/OPEN_QUESTIONS.md | OPEN_QUESTIONS | - | 20 |
@@ -158,6 +158,7 @@ Gerado em: 2026-04-28 14:41:21 UTC
 | docs/27-staged-apply-design.md | Staged Apply Design — FASE 1.8 | 1. Princípio; 2. Pré-requisitos para Staged Apply; 3. Objetos Permitidos (Primeira Versão); 4. Métodos Futuros por Objeto; 5. Regras de Bloqueio | 333 |
 | docs/28-staged-apply-contract.md | Staged Apply Contract — FASE 1.8 | 1. ApplyPlan — Contrato de Entrada; 2. StagedPayload — Contrato; 3. ApplyReadinessCheck — Contrato; 4. ApplyPlan Validation (Exemplo); 5. Apply Simulation (Exemplo) | 471 |
 | docs/29-staged-apply-dry-run-engine.md | Staged Apply Dry-Run Engine — FASE 1.9 | 1. Objetivo; 2. Scripts; 3. Fluxo Completo; 4. Garantias (FASE 1.9); 5. Limitações (FASE 1.9) | 311 |
+| docs/30-first-staged-netbox-write.md | First Staged NetBox Write — FASE 2.0 | 1. Objetivo; 2. Pré-requisitos; 3. Riscos; 4. Script: apply_staged_netbox_object.py; 5. Validações Obrigatórias | 373 |
 | docs/FASE_0_8_1_NETBOX_DEEP_MAPPING.md | Fase 0 8 1 Netbox Deep Mapping | Objetivo; Componentes coletados; Core obrigatório; Plugin BGP; Limitações atuais | 30 |
 | docs/adr/0001-netbox-as-single-sot.md | ADR 0001 — NetBox como single source of truth técnico | Status; Contexto; Decisão; Consequências; Referências | 19 |
 | docs/adr/0002-n8n-as-orchestrator.md | ADR 0002 — N8N como orquestrador principal | Status; Contexto; Decisão; Consequências; Referências | 19 |

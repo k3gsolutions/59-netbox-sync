@@ -84,13 +84,17 @@ Antes do POST:
 - ✅ Token fornecido (se real write)
 - ✅ Dispositivo existe no NetBox
 - ✅ Interface NÃO existe no NetBox
+- ✅ Todas as tags existem no NetBox (NEW in 2.0-hotfix)
 
 Se validação falhar:
 - ❌ Aborta imediatamente
 - ❌ Nenhuma escrita
 - ❌ Erro registrado
+- ❌ Se TAG_MISSING: gera instrução manual para criar tags
 
-## 6. Preflight Check
+## 6. Preflight Checks
+
+### 6.1 Object Existence Check
 
 GET `/api/dcim/interfaces/?device_id={device_id}&name={object_key}`
 
@@ -99,6 +103,31 @@ Respostas:
 - 200 + [obj] = aborta, objeto existe
 - 404 = OK, criar
 - 40x/50x = aborta, erro API
+
+### 6.2 Tag Existence Check
+
+Para cada tag no staged_payload, fazer GET read-only:
+GET `/api/extras/tags/?name={tag_name}`
+
+Respostas por tag:
+- 200 + [tag] = OK, tag existe
+- 200 + [] = aborta, tag não existe
+- 404 = aborta, tag não existe
+- 40x/50x = aborta, erro API
+
+Se qualquer tag não existir:
+- ❌ Aborta antes do POST
+- ❌ Não cria interface
+- ❌ Gera apply-result com status 400
+- ❌ Reason: TAG_MISSING
+- ❌ Lista tags ausentes em missing_tags
+
+Tags devem ser criadas manualmente no NetBox antes do POST:
+1. NetBox > Extras > Tags > Create
+2. Name: tag_name
+3. Color: conforme necessário
+
+Fase futura: bootstrap controlado de tags (FASE 2.1+)
 
 ## 7. Resultado POST
 
@@ -242,6 +271,7 @@ Antes do POST:
 - ❌ Objeto já existe no NetBox
 - ❌ >1 objeto no ApplyPlan
 - ❌ Validação preflight falha
+- ❌ Tag não existe no NetBox (NEW in 2.0-hotfix)
 
 Se POST falha:
 - ❌ NetBox retorna 40x/50x
