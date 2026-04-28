@@ -1,4 +1,4 @@
-# Current State — FASE 1.8 (Design Complete)
+# Current State — FASE 1.9 (Dry-Run Engine Complete)
 
 ## Completed
 
@@ -130,6 +130,21 @@
 - ✅ Error/blocking codes defined (APPROVAL_NOT_DRY_RUN_PASSED, etc)
 - ✅ Write policy: real_apply_enabled=false, write_token_provided=false
 - ✅ Zero API, zero NetBox writes, design only
+
+### Staged Apply Dry-Run Engine (FASE 1.9)
+- ✅ build_staged_apply_plan.py: generate ApplyPlan from ApprovalRecord (dry-run, no writes)
+- ✅ validate_staged_apply_plan.py: validate ApplyPlan against 13 checks
+- ✅ render_staged_apply_plan.py: render ApplyPlan as readable Markdown
+- ✅ simulate_staged_apply.py: simulate staged apply result (zero API)
+- ✅ 13 readiness checks: approval_id, status, action, object_type, no_secrets, tags, custom_fields, etc
+- ✅ ApplyPlan generation with readiness_status and blocked_reasons
+- ✅ Markdown sections: Resumo, Readiness Status, Checks, Bloqueios, Payload, Política, Segurança
+- ✅ Simulation result: would_create_staged (status 201) or would_fail_blocked (status 400)
+- ✅ Tested with pilot c9363dfb: ApplyPlan → Validation → Rendering → Simulation (ALL PASSED)
+- ✅ Documentation: docs/29-staged-apply-dry-run-engine.md
+- ✅ Zero API, zero NetBox writes, simulation only
+- ✅ real_apply_enabled=false, write_token_provided=false confirmed
+- ✅ Piloto generated files: apply-plan-c9363dfb-*.json, apply-plan-*.md, apply-simulation-*.md
 
 ## In Progress
 

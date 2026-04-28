@@ -139,7 +139,38 @@
 - Write policy: real_apply_enabled=false, write_token_provided=false
 - Zero API, zero NetBox writes, design only
 
-### Planned (FASE 1.9+)
+### Completed — FASE 1.9
+
+**Staged Apply Dry-Run Engine (Local, Zero API/Writes)**
+- Script `tools/local/build_staged_apply_plan.py`: gera ApplyPlan a partir de ApprovalRecord
+  - Valida prerequisites (status=dry_run_passed, action=safe_create_staged)
+  - Corre 13 readiness checks
+  - Gera ApplyPlan JSON com readiness_status
+  - Zero API, zero writes
+- Script `tools/local/validate_staged_apply_plan.py`: valida ApplyPlan
+  - Verificações: campos obrigatórios, write_policy, action, method, object_type
+  - Exit code: 0 (válido) / 1 (bloqueado)
+  - Zero API, zero writes
+- Script `tools/local/render_staged_apply_plan.py`: renderiza ApplyPlan em Markdown
+  - 7 seções: Resumo, Readiness Status, Checks, Bloqueios, Payload, Política, Segurança
+  - Readiness status: 🟢 READY / 🔴 BLOCKED
+  - Zero API, zero writes
+- Script `tools/local/simulate_staged_apply.py`: simula resultado de apply
+  - Resultado: would_create_staged (201) ou would_fail_blocked (400)
+  - Prevê estado futuro: approval_status → applied_staged
+  - Rollback hint: DELETE /api/dcim/interfaces/{id}/
+  - Zero API, zero writes
+- Teste com piloto c9363dfb: ApplyPlan → Validate → Render → Simulate (TODOS PASSARAM)
+  - ApplyPlan ID: 8017f140-07a4-4401-bbed-42f7e705a6af
+  - Readiness Status: ready
+  - Checks: 12/13 PASSED (1 NOT_CHECKED — requer API futuro)
+  - Simulação: WOULD CREATE STAGED com status=201
+- Documentação: `docs/29-staged-apply-dry-run-engine.md` (complete guide com exemplos)
+- Zero API calls, zero NetBox writes, simulation only
+- real_apply_enabled=false, write_token_provided=false confirmados
+- Arquivos gerados em approvals/approved/: apply-plan-*.json, apply-plan-*.md, apply-simulation-*.md
+
+### Planned (FASE 2.0+)
 - `/compliance/approve` endpoint com state management
 - Batch generation script para ApprovalRecords
 - CI integration para gerar approvals automaticamente

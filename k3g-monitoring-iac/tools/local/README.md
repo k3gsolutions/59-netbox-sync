@@ -196,8 +196,55 @@ python3 tools/local/manage_approval_state.py mark-dry-run-passed \
 - Atualiza status, reviewed_by, state_history
 - Cria backup automático
 
+### build_staged_apply_plan.py
+
+Gerar ApplyPlan local a partir de ApprovalRecord (dry-run, sem API).
+
+```bash
+python3 tools/local/build_staged_apply_plan.py \
+  --approval approvals/approved/approval-*.json \
+  --output approvals/approved/
+```
+
+**Output:** ApplyPlan JSON com readiness checks
+
+### validate_staged_apply_plan.py
+
+Validar ApplyPlan contra 13 critérios.
+
+```bash
+python3 tools/local/validate_staged_apply_plan.py \
+  --plan approvals/approved/apply-plan-*.json
+```
+
+**Exit Code:** 0 (válido) / 1 (bloqueado)
+
+### render_staged_apply_plan.py
+
+Renderizar ApplyPlan em Markdown.
+
+```bash
+python3 tools/local/render_staged_apply_plan.py \
+  --plan approvals/approved/apply-plan-*.json \
+  --output approvals/approved/apply-plan-*.md
+```
+
+**Output:** Markdown com readiness status e checks
+
+### simulate_staged_apply.py
+
+Simular resultado de apply (sem API, sem writes).
+
+```bash
+python3 tools/local/simulate_staged_apply.py \
+  --plan approvals/approved/apply-plan-*.json \
+  --output approvals/approved/apply-simulation-*.md
+```
+
+**Output:** Markdown com resultado simulado (would_create_staged)
+
 ## Integração CI
 
 Futuro: rodar `archive_compliance_report.py` após cada `/compliance/analyze/report`.
 
-Integração com approval: rodar scripts acima antes de staged import real.
+Integração com approval: rodar scripts acima antes de staged import real (FASE 2.0).
