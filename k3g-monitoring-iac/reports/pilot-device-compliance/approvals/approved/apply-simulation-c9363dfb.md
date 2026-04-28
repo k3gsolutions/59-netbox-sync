@@ -2,7 +2,7 @@
 
 **Device:** 4WNET-MNS-KTG-RX
 **Object:** interface / Eth-Trunk0
-**Simulated At:** 2026-04-28T14:43:13.270223+00:00
+**Simulated At:** 2026-04-28T15:16:51.061462+00:00
 
 ## 1. Resultado da Simulação
 
@@ -32,7 +32,7 @@ Próximas ações:
 - From: dry_run_passed
 - To: applied_staged
 - By: staged_apply_executor
-- At: 2026-04-28T14:43:13.270487+00:00
+- At: 2026-04-28T15:16:51.062244+00:00
 - Reason: Staged import executed via /compliance/apply
 
 ## 4. Rollback Hint

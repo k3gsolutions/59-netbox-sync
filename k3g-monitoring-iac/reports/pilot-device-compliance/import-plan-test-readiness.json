@@ -1,0 +1,85 @@
+{
+  "import_plan_id": "test-readiness-001",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 18,
+  "generated_at": "2026-04-28T17:30:00Z",
+  "items": [
+    {
+      "object_type": "interface",
+      "object_key": "Eth-Trunk0.10",
+      "code": "INTERFACE_MISSING_IN_NETBOX",
+      "action": "needs_review",
+      "category": "service",
+      "evidence": {
+        "service_type": "customer-internet",
+        "tenant": null
+      }
+    },
+    {
+      "object_type": "interface",
+      "object_key": "Eth-Trunk0.147",
+      "code": "INTERFACE_MISSING_IN_NETBOX",
+      "action": "needs_review",
+      "category": "service",
+      "evidence": {
+        "service_type": "customer-internet",
+        "tenant": null
+      }
+    },
+    {
+      "object_type": "interface",
+      "object_key": "Eth-Trunk0.1580",
+      "code": "INTERFACE_MISSING_IN_NETBOX",
+      "action": "needs_review",
+      "category": "service",
+      "evidence": {
+        "service_type": "customer-internet",
+        "tenant": null
+      }
+    },
+    {
+      "object_type": "interface",
+      "object_key": "Eth-Trunk0.1589",
+      "code": "INTERFACE_MISSING_IN_NETBOX",
+      "action": "needs_review",
+      "category": "service",
+      "evidence": {
+        "service_type": "customer-internet",
+        "tenant": null
+      }
+    },
+    {
+      "object_type": "interface",
+      "object_key": "Eth-Trunk0.1606",
+      "code": "INTERFACE_MISSING_IN_NETBOX",
+      "action": "needs_review",
+      "category": "service",
+      "evidence": {
+        "service_type": "customer-internet",
+        "tenant": null
+      }
+    },
+    {
+      "object_type": "bgp_peer",
+      "object_key": "203.0.113.1",
+      "code": "BGP_PEER_MISSING",
+      "action": "needs_review",
+      "category": "service",
+      "evidence": {
+        "remote_as": 65001,
+        "remote_address": "203.0.113.1",
+        "description": "Carrier BGP peering"
+      }
+    },
+    {
+      "object_type": "ip_address",
+      "object_key": "192.0.2.1/30",
+      "code": "IP_MISSING",
+      "action": "needs_review",
+      "category": "service",
+      "evidence": {
+        "address": "192.0.2.1/30"
+      }
+    }
+  ]
+}

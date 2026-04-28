@@ -64,6 +64,12 @@ Read-only enrichment proposals para o NetBox.
 - ImportPlan real gerado para `4WNET-MNS-KTG-RX`
 - Netops_netbox_sync tests: 32 passing
 
+## After FASE 1
+- ✅ FASE 1 complete
+- ✅ FASE 2.0 first real staged write executed (Approval ID c9363dfb, Eth-Trunk0, POST, 201 Created, NetBox object ID 18228)
+- ✅ FASE 2.1 design validated with base/service correction and post-apply compliance validation
+- ➜ Next: FASE 2.2 política para múltiplos staged applies em lote controlado, ainda limitado a base_inventory
+
 ## FASE 1.4 Web UI Prototype
 
 Lightweight browser interface for report viewing.

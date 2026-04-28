@@ -38,6 +38,8 @@ A partir da fase atual, o fluxo de compliance também gera um ImportPlan read-on
 - Sem `/sync`
 - Sem alteração em equipamento
 - ImportPlan real gerado para `4WNET-MNS-KTG-RX`
+- FASE 2.0 completed: first real staged apply for Eth-Trunk0 with 201 Created and post-apply compliance validated
+- Recommended next: FASE 2.2 — política para múltiplos staged applies em lote controlado, ainda limitado a base_inventory
 
 ## Comparar Relatórios
 

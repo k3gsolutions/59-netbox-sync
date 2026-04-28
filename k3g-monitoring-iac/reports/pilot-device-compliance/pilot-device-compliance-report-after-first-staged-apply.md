@@ -6,7 +6,7 @@
 - NetBox carregado: Sim
 - Compliance habilitado: Sim
 - Status geral: drift_detected
-- Total de divergências: 161
+- Total de divergências: 162
 - Severidade mais alta: high
 
 ## 2. Sumário aplicado no dispositivo
@@ -69,6 +69,7 @@
 | Severidade | Código | Tipo de objeto | Chave do objeto | Ação preferida | Mensagem |
 |---|---|---|---|---|---|
 | medium | INTERFACE_DESCRIPTION_MISMATCH | interface | Eth-Trunk0 | review | Descrição da interface Eth-Trunk0 difere entre dispositivo e NetBox. |
+| medium | DESCRIPTION_NON_COMPLIANT | interface | Eth-Trunk0 | fix_device | Descrição da interface Eth-Trunk0 não segue o naming convention esperado. |
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | Eth-Trunk0.10 | fix_netbox | Interface Eth-Trunk0.10 existe no dispositivo, mas não no NetBox. |
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | Eth-Trunk0.147 | fix_netbox | Interface Eth-Trunk0.147 existe no dispositivo, mas não no NetBox. |
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | Eth-Trunk0.1580 | fix_netbox | Interface Eth-Trunk0.1580 existe no dispositivo, mas não no NetBox. |
@@ -378,7 +379,7 @@
 - BGP_PEER_MISSING_IN_NETBOX (bgp_session: 2804:A8:2:A8::48C9|ipv6) — Sessão BGP 2804:A8:2:A8::48C9|ipv6 existe no dispositivo, mas não no NetBox.
 
 ### Corrigir equipamento
-- Nenhuma ação recomendada.
+- DESCRIPTION_NON_COMPLIANT (interface: Eth-Trunk0) — Descrição da interface Eth-Trunk0 não segue o naming convention esperado.
 
 ### Revisão manual
 - MISSING_ON_DEVICE — Existem objetos documentados no NetBox que não aparecem no dispositivo.

@@ -1,7 +1,7 @@
 # Pilot Device Summary — Primeiro Piloto de Compliance
 
 ## Contexto
-Primeiro piloto de compliance com `netops_netbox_sync` em modo read-only, sem escrita no NetBox e sem alterações de configuração. O relatório real foi gerado para o device `4WNET-MNS-KTG-RX`.
+Primeiro piloto de compliance com `netops_netbox_sync`: inicialmente em modo read-only, sem escrita no NetBox e sem alterações de configuração, seguido por uma primeira etapa de staged write controlada.
 
 ## Resultado do primeiro relatório real
 - Relatório gerado: `reports/pilot-device-compliance/pilot-device-compliance-report.md`
@@ -57,6 +57,12 @@ O NetBox está incompleto para este device: há um grande gap entre o estado apl
 - Nenhuma configuração aplicada.
 - 32 testes passando no `netops_netbox_sync`.
 - ImportPlan real gerado para `4WNET-MNS-KTG-RX`.
+- Correção base/service aplicada no netops_netbox_sync.
+- Total de divergências pós-ajuste: 161.
+- Eth-Trunk0 não aparece mais como INTERFACE_MISSING_IN_NETBOX.
+- Eth-Trunk0 não aparece mais como DESCRIPTION_NON_COMPLIANT.
+- Eth-Trunk0 aparece apenas como INTERFACE_DESCRIPTION_MISMATCH (ação review).
+- Next recommended: FASE 2.2 — política para múltiplos staged applies em lote controlado, ainda limitado a base_inventory.
 
 ## FASE 1.6 — End-to-End Approval Dry-Run Pilot
 
@@ -127,6 +133,24 @@ O NetBox está incompleto para este device: há um grande gap entre o estado apl
 - Sem segredos vazados
 - Sem alterações no NetBox
 - Pronto para FASE 1.7 (implementar `/compliance/approve` endpoint)
+
+## FASE 2.0 — First Real Staged Write
+
+- Approval ID: `c9363dfb`
+- Objeto: `Eth-Trunk0`
+- Método: `POST`
+- Resultado: `201 Created`
+- NetBox object ID: `18228`
+- Escopo: 1 objeto
+- Nenhum `PATCH`
+- Nenhum `DELETE`
+- Nenhum `/sync`
+- Nenhuma configuração em equipamento
+- Token não exposto
+- Tags verificadas antes do `POST`
+- Relatório `apply-result` gerado
+- Compliance pós-apply gerado
+- Comparação antes/depois gerada
 
 ### Referência
 

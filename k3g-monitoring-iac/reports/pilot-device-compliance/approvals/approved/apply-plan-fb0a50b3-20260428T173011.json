@@ -1,0 +1,142 @@
+{
+  "apply_plan_id": "ea6a7fd8-4136-4b0a-9071-e910ebc6d9ab",
+  "approval_id": "fb0a50b3-c780d1e9-1338-42c4-acfc-b8ca4f49ea9d",
+  "import_plan_id": "84c3921a-ced7-4d0d-8051-948e3b62f190",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 18,
+  "object_type": "interface",
+  "object_key": "Eth-Trunk1",
+  "action": "safe_create_staged",
+  "category": "base_inventory",
+  "confidence": "exact",
+  "target_endpoint": "/api/dcim/interfaces/",
+  "method": "POST",
+  "staged_payload": {
+    "device": 18,
+    "name": "Eth-Trunk1",
+    "type": "1000base-t",
+    "enabled": true,
+    "mtu": 1500,
+    "tags": [
+      {
+        "name": "discovery:netops_netbox_sync"
+      },
+      {
+        "name": "discovery:staged"
+      },
+      {
+        "name": "source:device"
+      },
+      {
+        "name": "approval:fb0a50b3"
+      }
+    ],
+    "custom_fields": {
+      "discovery_source": "device_inventory",
+      "discovery_status": "staged",
+      "discovery_confidence": "exact",
+      "import_plan_id": "84c3921a-ced7-4d0d-8051-948e3b62f190",
+      "approval_id": "fb0a50b3-c780d1e9-1338-42c4-acfc-b8ca4f49ea9d"
+    }
+  },
+  "payload_hash": "sha256:b2d59b1ae29facc16d6debe238b63ba6eea1bc84ed8f1b1945d318440676a566",
+  "readiness_status": "ready",
+  "readiness_checks": [
+    {
+      "check": "approval_id_present",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "approval_id: fb0a50b3..."
+    },
+    {
+      "check": "status_dry_run_passed",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "status: dry_run_passed"
+    },
+    {
+      "check": "action_safe_create_staged",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "action: safe_create_staged"
+    },
+    {
+      "check": "object_type_supported",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "object_type: interface"
+    },
+    {
+      "check": "no_secrets_in_payload",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "0 forbidden patterns found"
+    },
+    {
+      "check": "tags_staged_present",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "discovery:staged tag present"
+    },
+    {
+      "check": "tags_approval_present",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "approval:fb0a50b3 tag present"
+    },
+    {
+      "check": "custom_fields_valid",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "discovery_source, discovery_status, approval_id present"
+    },
+    {
+      "check": "confidence_valid",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "confidence: exact"
+    },
+    {
+      "check": "naming_follows_pattern",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "Base interface naming valid: Eth-Trunk1"
+    },
+    {
+      "check": "object_not_exists",
+      "result": "NOT_CHECKED",
+      "severity": "WARNING",
+      "details": "Requires NetBox API call (not done in dry-run)"
+    },
+    {
+      "check": "write_policy_enforced",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "real_apply_enabled=false, write_token_provided=false"
+    },
+    {
+      "check": "write_token_not_provided",
+      "result": "PASSED",
+      "severity": "CRITICAL",
+      "details": "write_token_provided=false (as expected in FASE 1.9)"
+    }
+  ],
+  "blocked_reasons": [],
+  "generated_at": "2026-04-28T17:30:11.464605+00:00",
+  "generated_by_tool": "build_staged_apply_plan.py",
+  "generated_by_version": "1.0",
+  "write_policy": {
+    "requires_write_token": true,
+    "write_token_provided": false,
+    "write_token_validated": false,
+    "real_apply_enabled": false,
+    "write_policy_enforced": "STAGE_ONLY_NO_ACTIVE"
+  },
+  "metadata": {
+    "dry_run_report_path": null,
+    "dry_run_timestamp": "2026-04-28T06:23:28Z",
+    "dry_run_hash": "sha256:...",
+    "netbox_readiness_check_performed": false,
+    "notes": "Ready for staged import. Requires write token validation before apply."
+  }
+}

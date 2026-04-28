@@ -1,0 +1,29 @@
+{
+  "batch_id": "33423d0a-6b34-41c9-9549-46a7b359aab4",
+  "generated_at": "2026-04-28T17:30:29.925046+00:00",
+  "max_items": 3,
+  "total_items": 2,
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 18,
+  "items": [
+    {
+      "apply_plan_id": "ea6a7fd8-4136-4b0a-9071-e910ebc6d9ab",
+      "approval_id": "fb0a50b3-c780d1e9-1338-42c4-acfc-b8ca4f49ea9d",
+      "object_key": "Eth-Trunk1",
+      "object_type": "interface"
+    },
+    {
+      "apply_plan_id": "d06c06d7-c62d-4a7d-8d96-a33def26de45",
+      "approval_id": "d1dce466-edaeefe9-1f54-4165-ada7-fd9ff7fc8f6a",
+      "object_key": "GigabitEthernet0/5/0",
+      "object_type": "interface"
+    }
+  ],
+  "readiness_status": "ready",
+  "blocked_reasons": [],
+  "write_policy": {
+    "real_apply_enabled": false,
+    "write_token_provided": false,
+    "max_items": 3
+  }
+}

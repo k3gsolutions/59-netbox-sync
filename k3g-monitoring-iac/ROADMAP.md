@@ -98,9 +98,42 @@ Dashboard & alerts:
 
 **Estimated effort:** 4 semanas
 
-### FASE 2.0 — Multi-Device Sync (Q3-Q4 2026)
+### ✅ FASE 2.0 — First Real Staged Write (2026-04-28)
 
-Read-write mode (POST /sync):
+**Completed:**
+- Approval ID: `c9363dfb`
+- Object: `Eth-Trunk0`
+- Method: `POST`
+- Result: `201 Created`
+- NetBox object ID: `18228`
+- Scope: 1 object
+- No `PATCH`
+- No `DELETE`
+- No `/sync`
+- No equipment configuration
+- Tags verified before POST
+- apply-result report generated
+- Compliance pós-apply generated
+- Before/after comparison generated
+- Token not exposed
+
+### FASE 2.1 — Tag Bootstrap & Batch Staged Apply (Q2-Q3 2026)
+
+**Planned:**
+- Controlled batch apply for approved staged objects
+- Missing tag verification/bootstrap before apply
+- Approval workflow integration with apply
+- Per-object preflight checks and audit trail
+- Still no DELETE, no unsafe update, no bulk overwrite
+- Report before/after comparison as standard
+
+**Estimated effort:** 4 semanas
+
+**Recommended next:** FASE 2.2 — política para múltiplos staged applies em lote controlado, ainda limitado a base_inventory
+
+### FASE 2.2 — Multi-Device Sync (Later)
+
+Read-write mode beyond staged apply:
 - Bulk device collection
 - Recommended fixes to NetBox
 - Device configuration changes (with approval)

@@ -1,0 +1,69 @@
+{
+  "approval_id": "1abb57c7-ee53-4ab9-8556-7e27eccbb17b",
+  "import_plan_id": "2b5be740-c93e-42db-a343-aa6967e3d57d",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 1890,
+  "generated_at": "2026-04-28T17:24:13.369859+00:00Z",
+  "proposal": {
+    "object_type": "interface",
+    "object_key": "GigabitEthernet0/5/0",
+    "code": "INTERFACE_MISSING_IN_NETBOX",
+    "action": "safe_create_staged",
+    "category": "base_inventory",
+    "confidence": "exact",
+    "naming_compliant": true,
+    "reason": "Base interface inventory",
+    "preferred_next_step": "Revisar payload sugerido e aplicar staged import"
+  },
+  "evidence": {
+    "interface": "GigabitEthernet0/5/0",
+    "category": "base_inventory",
+    "source": "compliance"
+  },
+  "review": {
+    "status": "approved",
+    "reviewed_by": "Keslley",
+    "reviewed_at": "2026-04-28T17:25:33.508342+00:00",
+    "decision": "approve",
+    "comment": "Aprovado para batch pilot base_inventory",
+    "changes_requested": [],
+    "expected_netbox_payload": null
+  },
+  "audit": {
+    "created_at": "2026-04-28T17:24:13.369859+00:00Z",
+    "updated_at": "2026-04-28T17:24:13.369859+00:00Z",
+    "created_by": "approval-engine",
+    "report_path": "reports/pilot-device-compliance/pilot-device-compliance-report-after-first-staged-apply-v3.md",
+    "report_timestamp": "2026-04-28T17:24:02Z",
+    "evidence_hash": "sha256:9aa4fbbb126e402a1db3b326a96171f553b8ff4502f0729193bb94942364793f",
+    "import_plan_hash": null
+  },
+  "future_staging": {
+    "dry_run_id": null,
+    "dry_run_status": null,
+    "dry_run_passed_at": null,
+    "applied_at": null,
+    "applied_by": null,
+    "staged_import_id": null,
+    "deployment_timestamp": null
+  },
+  "metadata": {
+    "version": "1.0",
+    "source": "ImportPlan",
+    "priority": "normal",
+    "requires_2fa": false,
+    "requires_2_approvers": false,
+    "sla_hours": 24,
+    "ttl_days": 90
+  },
+  "state_history": [
+    {
+      "from": "proposed",
+      "to": "approved",
+      "by": "Keslley",
+      "at": "2026-04-28T17:25:33.508628+00:00",
+      "tool_version": "1.0",
+      "reason": "Aprovado para batch pilot base_inventory"
+    }
+  ]
+}

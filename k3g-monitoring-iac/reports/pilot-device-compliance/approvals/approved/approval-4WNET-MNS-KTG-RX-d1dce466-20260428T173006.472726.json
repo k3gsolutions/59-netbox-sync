@@ -1,0 +1,80 @@
+{
+  "approval_id": "d1dce466-edaeefe9-1f54-4165-ada7-fd9ff7fc8f6a",
+  "import_plan_id": "54ad4ef6-a8e6-46cf-8bc7-0b624ad353db",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 18,
+  "generated_at": "2026-04-28T17:30:06.472676+00:00",
+  "proposal": {
+    "object_type": "interface",
+    "object_key": "GigabitEthernet0/5/0",
+    "code": "INTERFACE_MISSING_IN_NETBOX",
+    "action": "safe_create_staged",
+    "category": "base_inventory",
+    "confidence": "exact",
+    "naming_compliant": true,
+    "reason": "Base interface, part of core infrastructure",
+    "preferred_next_step": "Revisar payload sugerido e aplicar staged import"
+  },
+  "evidence": {
+    "applied": 1,
+    "documented": 0,
+    "status": "up"
+  },
+  "review": {
+    "status": "dry_run_passed",
+    "reviewed_by": "pilot-tester",
+    "reviewed_at": "2026-04-28T17:30:06.472676+00:00",
+    "decision": "approve",
+    "comment": "Aprovado para valida\u00e7\u00e3o de fluxo FASE 2.3",
+    "changes_requested": [],
+    "expected_netbox_payload": null,
+    "dry_run_by": "dry-run-validator",
+    "dry_run_at": "2026-04-28T17:30:06.472676+00:00"
+  },
+  "audit": {
+    "created_at": "2026-04-28T17:30:06.472676+00:00",
+    "updated_at": "2026-04-28T17:30:06.472676+00:00",
+    "created_by": "approval-engine",
+    "report_path": "reports/pilot-device-compliance/import-plan-4WNET-MNS-KTG-RX.md",
+    "report_timestamp": "2026-04-28T06:23:28Z",
+    "evidence_hash": "sha256:243eb021033a20ed1de46ef0e86acbaac04442ce4b67193c4189c23c851f7ce6",
+    "import_plan_hash": null,
+    "dry_run_report": null
+  },
+  "future_staging": {
+    "dry_run_id": null,
+    "dry_run_status": null,
+    "dry_run_passed_at": null,
+    "applied_at": null,
+    "applied_by": null,
+    "staged_import_id": null,
+    "deployment_timestamp": null
+  },
+  "metadata": {
+    "version": "1.0",
+    "source": "ImportPlan",
+    "priority": "normal",
+    "requires_2fa": false,
+    "requires_2_approvers": false,
+    "sla_hours": 24,
+    "ttl_days": 90
+  },
+  "state_history": [
+    {
+      "from": "proposed",
+      "to": "approved",
+      "by": "pilot-tester",
+      "at": "2026-04-28T17:30:06.472676+00:00",
+      "tool_version": "1.0",
+      "reason": "Aprovado para valida\u00e7\u00e3o de fluxo FASE 2.3"
+    },
+    {
+      "from": "approved",
+      "to": "dry_run_passed",
+      "by": "dry-run-validator",
+      "at": "2026-04-28T17:30:06.472676+00:00",
+      "tool_version": "1.0",
+      "reason": "Dry-run passed validation"
+    }
+  ]
+}

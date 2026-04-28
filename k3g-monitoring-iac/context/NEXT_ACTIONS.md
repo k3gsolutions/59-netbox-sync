@@ -176,28 +176,37 @@ Interface básica para revisão de approvals.
 
 ---
 
-## FASE 2.0 — Staged Import Execution
+## FASE 2.0 Complete ✅
 
-### Task
-Implementar staged import real com token write separado.
+- Primeiro staged apply real executado no NetBox
+- Approval ID: `c9363dfb`
+- Objeto: `Eth-Trunk0`
+- Método: `POST`
+- Resultado: `201 Created`
+- NetBox object ID: `18228`
+- Escopo: 1 objeto
+- Nenhum `PATCH`
+- Nenhum `DELETE`
+- Nenhum `/sync`
+- Nenhuma configuração em equipamento
+- Token não exposto
+- Tags verificadas antes do `POST`
+- Compliance pós-apply gerado
+- Correção base/service aplicada no netops_netbox_sync
+- Total de divergências pós-ajuste: 161
+- Eth-Trunk0 não aparece mais como INTERFACE_MISSING_IN_NETBOX
+- Eth-Trunk0 não aparece mais como DESCRIPTION_NON_COMPLIANT
+- Eth-Trunk0 aparece apenas como INTERFACE_DESCRIPTION_MISMATCH (ação review)
 
-**Scope (FUTURE):**
-- POST /compliance/apply
-- Accept list of approval_ids
-- Call NetBox API with write token
-- Track status em ApprovalRecord.future_staging.applied_at
-- Move ApprovalRecord a approvals/applied/ após sucesso
-- Rollback mechanism se import falhar
+## FASE 2.1 — Next Actions
 
-**Security:**
-- Token write separado, nunca em code
-- Cada import auditado com timestamp
-- Nunca delete, apenas create/update
-- Dry-run obrigatório antes (FASE 1.5 already done)
+- Documentar política de batch staged applies controlado para base_inventory
+- Consolidar o fluxo completo Device → Compliance → ImportPlan → Approval → Dry-run → Staged Apply → Pós-Compliance
+- Registrar lições aprendidas no `reports/pilot-device-compliance/README.md`
+- Atualizar `docs/31-...` com estratégia de tag bootstrap e batch apply
+- Definir política para múltiplos staged applies em lote controlado, ainda limitado a base_inventory
 
 ---
-
-## Checklist: Ready for FASE 1.7
 
 - [x] Workflow completo testado (FASE 1.6 pilot)
 - [x] ApprovalRecord schema validado
