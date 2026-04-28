@@ -225,6 +225,31 @@
 - Compliance pós-apply gerado
 - Comparação antes/depois gerada
 
+### Completed — FASE 2.2 (Design)
+- ✅ docs/31-controlled-batch-staged-apply.md
+- ✅ docs/32-batch-apply-runbook.md
+- ✅ Design: batch limitado a 3 objetos
+- ✅ Design: somente base_inventory interfaces
+- ✅ Design: all-or-none preflight, item-by-item execution
+- ✅ Design: 15+ gates definidos
+- ✅ Design: estados do lote documentados
+- ✅ Zero código de escrita
+- ✅ Zero API calls
+
+### Completed — FASE 2.3 (Implementação)
+- ✅ Script: tools/local/build_batch_staged_apply_plan.py
+- ✅ Script: tools/local/validate_batch_staged_apply_plan.py
+- ✅ Script: tools/local/render_batch_staged_apply_plan.py
+- ✅ Script: tools/local/apply_batch_staged_netbox_objects.py
+- ✅ Pilot: máx 2 itens (Eth-Trunk1, GigabitEthernet0/5/0)
+- ✅ Dry-run: teste sem writes
+- ✅ Real write: pronto para execução com --confirm-real-write-batch
+- ✅ Validações: all-or-none preflight
+- ✅ Validações: item-by-item execution
+- ✅ Validações: token via env var
+- ✅ Validações: sem secrets
+- ✅ Output: batch-apply-result-<batch_id>.md
+
 ### Planned — FASE 2.2 (Design)
 - ✅ Documentação: docs/31-controlled-batch-staged-apply.md (design e gates)
 - ✅ Documentação: docs/32-batch-apply-runbook.md (runbook operacional)
@@ -237,18 +262,17 @@
 - Zero código de escrita em FASE 2.2 (design only)
 - Zero API calls (design only)
 
-### Planned — FASE 2.3 (Implementação)
-- Script: tools/local/build_batch_staged_apply_plan.py
-- Script: tools/local/validate_batch_staged_apply_plan.py
-- Script: tools/local/render_batch_staged_apply_plan.py
-- Script: tools/local/apply_batch_staged_netbox_objects.py
-- Batch apply com 2-3 interfaces base_inventory
-- Dry-run test
-- Real write test (com verificação de tags)
-- Compliance pós-batch gerado
-- Comparação antes/depois gerada
+### Planned — FASE 2.4 (Service Candidate Readiness)
+- Documentação: docs/33-service-candidate-readiness.md
+- Script: tools/local/analyze_service_candidate_readiness.py
+- Validação de readiness para service candidates
+- Classificação: ready_for_review, missing_metadata, naming_failed, ambiguous, blocked, ignored
+- Zero writes
+- Zero token write
+- Zero equipamento
+- Relatório com recomendações
 
-### Planned (FASE 2.4+)
+### Planned (FASE 2.5+)
 - `/compliance/approve` endpoint com state management
 - CI integration para gerar approvals automaticamente
 - Web UI básica para revisão

@@ -161,6 +161,7 @@ Gerado em: 2026-04-28 14:41:21 UTC
 | docs/30-first-staged-netbox-write.md | First Staged NetBox Write — FASE 2.0 | 1. Objetivo; 2. Pré-requisitos; 3. Riscos; 4. Script: apply_staged_netbox_object.py; 5. Validações Obrigatórias | 396 |
 | docs/31-controlled-batch-staged-apply.md | Controlled Batch Staged Apply | 1. Princípio; 2. Escopo Permitido; 3. Escopo Proibido; 4. Política de Lote; 5. Gates por Item | 193 |
 | docs/32-batch-apply-runbook.md | Batch Apply Runbook | 1. Pré-Requisitos; 2. Seleção de Candidatos; 3. Preparação de cada Candidato; 4. Construir Batch ApplyPlan; 5. Validar BatchApplyPlan | 348 |
+| docs/33-service-candidate-readiness.md | Service Candidate Readiness Analysis | 1. Objetivo; 2. O que é Service Candidate; 3. Diferença: Base Inventory vs Service; 4. Campos Obrigatórios por Tipo; 5. Classificação de Readiness | 311 |
 | docs/FASE_0_8_1_NETBOX_DEEP_MAPPING.md | Fase 0 8 1 Netbox Deep Mapping | Objetivo; Componentes coletados; Core obrigatório; Plugin BGP; Limitações atuais | 30 |
 | docs/adr/0001-netbox-as-single-sot.md | ADR 0001 — NetBox como single source of truth técnico | Status; Contexto; Decisão; Consequências; Referências | 19 |
 | docs/adr/0002-n8n-as-orchestrator.md | ADR 0002 — N8N como orquestrador principal | Status; Contexto; Decisão; Consequências; Referências | 19 |
