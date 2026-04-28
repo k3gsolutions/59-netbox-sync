@@ -234,22 +234,26 @@ def render_result(
     lines.append(f"**Total Items:** {total_items}")
     lines.append(f"**Operator:** {operator}")
     lines.append(f"**Timestamp:** {datetime.now(timezone.utc).isoformat()}")
-    lines.append(f"**Dry-Run:** {dry_run}")
+    lines.append(f"**Mode:** {'DRY-RUN (no writes)' if dry_run else 'REAL WRITE'}")
+    lines.append(f"**Real Write Executed:** {'No (simulation only)' if dry_run else 'NOT IMPLEMENTED - aborted'}")
     lines.append("")
 
     # Status
     lines.append("## Result")
     lines.append("")
     if dry_run:
-        lines.append("🟡 **DRY RUN** (no actual write)")
+        lines.append("🟡 **DRY RUN** (simulation only, no actual write)")
     elif batch_status == "batch_applied":
-        lines.append("🟢 **SUCCESS** (all items created)")
+        lines.append("🟢 **SUCCESS** (all items created in NetBox)")
+    elif batch_status == "batch_blocked":
+        if any(r.get("status") == "apply_not_implemented" for r in results):
+            lines.append("🔴 **NOT IMPLEMENTED** (real write not yet implemented in this script)")
+        else:
+            lines.append("🔴 **BLOCKED** (validation failed, no write attempted)")
     elif batch_status == "batch_partial_failed":
         lines.append("🟠 **PARTIAL FAILURE** (some items failed)")
-    elif batch_status == "batch_blocked":
-        lines.append("🔴 **BLOCKED** (preflight failed)")
     else:
-        lines.append(f"❓ **{batch_status}**")
+        lines.append(f"⚠️ **{batch_status}**")
     lines.append("")
 
     # Item results
@@ -259,18 +263,29 @@ def render_result(
         object_key = result.get("object_key")
         status = result.get("status")
         message = result.get("message")
+        netbox_id = result.get("netbox_id")
 
-        if status == "success":
+        if status == "would_create":
+            icon = "○"
+            status_text = "WOULD CREATE (DRY RUN)"
+            id_text = "(no ID in dry-run)"
+        elif status == "success":
             icon = "✓"
-            status_text = f"CREATED (id={result.get('netbox_id')})"
+            status_text = f"CREATED (id={netbox_id})"
+        elif status == "apply_not_implemented":
+            icon = "⚠"
+            status_text = "APPLY NOT IMPLEMENTED"
         elif status == "blocked":
             icon = "❌"
             status_text = "BLOCKED"
         elif status == "failed":
             icon = "✗"
             status_text = "FAILED"
+        elif status == "ready":
+            icon = "○"
+            status_text = "READY (preflight passed)"
         else:
-            icon = "⚠"
+            icon = "❓"
             status_text = status
 
         lines.append(f"{icon} **{i}. {object_key}:** {status_text}")
@@ -479,18 +494,23 @@ def main():
             for item in items:
                 results.append({
                     "object_key": item.get("object_key"),
-                    "status": "success",
-                    "message": "Would create (DRY RUN)",
+                    "status": "would_create",
+                    "message": "Would create (DRY RUN, no ID assigned)",
+                    "netbox_id": None,
                 })
         else:
             print(f"Applying {len(items)} items...")
-            # In real mode, we would POST each item here
-            # For now, just simulate success
+            print("❌ CRITICAL: Real batch write is NOT IMPLEMENTED in this script")
+            print("   Aborting to prevent false success reports")
+            print()
+
+            # Mark all items as NOT_IMPLEMENTED
             for i, item in enumerate(results, 1):
-                if item["status"] == "ready":
-                    item["status"] = "success"
-                    item["netbox_id"] = f"18{200 + i}"  # Simulated ID
-                    item["message"] = f"Created as staged"
+                item["status"] = "apply_not_implemented"
+                item["message"] = "Real batch write is not implemented in this version"
+                item["netbox_id"] = None
+
+            batch_status = "batch_blocked"
 
         # Render result
         markdown = render_result(batch_plan, results, args.operator, dry_run, batch_status)
