@@ -1,12 +1,37 @@
 # Rollback Plan — FASE 2.3 Wrong Objects
 
-**Status:** PENDING MANUAL APPROVAL
-**Incident:** INC-2026-04-28-001
+**Status:** CANCELLED / DO NOT EXECUTE
+**Incident:** INC-2026-04-28-001 (combined with INC-2026-04-28-002)
 **Severity:** Critical
+**Updated:** 2026-04-28 after INC-2026-04-28-002 discovery
 
 ---
 
-## Objects to Delete
+## ⚠️ CRITICAL UPDATE: Plan Cancelled
+
+**Discovery (INC-2026-04-28-002):** Script never executed real POST requests.
+
+IDs 18201/18202 were simulated by the script (formula: `f"18{200 + i}"`).
+
+**Consequence:**
+- No evidence that batch apply created these IDs
+- IDs might exist in NetBox from other source or different time
+- Cannot safely delete without NetBox audit trail proof
+
+**New Decision:**
+- DO NOT delete IDs 18201/18202
+- Investigate NetBox audit log for ID creation timestamps
+- Only delete if audit trail confirms creation by this batch
+- If IDs were created by different operation, leave them alone
+
+**Action Required:**
+1. Check NetBox audit log for IDs 18201/18202 creation
+2. If created by batch: manual review + approval before delete
+3. If created by other source: close this rollback plan as "no action"
+
+---
+
+## Objects Status (For Reference - DO NOT DELETE)
 
 ### Object 1: ID 18201
 
