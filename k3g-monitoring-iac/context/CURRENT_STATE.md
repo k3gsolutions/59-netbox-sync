@@ -1,4 +1,4 @@
-# Current State — FASE 1.5 (Complete)
+# Current State — FASE 1.6 (Pilot Complete)
 
 ## Completed
 
@@ -94,6 +94,18 @@
 - ✅ Zero NetBox writes
 - ✅ Zero secrets in records
 
+### End-to-End Approval Pilot (FASE 1.6)
+- ✅ Pilot executed with Eth-Trunk0 (base_inventory interface)
+- ✅ Item selected: safe_create_staged, exact confidence
+- ✅ ApprovalRecord generated (ID: c9363dfb)
+- ✅ Approval summary rendered (7 sections, risk assessment 🟢 LOW)
+- ✅ Dry-run validation passed (exit code 0)
+- ✅ Suggested NetBox payload generated with tags
+- ✅ All security checks passed (zero API, zero writes, zero secrets)
+- ✅ Pilot report created: PILOT-FASE-1-6-RESULT.md
+- ✅ Workflow complete and tested (create → render → dry-run)
+- ✅ Readiness confirmed for FASE 1.7 (endpoint implementation)
+
 ## In Progress
 
 None
@@ -158,11 +170,17 @@ POST /compliance/import-plan/report (FASE 1.3)
 - generate_phase_report.py — Generate phase completion report
 - summarize_repo.py — Summarize repository structure
 
-## Next Phase (FASE 1.6)
+## Next Phase (FASE 1.7)
 
 - Implement `/compliance/approve` endpoint (approval state management, no writes)
-- Web UI para visualizar histórico e timelines
-- CI integration para arquivar relatórios automaticamente
-- Staged import real com execution de aprovações aprovadas (com token write separado)
+  - Accept approval_id in request body
+  - Accept decision (approve, reject, request_changes)
+  - Move ApprovalRecord to approvals/approved/ or /rejected/
+  - Return status and next_step
+  - Zero NetBox writes
+- CI integration para arquivar ImportPlans automaticamente
+- Gerar ApprovalRecords em lote (batch generation script)
+- Web UI básica para visualizar approvals/pending/ e renderizar approval-summary.md
+- Staged import real com execution de aprovações (com token write separado, FASE 1.8)
 - Trend analysis & alertas baseado em histórico
 - Audit log persistence com immutability guarantees

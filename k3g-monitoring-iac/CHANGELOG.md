@@ -94,11 +94,25 @@
 - Workflow completo: create → render → review → dry-run → approved/rejected
 - Zero API calls, zero NetBox writes, apenas validação local
 
-### Planned (FASE 1.6+)
-- Web UI para visualizar histórico e timelines
-- CI integration para arquivar automaticamente
+### Completed — FASE 1.6
+
+**End-to-End Approval Dry-Run Pilot**
+- Piloto completo com item real: Eth-Trunk0 (base_inventory, safe_create_staged, exact confidence)
+- ApprovalRecord generation com validação (ID: c9363dfb)
+- Approval summary rendering com 7 seções e risk assessment (🟢 BAIXO RISCO)
+- Dry-run validation com exit code 0 (PASSED)
+- Suggested NetBox payload gerado com tags
+- Zero API calls, zero NetBox writes confirmado
+- Arquivo: reports/pilot-device-compliance/approvals/pending/PILOT-FASE-1-6-RESULT.md
+- Workflow completo: create_approval_record → render_approval_summary → dry_run_netbox_payload
+
+### Planned (FASE 1.7+)
+- `/compliance/approve` endpoint com state management
+- Batch generation script para ApprovalRecords
+- CI integration para gerar approvals automaticamente
+- Web UI básica para revisão
+- Staged import real com execution (FASE 2.0)
 - Trend analysis & alertas
-- Staged import real com execution de aprovações
 
 ### Fixed
 
