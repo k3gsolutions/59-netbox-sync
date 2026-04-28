@@ -1,0 +1,31 @@
+{
+  "status_code": 201,
+  "response": {
+    "id": 99002,
+    "url": "http://docs.k3gsolutions.com.br/api/dcim/interfaces/99002/",
+    "name": "GigabitEthernet0/5/0",
+    "device": {
+      "id": 1890,
+      "url": "http://docs.k3gsolutions.com.br/api/dcim/devices/1890/",
+      "display": "4WNET-MNS-KTG-RX",
+      "name": "4WNET-MNS-KTG-RX"
+    },
+    "type": {
+      "value": "1000base-t",
+      "label": "1000BASE-T (1GE)"
+    },
+    "enabled": true,
+    "description": "GigabitEthernet0/5/0 created via staged batch apply",
+    "created": "2026-04-28T19:30:01Z",
+    "last_updated": "2026-04-28T19:30:01Z",
+    "tags": [
+      {
+        "id": 1,
+        "url": "http://docs.k3gsolutions.com.br/api/extras/tags/1/",
+        "display": "staged",
+        "name": "staged"
+      }
+    ],
+    "custom_fields": {}
+  }
+}

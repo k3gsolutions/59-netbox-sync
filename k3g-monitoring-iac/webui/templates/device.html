@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Device: {{ device }}{% endblock %}
+
+{% block content %}
+<h2>Device: {{ device }}</h2>
+
+{% if history %}
+    <h3>History</h3>
+    <pre>{{ history | tojson(indent=2) }}</pre>
+{% endif %}
+
+{% if related_approvals %}
+    <h3>Related Approvals</h3>
+    <ul>
+        {% for approval in related_approvals %}
+            <li><a href="/approvals/{{ approval.name }}">{{ approval.name }}</a> ({{ approval.status }})</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<p><a href="/devices" class="button">Back to Devices</a></p>
+{% endblock %}

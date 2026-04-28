@@ -122,11 +122,12 @@ Gerado em: 2026-04-28 14:41:21 UTC
 ## Índice detalhado (auto)
 | Arquivo | Título | Seções (H2) | Linhas |
 | --- | --- | --- | --- |
-| context/CURRENT_STATE.md | Current State — FASE 2.0 (First Real Write Ready) | Completed; In Progress; Blocked; Known Limitations; Metrics | 281 |
+| context/CURRENT_STATE.md | Current State — FASE 2.0 (First Real Write Ready) | Completed; In Progress; Blocked; Known Limitations; Metrics | 292 |
+| context/FASE-2-7-READY-FOR-APPROVAL.md | FASE 2.7 — First Real Batch POST (Ready for Approval) | Current Situation; FASE 2.7 Readiness Checklist; Approval Requirements; Execution Command (Once Approved); Expected Outcome | 156 |
 | context/GLOSSARY.md | GLOSSARY | - | 12 |
-| context/NEXT_ACTIONS.md | Next Actions — FASE 1.7+ | FASE 1.6 Complete ✅; FASE 1.7 Complete ✅; FASE 1.8 Complete ✅; FASE 1.9 — Staged Apply Dry-Run Engine; FASE 1.7.1 — `/compliance/approve` HTTP Endpoint | 231 |
+| context/NEXT_ACTIONS.md | Next Actions — FASE 1.7+ | FASE 1.6 Complete ✅; FASE 1.7 Complete ✅; FASE 1.8 Complete ✅; FASE 1.9 — Staged Apply Dry-Run Engine; FASE 1.7.1 — `/compliance/approve` HTTP Endpoint | 245 |
 | context/OPEN_QUESTIONS.md | OPEN_QUESTIONS | - | 20 |
-| context/PHASE_1_ROADMAP.md | FASE 1 Roadmap — Report Tooling | FASE 1.0 ✅ Core Analysis; FASE 1.1 ✅ Report History; FASE 1.2 ✅ Report Comparison & Cleanup; FASE 1.3 ✅ ImportPlan Read-Only; After FASE 1 | 109 |
+| context/PHASE_1_ROADMAP.md | FASE 1 Roadmap — Report Tooling | FASE 1.0 ✅ Core Analysis; FASE 1.1 ✅ Report History; FASE 1.2 ✅ Report Comparison & Cleanup; FASE 1.3 ✅ ImportPlan Read-Only; After FASE 1 | 110 |
 | context/SYSTEM_MAP.md | SYSTEM_MAP | - | 29 |
 | docs/00-overview.md | 00 — Projeto ISP Observability Automation Framework | Objetivo; Pilares principais; Estrutura de documentação | 16 |
 | docs/01-architecture.md | 01 — Arquitetura | Visão macro; Componentes; Princípios arquiteturais; Integrações planejadas | 31 |
@@ -160,7 +161,7 @@ Gerado em: 2026-04-28 14:41:21 UTC
 | docs/29-staged-apply-dry-run-engine.md | Staged Apply Dry-Run Engine — FASE 1.9 | 1. Objetivo; 2. Scripts; 3. Fluxo Completo; 4. Garantias (FASE 1.9); 5. Limitações (FASE 1.9) | 311 |
 | docs/30-first-staged-netbox-write.md | First Staged NetBox Write — FASE 2.0 | 1. Objetivo; 2. Pré-requisitos; 3. Riscos; 4. Script: apply_staged_netbox_object.py; 5. Validações Obrigatórias | 396 |
 | docs/31-controlled-batch-staged-apply.md | Controlled Batch Staged Apply | 1. Princípio; 2. Escopo Permitido; 3. Escopo Proibido; 4. Política de Lote; 5. Gates por Item | 193 |
-| docs/32-batch-apply-runbook.md | Batch Apply Runbook | 1. Pré-Requisitos; 2. Seleção de Candidatos; 3. Preparação de cada Candidato; 4. Construir Batch ApplyPlan; 5. Validar BatchApplyPlan | 348 |
+| docs/32-batch-apply-runbook.md | Batch Apply Runbook | 1. Pré-Requisitos; 2. Seleção de Candidatos; 3. Preparação de cada Candidato; 4. Construir Batch ApplyPlan; 5. Validar BatchApplyPlan | 361 |
 | docs/33-service-candidate-readiness.md | Service Candidate Readiness Analysis | 1. Objetivo; 2. O que é Service Candidate; 3. Diferença: Base Inventory vs Service; 4. Campos Obrigatórios por Tipo; 5. Classificação de Readiness | 311 |
 | docs/FASE_0_8_1_NETBOX_DEEP_MAPPING.md | Fase 0 8 1 Netbox Deep Mapping | Objetivo; Componentes coletados; Core obrigatório; Plugin BGP; Limitações atuais | 30 |
 | docs/adr/0001-netbox-as-single-sot.md | ADR 0001 — NetBox como single source of truth técnico | Status; Contexto; Decisão; Consequências; Referências | 19 |

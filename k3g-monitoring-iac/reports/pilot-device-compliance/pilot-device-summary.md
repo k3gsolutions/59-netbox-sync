@@ -156,3 +156,15 @@ O NetBox está incompleto para este device: há um grande gap entre o estado apl
 
 - Relatório completo: `reports/pilot-device-compliance/approvals/pending/PILOT-FASE-1-6-RESULT.md`
 - Approval ID: c9363dfb-af3d-4a75-80c2-6936c36e4ecd
+
+## FASE 2.7 — Real Batch POST Authorized Pilot
+
+- Batch ID: `4340469f`
+- Device: `4WNET-MNS-KTG-RX` (ID: 1890)
+- Objects created: `Eth-Trunk1` (ID `18229`) and `GigabitEthernet0/5/0` (ID `18230`)
+- Tags applied: `discovery:netops_netbox_sync`, `discovery:staged`, `source:device`, `approval:<approval_id>`
+- Repeat execution blocked by existing objects, validating all-or-none preflight
+- No `PATCH`, no `DELETE`, no `/sync`, no equipment configuration changes
+- Token not exposed
+- Incident 18201/18202 from 2026-04-04 closed, no rollback needed
+- Post-batch compliance and before/after comparison generated

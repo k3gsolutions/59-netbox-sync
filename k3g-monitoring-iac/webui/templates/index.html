@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<div class="cards">
+    <div class="card">
+        <h3>{{ total_devices }}</h3>
+        <p>Devices with History</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ total_reports }}</h3>
+        <p>Compliance Reports</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ total_approvals }}</h3>
+        <p>Approval Records</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ total_incidents }}</h3>
+        <p>Incidents</p>
+    </div>
+</div>
+
+<h3>Latest Report</h3>
+{% if latest_report %}
+    <a href="/reports/view?path={{ latest_report }}" class="button">View {{ latest_report }}</a>
+{% else %}
+    <p>No reports available</p>
+{% endif %}
+
+<h3>Latest Batch Result</h3>
+{% if latest_batch %}
+    <a href="/reports/view?path={{ latest_batch.path }}" class="button">View {{ latest_batch.name }}</a>
+{% else %}
+    <p>No batch results available</p>
+{% endif %}
+
+<h3>Quick Links</h3>
+<ul>
+    <li><a href="/devices">All Devices</a></li>
+    <li><a href="/approvals">Approval Records</a></li>
+    <li><a href="/apply-plans">Apply Plans</a></li>
+    <li><a href="/batch-results">Batch Results</a></li>
+    <li><a href="/incidents">Incident Reports</a></li>
+    <li><a href="/comparisons">Device Comparisons</a></li>
+</ul>
+{% endblock %}

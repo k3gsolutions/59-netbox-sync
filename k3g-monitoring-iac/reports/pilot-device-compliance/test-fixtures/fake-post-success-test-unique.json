@@ -1,0 +1,31 @@
+{
+  "status_code": 201,
+  "response": {
+    "id": 99999,
+    "url": "http://docs.k3gsolutions.com.br/api/dcim/interfaces/99999/",
+    "name": "TestInterface-20260428-DoNotCreate",
+    "device": {
+      "id": 1890,
+      "url": "http://docs.k3gsolutions.com.br/api/dcim/devices/1890/",
+      "display": "4WNET-MNS-KTG-RX",
+      "name": "4WNET-MNS-KTG-RX"
+    },
+    "type": {
+      "value": "1000base-t",
+      "label": "1000BASE-T (1GE)"
+    },
+    "enabled": true,
+    "description": "Test object (fake creation)",
+    "created": "2026-04-28T20:19:00Z",
+    "last_updated": "2026-04-28T20:19:00Z",
+    "tags": [
+      {
+        "id": 999,
+        "url": "http://docs.k3gsolutions.com.br/api/extras/tags/999/",
+        "display": "test:temporary",
+        "name": "test:temporary"
+      }
+    ],
+    "custom_fields": {}
+  }
+}

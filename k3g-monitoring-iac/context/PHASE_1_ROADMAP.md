@@ -67,8 +67,9 @@ Read-only enrichment proposals para o NetBox.
 ## After FASE 1
 - ✅ FASE 1 complete
 - ✅ FASE 2.0 first real staged write executed (Approval ID c9363dfb, Eth-Trunk0, POST, 201 Created, NetBox object ID 18228)
+- ✅ FASE 2.7 real batch POST authorized pilot completed for batch 4340469f on 4WNET-MNS-KTG-RX (device_id 1890)
 - ✅ FASE 2.1 design validated with base/service correction and post-apply compliance validation
-- ➜ Next: FASE 2.2 política para múltiplos staged applies em lote controlado, ainda limitado a base_inventory
+- ➜ Next: FASE 2.8 Base Inventory Expansion Policy; FASE 2.9 Service Candidate Enrichment Workflow (read-only); FASE 3.0 Web UI read-only
 
 ## FASE 1.4 Web UI Prototype
 

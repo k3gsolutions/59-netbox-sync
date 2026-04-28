@@ -1,0 +1,24 @@
+{
+  "status_code": 200,
+  "response": {
+    "id": 99001,
+    "url": "http://docs.k3gsolutions.com.br/api/dcim/interfaces/99001/",
+    "name": "Eth-Trunk1",
+    "device": {
+      "id": 2647,
+      "url": "http://docs.k3gsolutions.com.br/api/dcim/devices/2647/",
+      "display": "INFORR-BVA-JCL-RX",
+      "name": "INFORR-BVA-JCL-RX"
+    },
+    "type": {
+      "value": "1000base-t",
+      "label": "1000BASE-T (1GE)"
+    },
+    "enabled": true,
+    "description": "Device mismatch on GET verification (test)",
+    "created": "2026-04-28T19:30:00Z",
+    "last_updated": "2026-04-28T19:30:00Z",
+    "tags": [],
+    "custom_fields": {}
+  }
+}

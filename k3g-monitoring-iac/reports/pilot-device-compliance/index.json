@@ -1,11 +1,11 @@
 {
   "version": "1.1",
-  "generated_at": "2026-04-28T17:11:40Z",
+  "generated_at": "2026-04-28T20:46:03Z",
   "devices": {
     "4WNET-MNS-KTG-RX": {
       "device_id": 1890,
-      "last_report": "2026-04-28T17:11:40Z",
-      "reports_count": 3,
+      "last_report": "2026-04-28T20:46:03Z",
+      "reports_count": 6,
       "history_path": "history/4WNET-MNS-KTG-RX"
     }
   },

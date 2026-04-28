@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Apply Plans{% endblock %}
+
+{% block content %}
+<h2>Apply Plans</h2>
+
+{% if apply_plans %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Path</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in apply_plans %}
+                <tr>
+                    <td>{{ plan.name }}</td>
+                    <td>{{ plan.path }}</td>
+                    <td>
+                        <a href="/reports/view?path={{ plan.path }}" class="button-small">View</a>
+                        <a href="/reports/download?path={{ plan.path }}" class="button-small">Download</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No apply plans found</p>
+{% endif %}
+{% endblock %}

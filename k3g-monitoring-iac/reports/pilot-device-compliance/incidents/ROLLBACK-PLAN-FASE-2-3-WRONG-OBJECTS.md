@@ -1,33 +1,34 @@
 # Rollback Plan — FASE 2.3 Wrong Objects
 
-**Status:** CANCELLED / DO NOT EXECUTE
+**Status:** CLOSED — NO ACTION REQUIRED
 **Incident:** INC-2026-04-28-001 (combined with INC-2026-04-28-002)
 **Severity:** Critical
 **Updated:** 2026-04-28 after INC-2026-04-28-002 discovery
 
 ---
 
-## ⚠️ CRITICAL UPDATE: Plan Cancelled
+## ✅ CLOSED — Audit Investigation Complete
 
-**Discovery (INC-2026-04-28-002):** Script never executed real POST requests.
+**Discovery (FASE 2.5):** NetBox audit confirmed IDs 18201/18202 pre-existed.
 
-IDs 18201/18202 were simulated by the script (formula: `f"18{200 + i}"`).
+Audit Results:
+- ID 18201: created 2026-04-04T21:51:31Z (LoopBack100)
+- ID 18202: created 2026-04-04T21:51:32Z (NULL0)
+- Batch executed: 2026-04-28T19:01:04Z (24 days later)
 
-**Consequence:**
-- No evidence that batch apply created these IDs
-- IDs might exist in NetBox from other source or different time
-- Cannot safely delete without NetBox audit trail proof
+**Evidence:**
+- IDs created **24 days before** batch execution
+- Script never made real POST (verified via code analysis)
+- IDs were NOT created by batch apply
 
-**New Decision:**
-- DO NOT delete IDs 18201/18202
-- Investigate NetBox audit log for ID creation timestamps
-- Only delete if audit trail confirms creation by this batch
-- If IDs were created by different operation, leave them alone
+**Final Decision:**
+- ✅ NO ROLLBACK NEEDED
+- ✅ IDs can remain in NetBox (pre-existing, unrelated to batch)
+- ✅ No delete required
+- ✅ Incident closes as "no action required"
 
-**Action Required:**
-1. Check NetBox audit log for IDs 18201/18202 creation
-2. If created by batch: manual review + approval before delete
-3. If created by other source: close this rollback plan as "no action"
+**Conclusion:**
+This rollback plan is hereby **CLOSED**. No manual deletion necessary. The IDs 18201/18202 are pre-existing objects on device 2647 and have no relation to batch execution on 2026-04-28.
 
 ---
 

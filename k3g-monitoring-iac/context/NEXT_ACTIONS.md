@@ -1,3 +1,24 @@
+# Next Actions — 2026-04-28 (FASE 2.7 Ready for Approval)
+
+## Immediate (This Week)
+
+### 1. FASE 2.7 — Real Batch POST ✅ **COMPLETE**
+- ✅ Tech lead review + code approval (completed)
+- ✅ Supervisor incident closure approval (completed)
+- ✅ Operations batch execution approval (completed)
+- ✅ Executed with --enable-real-post-implementation flag
+- ✅ NetBox objects created: Eth-Trunk1 (ID 18229), GigabitEthernet0/5/0 (ID 18230)
+- ✅ Results documented in FASE-2-7-BATCH-CLOSURE.md
+- ⏳ FREEZE ready for closure (objects verified in NetBox)
+
+### 2. Web UI Production ✅ **LIVE**
+- Status: http://127.0.0.1:8890 (all 7/7 tests passing)
+- Features: Dashboard, Devices, Approvals, Incidents, Batch Results, Search
+- Security: Path traversal blocked, denylist enforced, zero POST routes
+- Ready for team demo
+
+---
+
 # Next Actions — FASE 1.7+
 
 ## FASE 1.6 Complete ✅
@@ -220,6 +241,20 @@ Interface básica para revisão de approvals.
 - [ ] CI integration
 - [ ] Web UI
 - [ ] Staged import (FASE 2.0)
+
+## FASE 2.7 — Real Batch POST Authorized Pilot Completed
+- Batch ID: `4340469f` executed on `4WNET-MNS-KTG-RX` (device_id `1890`)
+- Objects created: `Eth-Trunk1` ID `18229`, `GigabitEthernet0/5/0` ID `18230`
+- Preflight all-or-none validated by repeat run blocked on existing objects
+- No `PATCH`, no `DELETE`, no `/sync`, no equipment configuration changes
+- Token not exposed
+- Incident 18201/18202 closed, no rollback needed
+- Post-batch compliance and before/after comparison created
+
+## Próximas fases recomendadas
+- FASE 2.8 — Base Inventory Expansion Policy
+- FASE 2.9 — Service Candidate Enrichment Workflow, sem escrita
+- FASE 3.0 — Web UI read-only
 
 ---
 

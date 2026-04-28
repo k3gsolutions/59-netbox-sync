@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Batch Results{% endblock %}
+
+{% block content %}
+<h2>Batch Apply Results</h2>
+
+{% if results %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Path</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+                <tr>
+                    <td>{{ result.name }}</td>
+                    <td>{{ result.path }}</td>
+                    <td>
+                        <a href="/reports/view?path={{ result.path }}" class="button-small">View</a>
+                        <a href="/reports/download?path={{ result.path }}" class="button-small">Download</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No batch results found</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,24 @@
+{
+  "status_code": 201,
+  "response": {
+    "id": null,
+    "url": null,
+    "name": "Eth-Trunk1",
+    "device": {
+      "id": 1890,
+      "url": "http://docs.k3gsolutions.com.br/api/dcim/devices/1890/",
+      "display": "4WNET-MNS-KTG-RX",
+      "name": "4WNET-MNS-KTG-RX"
+    },
+    "type": {
+      "value": "1000base-t",
+      "label": "1000BASE-T (1GE)"
+    },
+    "enabled": true,
+    "description": "Missing ID (test)",
+    "created": null,
+    "last_updated": null,
+    "tags": [],
+    "custom_fields": {}
+  }
+}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Approvals{% endblock %}
+
+{% block content %}
+<h2>Approval Records</h2>
+
+{% if approvals %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for approval in approvals %}
+                <tr>
+                    <td>{{ approval.name }}</td>
+                    <td><span class="badge badge-{{ approval.status }}">{{ approval.status }}</span></td>
+                    <td>
+                        <a href="/approvals/{{ approval.name }}" class="button-small">View</a>
+                        <a href="/reports/download?path={{ approval.path }}" class="button-small">Download</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No approval records found</p>
+{% endif %}
+{% endblock %}

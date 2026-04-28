@@ -1,0 +1,285 @@
+# Web UI — Read-Only Compliance & Governance Dashboard
+
+**Version:** 3.0
+**Status:** Local development
+**Security:** Read-only, no writes, no tokens
+
+---
+
+## Overview
+
+Local web interface for reviewing compliance reports, approval records, apply plans, batch results, and incidents.
+
+- FastAPI + Jinja2 templates
+- Static CSS (no JavaScript framework)
+- Path traversal protection
+- Denylist for sensitive files
+- No POST/PATCH/DELETE endpoints
+- No NetBox API integration
+
+---
+
+## Installation
+
+### Option 1: Virtual Environment (Recommended)
+
+```bash
+# Create venv
+python3 -m venv .venv-ui
+
+# Activate
+source .venv-ui/bin/activate  # macOS/Linux
+# or
+.venv-ui\Scripts\activate  # Windows
+
+# Install dependencies
+pip install -r webui/requirements.txt
+```
+
+### Option 2: Use Existing venv
+
+```bash
+.venv/bin/pip install -r webui/requirements.txt
+```
+
+---
+
+## Running the UI
+
+```bash
+# If using .venv-ui
+source .venv-ui/bin/activate
+python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 8890 --reload
+
+# If using existing .venv
+.venv/bin/python -m uvicorn webui.app:app --host 127.0.0.1 --port 8890 --reload
+```
+
+Then open: **http://127.0.0.1:8890**
+
+---
+
+## Features
+
+### Dashboard
+- Summary cards (devices, reports, approvals, incidents)
+- Latest report link
+- Latest batch result
+- Quick navigation links
+
+### Devices
+- List all devices with history
+- Device detail page
+- Related approval records
+
+### Reports
+- View markdown reports (formatted HTML)
+- Download as .md
+- Search across reports
+
+### Approvals
+- List approval records by status (pending, approved, rejected, applied)
+- View single approval (formatted JSON)
+- Download JSON
+
+### Apply Plans
+- List all apply plans
+- View as JSON or formatted
+- Download
+
+### Batch Results
+- List batch apply results
+- View markdown report
+- Download
+
+### Incidents
+- List incident reports
+- View markdown
+- Download
+
+### Comparisons
+- List device comparisons
+- View and download
+
+### Search
+- Simple search across .md files
+- Search in reports/, docs/, context/
+
+---
+
+## Security
+
+### Protections
+- ✅ Path traversal blocked (`..` disallowed)
+- ✅ Denylist blocks sensitive files:
+  - `payload.local.json`
+  - Files with "raw" in name
+  - Files with "token", "password", "secret"
+- ✅ No POST/PATCH/DELETE endpoints
+- ✅ Read-only only
+- ✅ No NetBox API calls
+- ✅ No write tokens needed
+
+### Safe File Access
+- Paths validated against `reports/` directory only
+- Extensions whitelist: `.md`, `.json`, `.txt`
+- Markdown rendered to HTML (prevents script injection)
+- File downloads blocked for sensitive extensions
+
+---
+
+## Structure
+
+```
+webui/
+  app.py                 # FastAPI application
+  requirements.txt       # Python dependencies
+  README.md             # This file
+  services/
+    artifact_scanner.py # Path safety, file discovery
+    markdown_loader.py  # Load and render markdown
+    report_index.py     # Parse report metrics
+  templates/
+    base.html           # Layout template
+    index.html          # Dashboard
+    devices.html        # Device list
+    device.html         # Device detail
+    approvals.html      # Approval list
+    approval_view.html  # Approval detail
+    apply_plans.html    # Apply plan list
+    batch_results.html  # Batch result list
+    incidents.html      # Incident list
+    comparisons.html    # Comparison list
+    report_view.html    # Report viewer
+    search.html         # Search results
+  static/
+    style.css           # Stylesheet
+```
+
+---
+
+## Testing
+
+### Syntax Check
+```bash
+python3 -m py_compile webui/app.py webui/services/*.py
+```
+
+### Security Tests
+```bash
+python3 tools/local/test_webui_readonly.py
+```
+
+Tests verify:
+- ✅ Path traversal blocked
+- ✅ Sensitive files blocked
+- ✅ No POST routes
+- ✅ No write keywords in code
+- ✅ Read-only enforced
+
+---
+
+## Limitations
+
+- **No authentication** — local only, no login
+- **No RBAC** — all users see everything
+- **No approval actions** — read-only, no approve/reject/apply buttons
+- **No NetBox API** — reads local files only
+- **Basic search** — no advanced filters yet
+- **Markdown rendering** — requires `markdown` library or fallback to <pre>
+
+---
+
+## Future Phases
+
+- **FASE 3.1** — Advanced filters and search
+- **FASE 3.2** — Approval timeline visualization
+- **FASE 3.3** — Authentication/RBAC
+- **FASE 3.4** — Read-only approval workflow UI (still no apply)
+- **FASE 3.5** — Apply via UI (requires 3.4 + RBAC + approval)
+
+---
+
+## Configuration
+
+### Port
+Change in `app.py` or via command-line:
+```bash
+python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 9999 --reload
+```
+
+### Host
+Change to allow external access (not recommended for production):
+```bash
+python3 -m uvicorn webui.app:app --host 0.0.0.0 --port 8890 --reload
+```
+
+### Auto-reload
+Remove `--reload` for production:
+```bash
+python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 8890
+```
+
+---
+
+## Troubleshooting
+
+### Port Already in Use
+```bash
+# Use different port
+python3 -m uvicorn webui.app:app --port 8891
+```
+
+### Jinja2 Not Found
+```bash
+# Install dependencies
+pip install -r webui/requirements.txt
+```
+
+### Templates Not Found
+Ensure you're running from project root:
+```bash
+cd /path/to/k3g-monitoring-iac
+python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 8890 --reload
+```
+
+---
+
+## Status
+
+✅ Implemented:
+- Dashboard with summary cards
+- Device list and detail
+- Report viewer with markdown rendering
+- Approval records (list and detail)
+- Apply plans list
+- Batch results list
+- Incidents list
+- Comparisons list
+- Simple search
+- Path traversal protection
+- Denylist for sensitive files
+- CSS styling (responsive)
+
+⏳ Not implemented (future phases):
+- Authentication
+- RBAC
+- Approval actions
+- Advanced filters
+- Timeline visualization
+- NetBox API integration
+
+---
+
+## Support
+
+- **Read-only only** — No changes made to files or NetBox
+- **Local only** — No external access by default
+- **Safe downloads** — Sensitive files blocked
+- **FREEZE honored** — UI respects project freeze status (informational only)
+
+---
+
+**Last updated:** 2026-04-28
+**Owner:** Claude Haiku 4.5
+**Version:** 3.0

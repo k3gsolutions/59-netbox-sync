@@ -1,0 +1,24 @@
+{
+  "status_code": 201,
+  "response": {
+    "id": 99004,
+    "url": "http://docs.k3gsolutions.com.br/api/dcim/interfaces/99004/",
+    "name": "WrongName",
+    "device": {
+      "id": 1890,
+      "url": "http://docs.k3gsolutions.com.br/api/dcim/devices/1890/",
+      "display": "4WNET-MNS-KTG-RX",
+      "name": "4WNET-MNS-KTG-RX"
+    },
+    "type": {
+      "value": "1000base-t",
+      "label": "1000BASE-T (1GE)"
+    },
+    "enabled": true,
+    "description": "Name mismatch (test)",
+    "created": "2026-04-28T19:30:00Z",
+    "last_updated": "2026-04-28T19:30:00Z",
+    "tags": [],
+    "custom_fields": {}
+  }
+}

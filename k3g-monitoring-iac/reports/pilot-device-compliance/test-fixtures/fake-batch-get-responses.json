@@ -1,0 +1,72 @@
+{
+  "18229": {
+    "status_code": 200,
+    "response": {
+      "id": 18229,
+      "url": "http://netbox.internal.lab/api/dcim/interfaces/18229/",
+      "name": "Eth-Trunk1",
+      "device": {
+        "id": 1890,
+        "url": "http://netbox.internal.lab/api/dcim/devices/1890/",
+        "display": "4WNET-MNS-KTG-RX",
+        "name": "4WNET-MNS-KTG-RX"
+      },
+      "type": {
+        "value": "1000base-t",
+        "label": "1000BASE-T (1GE)"
+      },
+      "enabled": true,
+      "mtu": 1500,
+      "created": "2026-04-28T22:58:27Z",
+      "last_updated": "2026-04-28T22:58:27Z",
+      "tags": [
+        {"id": 1, "name": "discovery:netops_netbox_sync"},
+        {"id": 2, "name": "discovery:staged"},
+        {"id": 3, "name": "source:device"},
+        {"id": 4, "name": "approval:fb0a50b3"}
+      ],
+      "custom_fields": {
+        "discovery_source": "device_inventory",
+        "discovery_status": "staged",
+        "discovery_confidence": "exact",
+        "import_plan_id": "84c3921a-ced7-4d0d-8051-948e3b62f190",
+        "approval_id": "fb0a50b3-c780d1e9-1338-42c4-acfc-b8ca4f49ea9d"
+      }
+    }
+  },
+  "18230": {
+    "status_code": 200,
+    "response": {
+      "id": 18230,
+      "url": "http://netbox.internal.lab/api/dcim/interfaces/18230/",
+      "name": "GigabitEthernet0/5/0",
+      "device": {
+        "id": 1890,
+        "url": "http://netbox.internal.lab/api/dcim/devices/1890/",
+        "display": "4WNET-MNS-KTG-RX",
+        "name": "4WNET-MNS-KTG-RX"
+      },
+      "type": {
+        "value": "1000base-t",
+        "label": "1000BASE-T (1GE)"
+      },
+      "enabled": true,
+      "mtu": 1500,
+      "created": "2026-04-28T22:58:27Z",
+      "last_updated": "2026-04-28T22:58:27Z",
+      "tags": [
+        {"id": 1, "name": "discovery:netops_netbox_sync"},
+        {"id": 2, "name": "discovery:staged"},
+        {"id": 3, "name": "source:device"},
+        {"id": 4, "name": "approval:d1dce466"}
+      ],
+      "custom_fields": {
+        "discovery_source": "device_inventory",
+        "discovery_status": "staged",
+        "discovery_confidence": "exact",
+        "import_plan_id": "54ad4ef6-a8e6-46cf-8bc7-0b624ad353db",
+        "approval_id": "d1dce466-edaeefe9-1f54-4165-ada7-fd9ff7fc8f6a"
+      }
+    }
+  }
+}

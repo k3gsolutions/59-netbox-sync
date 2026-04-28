@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Comparisons{% endblock %}
+
+{% block content %}
+<h2>Device Comparisons</h2>
+
+{% if comparisons %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Path</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comparison in comparisons %}
+                <tr>
+                    <td>{{ comparison.name }}</td>
+                    <td>{{ comparison.path }}</td>
+                    <td>
+                        <a href="/reports/view?path={{ comparison.path }}" class="button-small">View</a>
+                        <a href="/reports/download?path={{ comparison.path }}" class="button-small">Download</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No comparisons found</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Incidents{% endblock %}
+
+{% block content %}
+<h2>Incident Reports</h2>
+
+{% if incidents %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Path</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for incident in incidents %}
+                <tr>
+                    <td>{{ incident.name }}</td>
+                    <td>{{ incident.path }}</td>
+                    <td>
+                        <a href="/reports/view?path={{ incident.path }}" class="button-small">View</a>
+                        <a href="/reports/download?path={{ incident.path }}" class="button-small">Download</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No incidents found</p>
+{% endif %}
+{% endblock %}

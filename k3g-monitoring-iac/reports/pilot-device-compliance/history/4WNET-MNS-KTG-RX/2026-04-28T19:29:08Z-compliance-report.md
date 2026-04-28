@@ -6,7 +6,7 @@
 - NetBox carregado: Sim
 - Compliance habilitado: Sim
 - Status geral: drift_detected
-- Total de divergências: 160
+- Total de divergências: 161
 - Severidade mais alta: high
 
 ## 2. Sumário aplicado no dispositivo
@@ -26,7 +26,7 @@
 ## 3. Sumário documentado no NetBox
 | Métrica | Valor |
 |---|---|
-| Interfaces | 4 |
+| Interfaces | 2 |
 | IPs | 2 |
 | VRFs | 1 |
 | VLANs | 0 |
@@ -40,7 +40,7 @@
 ## 4. Diff agregado (por métrica)
 | Métrica | Aplicado | Documentado | Delta | Status |
 |---|---|---|---|---|
-| interfaces | 64 | 4 | 60 | mismatch |
+| interfaces | 64 | 2 | 62 | mismatch |
 | ip_addresses | 38 | 2 | 36 | mismatch |
 | vrfs | 2 | 1 | 1 | mismatch |
 | vlans | 1 | 0 | 1 | mismatch |
@@ -107,8 +107,9 @@
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | Eth-Trunk0.827 | fix_netbox | Interface Eth-Trunk0.827 existe no dispositivo, mas não no NetBox. |
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | Eth-Trunk0.828 | fix_netbox | Interface Eth-Trunk0.828 existe no dispositivo, mas não no NetBox. |
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | Eth-Trunk0.895 | fix_netbox | Interface Eth-Trunk0.895 existe no dispositivo, mas não no NetBox. |
-| medium | INTERFACE_DESCRIPTION_MISMATCH | interface | Eth-Trunk1 | review | Descrição da interface Eth-Trunk1 difere entre dispositivo e NetBox. |
+| medium | INTERFACE_MISSING_IN_NETBOX | interface | Eth-Trunk1 | fix_netbox | Interface Eth-Trunk1 existe no dispositivo, mas não no NetBox. |
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | Ethernet0/0/0 | fix_netbox | Interface Ethernet0/0/0 existe no dispositivo, mas não no NetBox. |
+| medium | INTERFACE_MISSING_IN_NETBOX | interface | GigabitEthernet0/5/0 | fix_netbox | Interface GigabitEthernet0/5/0 existe no dispositivo, mas não no NetBox. |
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | GigabitEthernet0/5/1 | fix_netbox | Interface GigabitEthernet0/5/1 existe no dispositivo, mas não no NetBox. |
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | GigabitEthernet0/5/2 | fix_netbox | Interface GigabitEthernet0/5/2 existe no dispositivo, mas não no NetBox. |
 | medium | INTERFACE_MISSING_IN_NETBOX | interface | GigabitEthernet0/5/3 | fix_netbox | Interface GigabitEthernet0/5/3 existe no dispositivo, mas não no NetBox. |
@@ -265,7 +266,9 @@
 - INTERFACE_MISSING_IN_NETBOX (interface: Eth-Trunk0.827) — Interface Eth-Trunk0.827 existe no dispositivo, mas não no NetBox.
 - INTERFACE_MISSING_IN_NETBOX (interface: Eth-Trunk0.828) — Interface Eth-Trunk0.828 existe no dispositivo, mas não no NetBox.
 - INTERFACE_MISSING_IN_NETBOX (interface: Eth-Trunk0.895) — Interface Eth-Trunk0.895 existe no dispositivo, mas não no NetBox.
+- INTERFACE_MISSING_IN_NETBOX (interface: Eth-Trunk1) — Interface Eth-Trunk1 existe no dispositivo, mas não no NetBox.
 - INTERFACE_MISSING_IN_NETBOX (interface: Ethernet0/0/0) — Interface Ethernet0/0/0 existe no dispositivo, mas não no NetBox.
+- INTERFACE_MISSING_IN_NETBOX (interface: GigabitEthernet0/5/0) — Interface GigabitEthernet0/5/0 existe no dispositivo, mas não no NetBox.
 - INTERFACE_MISSING_IN_NETBOX (interface: GigabitEthernet0/5/1) — Interface GigabitEthernet0/5/1 existe no dispositivo, mas não no NetBox.
 - INTERFACE_MISSING_IN_NETBOX (interface: GigabitEthernet0/5/2) — Interface GigabitEthernet0/5/2 existe no dispositivo, mas não no NetBox.
 - INTERFACE_MISSING_IN_NETBOX (interface: GigabitEthernet0/5/3) — Interface GigabitEthernet0/5/3 existe no dispositivo, mas não no NetBox.
@@ -380,7 +383,6 @@
 ### Revisão manual
 - MISSING_ON_DEVICE — Existem objetos documentados no NetBox que não aparecem no dispositivo.
 - INTERFACE_DESCRIPTION_MISMATCH (interface: Eth-Trunk0) — Descrição da interface Eth-Trunk0 difere entre dispositivo e NetBox.
-- INTERFACE_DESCRIPTION_MISMATCH (interface: Eth-Trunk1) — Descrição da interface Eth-Trunk1 difere entre dispositivo e NetBox.
 - INTERFACE_MISSING_ON_DEVICE (interface: eth0) — Interface eth0 existe no NetBox, mas não no dispositivo.
 - VRF_MISSING_ON_DEVICE (vrf: 4WNET) — VRF 4WNET existe no NetBox, mas não no dispositivo.
 

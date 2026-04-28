@@ -117,6 +117,19 @@ Dashboard & alerts:
 - Before/after comparison generated
 - Token not exposed
 
+### ✅ FASE 2.7 — Real Batch POST Authorized Pilot
+
+**Completed:**
+- Batch ID: `4340469f`
+- Device: `4WNET-MNS-KTG-RX` (device_id `1890`)
+- Objects created: `Eth-Trunk1` (ID `18229`) and `GigabitEthernet0/5/0` (ID `18230`)
+- Tags: `discovery:netops_netbox_sync`, `discovery:staged`, `source:device`, `approval:<approval_id>`
+- Repeat batch run blocked by existing objects, validating all-or-none preflight
+- No `PATCH`, no `DELETE`, no `/sync`, no equipment configuration changes
+- Token not exposed
+- Incident 18201/18202 from 2026-04-04 closed, no rollback needed
+- Post-batch compliance and before/after comparison generated
+
 ### FASE 2.1 — Tag Bootstrap & Batch Staged Apply (Q2-Q3 2026)
 
 **Planned:**

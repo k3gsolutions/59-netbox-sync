@@ -211,6 +211,19 @@ Conteúdo:
 
 Revisar resultado antes de executar real write.
 
+## 7.5 Piloto de FASE 2.7
+
+O piloto de FASE 2.7 foi executado com sucesso:
+- Batch ID: `4340469f`
+- Device: `4WNET-MNS-KTG-RX` (device_id `1890`)
+- Objetos criados: `Eth-Trunk1` (ID `18229`) e `GigabitEthernet0/5/0` (ID `18230`)
+- Tags aplicadas: `discovery:netops_netbox_sync`, `discovery:staged`, `source:device`, `approval:<approval_id>`
+- Reexecução bloqueada corretamente por objeto existente, validando preflight all-or-none
+- Sem `PATCH`, sem `DELETE`, sem `/sync`, sem alteração em equipamento
+- Token não exposto
+- Incidente 18201/18202 de 2026-04-04 encerrado, sem rollback necessário
+- Compliance pós-batch e comparação antes/depois geradas
+
 ## 8. Real Write Batch
 
 Se dry-run passou, executar real write:

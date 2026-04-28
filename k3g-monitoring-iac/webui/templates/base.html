@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} — k3g Compliance</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><a href="/">⚙️ k3g Compliance & Governance</a></h1>
+            <nav>
+                <a href="/">Dashboard</a>
+                <a href="/devices">Devices</a>
+                <a href="/approvals">Approvals</a>
+                <a href="/incidents">Incidents</a>
+                <a href="/apply-plans">Apply Plans</a>
+                <a href="/batch-results">Batch Results</a>
+            </nav>
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer>
+            <p>Read-only compliance dashboard v3.0 — No writes, no tokens</p>
+        </footer>
+    </div>
+</body>
+</html>

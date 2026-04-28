@@ -39,7 +39,8 @@ A partir da fase atual, o fluxo de compliance também gera um ImportPlan read-on
 - Sem alteração em equipamento
 - ImportPlan real gerado para `4WNET-MNS-KTG-RX`
 - FASE 2.0 completed: first real staged apply for Eth-Trunk0 with 201 Created and post-apply compliance validated
-- Recommended next: FASE 2.2 — política para múltiplos staged applies em lote controlado, ainda limitado a base_inventory
+- FASE 2.7 completed: real batch POST authorized pilot for batch 4340469f on 4WNET-MNS-KTG-RX with Eth-Trunk1 ID 18229 and GigabitEthernet0/5/0 ID 18230; repeat run blocked by existing objects; no PATCH/DELETE/sync/config changes; token not exposed
+- Recommended next: FASE 2.8 — Base Inventory Expansion Policy; FASE 2.9 — Service Candidate Enrichment Workflow (read-only); FASE 3.0 — Web UI read-only
 
 ## Comparar Relatórios
 

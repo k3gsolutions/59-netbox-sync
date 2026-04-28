@@ -1,0 +1,47 @@
+{
+  "batch_id": "test-unique-9999",
+  "generated_at": "2026-04-28T19:20:01.030110+00:00",
+  "max_items": 1,
+  "total_items": 1,
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 1890,
+  "items": [
+    {
+      "apply_plan_id": "test-unique-id-1",
+      "approval_id": "test-unique-approval",
+      "object_key": "TestInterface-20260428-DoNotCreate",
+      "object_type": "interface",
+      "action": "safe_create_staged",
+      "category": "base_inventory",
+      "device": "4WNET-MNS-KTG-RX",
+      "device_id": 1890,
+      "method": "POST",
+      "target_endpoint": "/api/dcim/interfaces/",
+      "staged_payload": {
+        "device": 1890,
+        "name": "TestInterface-20260428-DoNotCreate",
+        "type": "1000base-t",
+        "enabled": true,
+        "mtu": 1500,
+        "tags": [
+          {
+            "name": "test:temporary"
+          }
+        ],
+        "custom_fields": {
+          "discovery_source": "test",
+          "discovery_status": "test"
+        }
+      },
+      "payload_hash": "test",
+      "readiness_status": "ready"
+    }
+  ],
+  "readiness_status": "ready",
+  "blocked_reasons": [],
+  "write_policy": {
+    "real_apply_enabled": false,
+    "write_token_provided": false,
+    "max_items": 1
+  }
+}

@@ -250,6 +250,17 @@
 - ✅ Validações: sem secrets
 - ✅ Output: batch-apply-result-<batch_id>.md
 
+### Added — FASE 2.7
+- Real batch POST autorizado executado para batch `4340469f` em `4WNET-MNS-KTG-RX` (device_id `1890`)
+- Objetos criados no NetBox: `Eth-Trunk1` (ID `18229`) e `GigabitEthernet0/5/0` (ID `18230`)
+- Tags aplicadas: `discovery:netops_netbox_sync`, `discovery:staged`, `source:device`, `approval:<approval_id>`
+- Reexecução do batch bloqueada corretamente por `object already exists`, validando o preflight all-or-none
+- Nenhum `PATCH`, nenhum `DELETE`, nenhum `/sync`, nenhuma configuração em equipamento
+- Token não exposto em arquivo ou relatório
+- Incidente anterior encerrado: `18201`/`18202` eram objetos antigos de `2026-04-04`, `no_rollback_needed`
+- Compliance pós-batch gerado e comparação antes/depois registrada
+- Próximas fases recomendadas: FASE 2.8 — Base Inventory Expansion Policy; FASE 2.9 — Service Candidate Enrichment Workflow, sem escrita; FASE 3.0 — Web UI read-only
+
 ### Planned — FASE 2.2 (Design)
 - ✅ Documentação: docs/31-controlled-batch-staged-apply.md (design e gates)
 - ✅ Documentação: docs/32-batch-apply-runbook.md (runbook operacional)
@@ -297,3 +308,24 @@
 - Object-level divergence detection
 - Markdown compliance report generation
 - 58 unit tests, 100% read-only
+
+## [3.0.1] — 2026-04-28
+
+### Web UI Test Closure
+- ✅ All 7 security tests passing
+- ✅ Path traversal protection verified
+- ✅ Denylist enforcement verified
+- ✅ Zero POST/PATCH/DELETE routes confirmed
+- ✅ Dependencies resolved (FastAPI, Jinja2, Uvicorn, Markdown)
+- ✅ Live server online at http://127.0.0.1:8890
+
+### Improvements
+- Fixed test_no_post_routes() to inspect app_simple correctly
+- Enhanced denylist with pattern matching
+- Added fallback path resolution for templates and static files
+
+### Status
+- FASE 3.0 + 3.0.1 COMPLETE
+- Web UI read-only verified
+- Ready for integration and future phases (3.1+)
+

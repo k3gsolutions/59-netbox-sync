@@ -1,3 +1,14 @@
+# Current State — 2026-04-28 (FASE 3.0.1 Complete)
+
+## Latest Status
+
+**FASE 2.7 COMPLETE** — First real batch POST executed (2 objects created, IDs 18229 & 18230)
+**FASE 3.0 + 3.0.1 COMPLETE** — Web UI live, 7/7 tests passing
+**FREEZE READY FOR CLOSURE** — All batch objects created and verified in NetBox
+**Web UI ONLINE** — http://127.0.0.1:8890 (read-only dashboard)
+
+---
+
 # Current State — FASE 2.0 (First Real Write Ready)
 
 ## Completed
@@ -166,7 +177,20 @@
 - ✅ Eth-Trunk0 não aparece mais como INTERFACE_MISSING_IN_NETBOX
 - ✅ Eth-Trunk0 não aparece mais como DESCRIPTION_NON_COMPLIANT
 - ✅ Eth-Trunk0 aparece apenas como INTERFACE_DESCRIPTION_MISMATCH (ação review)
-- ✅ Next recommended: FASE 2.2 — política para múltiplos staged applies em lote controlado, ainda limitado a base_inventory
+
+### FASE 2.7 — Real Batch POST Authorized Pilot ✅ (2026-04-28)
+- ✅ Batch real executado: `4340469f` em `4WNET-MNS-KTG-RX` (device_id `1890`)
+- ✅ Criados com sucesso: `Eth-Trunk1` (ID `18229`) e `GigabitEthernet0/5/0` (ID `18230`)
+- ✅ Validação pré-POST: device_id=1890, payloads completos, método=POST, endpoint=/api/dcim/interfaces/
+- ✅ Tags aplicadas: `discovery:netops_netbox_sync`, `discovery:staged`, `source:device`, `approval:<approval_id>`
+- ✅ Custom fields: discovery_source, discovery_status, discovery_confidence, import_plan_id, approval_id
+- ✅ Reexecução do batch bloqueada corretamente por objeto existente (all-or-none policy)
+- ✅ Sem `PATCH`, sem `DELETE`, sem `/sync`, sem alteração em equipamento
+- ✅ Token não exposto (via env var apenas)
+- ✅ Incidente anterior encerrado: `18201`/`18202` eram objetos antigos de `2026-04-04`, no_rollback_needed
+- ✅ Documentação: FASE-2-7-BATCH-CLOSURE.md com audit trail completo
+
+- Next: FASE 2.8 — Base Inventory Expansion Policy; FASE 2.9 — Service Candidate Enrichment Workflow; FASE 3.0 — Web UI (ready)
 
 ## In Progress
 

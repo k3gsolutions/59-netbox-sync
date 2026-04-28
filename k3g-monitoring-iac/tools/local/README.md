@@ -358,6 +358,7 @@ NETBOX_WRITE_TOKEN="..." python3 tools/local/apply_batch_staged_netbox_objects.p
 - Item-by-item execution
 - Token via env var
 - Máximo 2 itens (piloto)
+- FASE 2.7 autorizado: batch real POST validado com objeto existente bloqueando reexecução
 - Nenhum PATCH/DELETE
 
 **Output:**
