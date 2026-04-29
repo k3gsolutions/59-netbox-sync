@@ -22,6 +22,47 @@ DENYLIST_PATTERNS = [
 ALLOWED_EXTENSIONS = {".md", ".json", ".txt"}
 
 
+def normalize_report_path(path: str) -> Optional[str]:
+    """
+    Normalize report path to be relative to reports/ directory.
+
+    Accepts:
+    - pilot-device-compliance/file.md
+    - reports/pilot-device-compliance/file.md
+    - /reports/pilot-device-compliance/file.md
+
+    Returns:
+    - pilot-device-compliance/file.md (relative to reports/)
+    - None if path is invalid
+    """
+    if not path:
+        return None
+
+    # Remove leading/trailing whitespace
+    path = path.strip()
+
+    # Block absolute paths
+    if path.startswith("/"):
+        path = path.lstrip("/")
+
+    # Block path traversal
+    if ".." in path:
+        return None
+
+    # Remove 'reports/' prefix if present
+    if path.startswith("reports/"):
+        path = path[8:]  # len("reports/") = 8
+
+    # Remove trailing slashes
+    path = path.rstrip("/")
+
+    # Reject empty result
+    if not path:
+        return None
+
+    return path
+
+
 def safe_resolve_path(base: Path, requested_path: str) -> Optional[Path]:
     """
     Safely resolve a path to prevent traversal attacks.

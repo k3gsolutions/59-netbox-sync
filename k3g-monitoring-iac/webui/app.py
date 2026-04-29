@@ -16,7 +16,8 @@ from datetime import datetime
 
 from .services.artifact_scanner import (
     list_reports, list_devices, list_approvals, list_apply_plans,
-    list_batch_results, list_incidents, list_comparisons, safe_resolve_path
+    list_batch_results, list_incidents, list_comparisons, safe_resolve_path,
+    normalize_report_path
 )
 from .services.markdown_loader import load_markdown, render_markdown, load_json
 from .services.report_index import load_index, get_latest_report, parse_report_metrics
@@ -132,7 +133,12 @@ async def device_detail(request: Request, device: str):
 @app.get("/reports/view", response_class=HTMLResponse)
 async def view_report(request: Request, path: str = Query(...)):
     """View markdown report safely."""
-    resolved = safe_resolve_path(REPORTS_DIR, path)
+    # Normalize path (accepts both "file.md" and "reports/file.md")
+    normalized = normalize_report_path(path)
+    if not normalized:
+        return HTMLResponse("<h1>Invalid path</h1>", status_code=400)
+
+    resolved = safe_resolve_path(REPORTS_DIR, normalized)
 
     if not resolved or not resolved.exists():
         return HTMLResponse("<h1>Report not found</h1>", status_code=404)
@@ -156,7 +162,12 @@ async def view_report(request: Request, path: str = Query(...)):
 @app.get("/reports/download")
 async def download_report(path: str = Query(...)):
     """Download markdown report safely."""
-    resolved = safe_resolve_path(REPORTS_DIR, path)
+    # Normalize path (accepts both "file.md" and "reports/file.md")
+    normalized = normalize_report_path(path)
+    if not normalized:
+        return JSONResponse({"error": "Invalid path"}, status_code=400)
+
+    resolved = safe_resolve_path(REPORTS_DIR, normalized)
 
     if not resolved or not resolved.exists():
         return JSONResponse({"error": "File not found"}, status_code=404)
@@ -1023,7 +1034,12 @@ async def logs_view(request: Request, path: str = ""):
         return JSONResponse({"error": "path parameter required"}, status_code=400)
 
     try:
-        resolved_path = safe_resolve_path(REPORTS_DIR, path)
+        # Normalize path (accepts both "file.md" and "reports/file.md")
+        normalized = normalize_report_path(path)
+        if not normalized:
+            return JSONResponse({"error": "Invalid path"}, status_code=400)
+
+        resolved_path = safe_resolve_path(REPORTS_DIR, normalized)
 
         if not resolved_path.exists():
             return JSONResponse({"error": "file not found"}, status_code=404)
