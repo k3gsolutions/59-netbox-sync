@@ -122,11 +122,20 @@ def test_no_post_routes():
 
 
 def test_no_write_keywords():
-    """Check source code for write keywords."""
-    print("\nTest 6: No Write Keywords in Code")
+    """Check source code for unsafe write keywords."""
+    print("\nTest 6: No Unsafe NetBox Write Keywords in Code")
     app_file = Path(__file__).parent.parent.parent / "webui" / "app.py"
 
-    forbidden = ["@app.post", "@app.patch", "@app.delete", "@app.put"]
+    # @app.post is now allowed for response forms (local save only)
+    # But check for NetBox writes and apply/sync operations
+    forbidden = [
+        "netbox_write",
+        ".apply(",
+        "/sync",
+        "ApplyPlan(",
+        "ApprovalRecord(",
+        "NETBOX_WRITE_TOKEN",
+    ]
 
     if not app_file.exists():
         print("  ⊘ App file not found")
@@ -140,10 +149,10 @@ def test_no_write_keywords():
             found.append(keyword)
 
     if not found:
-        print("  ✓ No write keywords found")
+        print("  ✓ No NetBox write keywords found")
         return True
     else:
-        print(f"  ✗ FAILED: Found {len(found)} write keywords")
+        print(f"  ✗ FAILED: Found {len(found)} NetBox write keywords")
         for kw in found:
             print(f"    - {kw}")
         return False
