@@ -39,6 +39,7 @@ from .services.artifact_scanner import (
 )
 from .services.markdown_loader import load_markdown, render_markdown, load_json
 from .services.report_index import load_index, get_latest_report, parse_report_metrics
+from .services.week2_decision_handler import Week2Decision, save_decision, load_decisions, get_item_decision
 
 
 # Setup
@@ -1416,12 +1417,24 @@ def _save_pending_item_response(device: str, item, payload):
     payload.setdefault("updated_by", payload.get("updated_by", ""))
     payload.setdefault("status", payload.get("status", ""))
 
-    valid, errors = validate_response_payload(item, payload)
+    valid, errors, convention_violations = validate_response_payload(item, payload)
+
+    # Check if any convention_violations are blockers
+    blocker_violations = [v for v in convention_violations if v.get("severity") == "blocker"]
+    if blocker_violations:
+        payload["validation_errors"] = errors + [f"{v.get('rule_id')}: {v.get('message_pt')}" for v in blocker_violations]
+        return JSONResponse({
+            "success": False,
+            "errors": errors,
+            "convention_violations": blocker_violations,
+        }, status_code=400)
+
     if not valid:
         payload["validation_errors"] = errors
         return JSONResponse({
             "success": False,
             "errors": errors,
+            "convention_violations": convention_violations,
         }, status_code=400)
 
     team = item.get("responsible_team_slug") or item.get("responsible_team", "")
@@ -1437,6 +1450,7 @@ def _save_pending_item_response(device: str, item, payload):
         "audit_path": str(audit_path.relative_to(ROOT)),
         "validation_status": _stringify_status(payload.get("status")),
         "device": device,
+        "convention_violations": convention_violations,
         "pipeline": pipeline,
     })
 
@@ -1559,9 +1573,322 @@ async def pending_item_response(request: Request, device: str, safe_item_id: str
         return JSONResponse({"success": False, "error": str(e)}, status_code=500)
 
 
+
+
 # ============================================================================
-# Health check
+# Week 2 Review Decision (FASE 2.35)
 # ============================================================================
+
+@app.get("/service-engagement/{device}/week2-review/items", response_class=JSONResponse)
+async def week2_review_items(request: Request, device: str):
+    """List Week 2 review items for decision."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    review_dir = compliance_dir / "week2-review"
+    drafts_dir = review_dir / "week2-approval-drafts"
+
+    items = []
+    if drafts_dir.exists():
+        for draft_file in drafts_dir.glob("approval-draft-*.json"):
+            try:
+                draft_data = load_json(draft_file)
+                if not draft_data:
+                    continue
+
+                safe_item_id = draft_file.stem.replace("approval-draft-", "")
+                existing_decision = get_item_decision(safe_item_id, review_dir)
+
+                items.append({
+                    "item_id": safe_item_id,
+                    "object_key": draft_data.get("object_key", ""),
+                    "object_type": draft_data.get("object_type", ""),
+                    "source_draft": draft_file.name,
+                    "status": draft_data.get("status", "pending_review"),
+                    "restriction": draft_data.get("restriction", "none"),
+                    "evidence": draft_data.get("evidence", ""),
+                    "owner": draft_data.get("owner", ""),
+                    "current_decision": existing_decision.get("decision") if existing_decision else None,
+                    "allowed_actions": [
+                        "approve_for_approval_record",
+                        "request_changes",
+                        "reject",
+                        "defer",
+                        "block",
+                    ],
+                })
+            except Exception:
+                pass
+
+    return JSONResponse({
+        "device": device,
+        "count": len(items),
+        "items": items,
+    })
+
+
+@app.get("/service-engagement/{device}/week2-review/items/{safe_item_id}", response_class=JSONResponse)
+async def week2_review_item_detail(request: Request, device: str, safe_item_id: str):
+    """Return Week 2 review item detail for modal."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    review_dir = compliance_dir / "week2-review"
+    drafts_dir = review_dir / "week2-approval-drafts"
+
+    draft_file = drafts_dir / f"approval-draft-{safe_item_id}.json"
+    if not draft_file.exists():
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    try:
+        draft_data = load_json(draft_file)
+        if not draft_data:
+            raise HTTPException(status_code=404, detail="Could not load item")
+
+        existing_decision = get_item_decision(safe_item_id, review_dir)
+
+        return JSONResponse({
+            "success": True,
+            "item_id": safe_item_id,
+            "object_key": draft_data.get("object_key", ""),
+            "object_type": draft_data.get("object_type", ""),
+            "category": draft_data.get("category", ""),
+            "status": draft_data.get("status", "pending_review"),
+            "restriction": draft_data.get("restriction", "none"),
+            "evidence": draft_data.get("evidence", ""),
+            "owner": draft_data.get("owner", ""),
+            "action": draft_data.get("action", ""),
+            "reason": draft_data.get("reason", ""),
+            "allowed_to_promote": draft_data.get("allowed_to_promote", False),
+            "current_decision": existing_decision,
+            "allowed_actions": [
+                "approve_for_approval_record",
+                "request_changes",
+                "reject",
+                "defer",
+                "block",
+            ],
+        })
+    except HTTPException:
+        raise
+    except Exception as e:
+        return JSONResponse({
+            "success": False,
+            "error": str(e),
+        }, status_code=500)
+
+
+@app.post("/service-engagement/{device}/week2-review/items/{safe_item_id}/decision", response_class=JSONResponse)
+async def week2_review_item_decision(request: Request, device: str, safe_item_id: str):
+    """Save Week 2 review decision locally (no NetBox, no AutoApprovalRecord)."""
+    try:
+        payload = await request.json()
+
+        # Validate payload
+        if not payload.get("reviewer"):
+            return JSONResponse({
+                "success": False,
+                "error": "reviewer required",
+            }, status_code=400)
+
+        if not payload.get("decision"):
+            return JSONResponse({
+                "success": False,
+                "error": "decision required",
+            }, status_code=400)
+
+        # Build decision object
+        decision = Week2Decision(
+            item_id=safe_item_id,
+            reviewer=payload.get("reviewer", ""),
+            decision=payload.get("decision", ""),
+            reason=payload.get("reason"),
+            notes=payload.get("notes"),
+            approval_record_allowed=payload.get("approval_record_allowed", False),
+        )
+
+        # Save
+        compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+        review_dir = compliance_dir / "week2-review"
+
+        success, message = save_decision(decision, review_dir)
+        if not success:
+            return JSONResponse({
+                "success": False,
+                "error": message,
+            }, status_code=400)
+
+        # Return success
+        return JSONResponse({
+            "success": True,
+            "message": message,
+            "item_id": safe_item_id,
+            "decision_summary": {
+                "reviewer": decision.reviewer,
+                "decision": decision.decision,
+                "reason": decision.reason,
+                "notes": decision.notes,
+                "reviewed_at": decision.reviewed_at,
+                "approval_record_allowed": decision.approval_record_allowed,
+            },
+            "next_step": "Decisão salva localmente. Sem ApprovalRecord automático. Validação local próxima.",
+            "security": {
+                "no_netbox_write": True,
+                "no_token": True,
+                "no_apply": True,
+                "no_approval_record_auto": True,
+            },
+        })
+    except Exception as e:
+        return JSONResponse({
+            "success": False,
+            "error": str(e),
+        }, status_code=500)
+
+
+# ============================================================================
+# Compliance Policies (FASE 3.17)
+# ============================================================================
+
+POLICY_WHITELIST = {
+    "discovery-elements",
+    "dependency-map",
+    "naming-conventions",
+    "snmp-policy",
+    "interface-policy",
+    "vrf-policy",
+    "bgp-policy",
+    "route-policy-policy",
+    "ip-prefix-policy",
+    "community-policy",
+    "as-path-policy",
+    "comments-policy",
+    "compliance-severity-policy",
+}
+
+POLICY_DESCRIPTIONS = {
+    "discovery-elements": "Elementos e estrutura de descoberta de rede",
+    "dependency-map": "Mapa de dependências entre componentes",
+    "naming-conventions": "Convenções de nomenclatura obrigatórias",
+    "snmp-policy": "Política SNMP e monitoramento",
+    "interface-policy": "Política de interfaces de rede",
+    "vrf-policy": "Política de roteamento e VRF",
+    "bgp-policy": "Política BGP e roteamento dinâmico",
+    "route-policy-policy": "Política de roteamento avançada",
+    "ip-prefix-policy": "Política de alocação de IPs",
+    "community-policy": "Política de comunidades BGP",
+    "as-path-policy": "Política de caminho AS",
+    "comments-policy": "Política de documentação e comentários",
+    "compliance-severity-policy": "Definição de severidades de compliance",
+}
+
+
+@app.get("/policies", response_class=JSONResponse)
+async def list_policies(request: Request):
+    """List all compliance policies."""
+    policies_dir = ROOT / "policies" / "compliance"
+    policies = []
+
+    for policy_name in sorted(POLICY_WHITELIST):
+        policy_file = policies_dir / f"{policy_name}.yaml"
+        if policy_file.exists():
+            try:
+                content = policy_file.read_text(encoding="utf-8")
+                # Check for secrets in content
+                has_secrets = any(s in content.lower() for s in ["password", "token", "secret", "key"])
+                policies.append({
+                    "name": policy_name,
+                    "file": f"{policy_name}.yaml",
+                    "path": str(policy_file.relative_to(ROOT)),
+                    "description": POLICY_DESCRIPTIONS.get(policy_name, ""),
+                    "status": "valid",
+                    "size_bytes": policy_file.stat().st_size,
+                    "mtime": policy_file.stat().st_mtime,
+                    "has_secrets_marker": has_secrets,
+                })
+            except Exception:
+                pass
+
+    return JSONResponse({
+        "total": len(policies),
+        "policies": policies,
+        "whitelist_count": 13,
+        "status": "active",
+    })
+
+
+@app.get("/policies/{policy_name}", response_class=JSONResponse)
+async def get_policy(request: Request, policy_name: str):
+    """Get a specific policy (whitelist enforced)."""
+    # Validate policy name against whitelist
+    if policy_name not in POLICY_WHITELIST:
+        raise HTTPException(status_code=404, detail="Policy not found or not whitelisted")
+
+    policies_dir = ROOT / "policies" / "compliance"
+    policy_file = policies_dir / f"{policy_name}.yaml"
+
+    if not policy_file.exists():
+        raise HTTPException(status_code=404, detail="Policy file not found")
+
+    try:
+        content = policy_file.read_text(encoding="utf-8")
+
+        # Mask any obvious secrets (defense in depth)
+        lines = []
+        for line in content.split("\n"):
+            if any(secret_word in line.lower() for secret_word in ["password", "token", "secret", "api_key"]):
+                # Replace values but keep structure
+                line = line.split(":")[0] + ": [MASKED]" if ":" in line else "[MASKED]"
+            lines.append(line)
+
+        masked_content = "\n".join(lines)
+
+        return JSONResponse({
+            "success": True,
+            "name": policy_name,
+            "description": POLICY_DESCRIPTIONS.get(policy_name, ""),
+            "content": masked_content,
+            "content_type": "text/yaml",
+            "status": "valid",
+            "whitelisted": True,
+            "size_bytes": len(content),
+        })
+    except Exception as e:
+        return JSONResponse({
+            "success": False,
+            "error": str(e),
+        }, status_code=500)
+
+
+@app.get("/policies/impact", response_class=JSONResponse)
+async def policies_impact(request: Request):
+    """Get policies impact report (from FASE 2.34)."""
+    impact_file = REPORTS_DIR / "compliance-policy-impact-report.md"
+    baseline_file = REPORTS_DIR / "pilot-device-compliance" / "compliance-policy-impact-baseline.md"
+
+    impact_content = ""
+    baseline_content = ""
+
+    if impact_file.exists():
+        try:
+            impact_content = impact_file.read_text(encoding="utf-8")
+        except Exception:
+            pass
+
+    if baseline_file.exists():
+        try:
+            baseline_content = baseline_file.read_text(encoding="utf-8")
+        except Exception:
+            pass
+
+    return JSONResponse({
+        "success": True,
+        "impact_report": impact_content,
+        "baseline_report": baseline_content,
+        "reports": {
+            "impact": str(impact_file.relative_to(ROOT)) if impact_file.exists() else None,
+            "baseline": str(baseline_file.relative_to(ROOT)) if baseline_file.exists() else None,
+        },
+    })
+
+
+
 
 @app.get("/health")
 async def health():

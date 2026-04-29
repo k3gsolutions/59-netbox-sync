@@ -1,6 +1,52 @@
-# Current State — 2026-04-29 (FASE 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10 Complete)
+# Current State — 2026-04-29 (FASE 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10 Complete)
 
 ## Latest Status
+
+**FASE 2.39 COMPLETE** — ApplyPlan Readiness Gate
+  - Gate validates proposed ApprovalRecords before ApplyPlan creation
+  - Checks: status=proposed/pending, reviewer, evidence_hash, safety flags, no secrets
+  - Decision: READY_FOR_APPROVAL_REVIEW (≥1 eligible) or NOT_READY_FOR_APPLYPLAN (0 eligible)
+  - Tool: `tools/local/applyplan_readiness_gate.py`
+  - Report: APPLYPLAN-READINESS-GATE.md with validation results
+  - Security: read-only validation only, NO ApplyPlan creation, NO NetBox writes
+  - **Deliverables:** applyplan_readiness_gate.py, docs/84-applyplan-readiness-gate.md
+
+**FASE 2.38 COMPLETE** — Manual Promotion of Week 2 Decisions to Proposed ApprovalRecords
+  - Reads week2-review-decisions.csv and promotes rows with explicit human approval
+  - Promotion criteria: decision=approve_for_approval_record, approval_record_allowed=true, reviewer, reviewed_at
+  - Creates ApprovalRecords with status=proposed (NOT auto-approved)
+  - Tool: `tools/local/promote_week2_drafts_to_approvals.py`
+  - Output: {output_dir}/promoted/ contains proposed ApprovalRecords with full audit trail
+  - Report: week2-promotion-report.md showing promoted count, failures, and next steps
+  - Security: no NetBox writes, no ApplyPlan creation, no automatic approvals, manual_review_required flag
+  - Testing: 39/39 Web UI tests passing
+  - **Deliverables:** promote_week2_drafts_to_approvals.py, docs/83-manual-promotion-to-proposed-approvalrecords.md
+
+**FASE 3.16.1 COMPLETE** — Registry Integration Fallback Hardening
+  - Removed all silent fallbacks in validators.py, response_forms.py
+  - Registry unavailable now returns REGISTRY-001 blocker (not valid=true silently)
+  - BGP/IP metadata validation returns REGISTRY-001 blocker (not empty list silently)
+  - Added tests for fallback hardening (test 16-17 in integration tests)
+  - All 56/56 tests passing (39 Web UI + 17 integration with fallback tests)
+  - **Deliverables:** Hardened validators.py, response_forms.py, convention_validator.py (+REGISTRY-001/002/003 rule IDs)
+
+**FASE 2.33 COMPLETE** — Compliance Registry Operationalization
+  - Operational process documented for policy changes: propose → validate → impact → review → merge
+  - compliance_policy_impact_report.py tool created for impact analysis
+  - docs/76-compliance-registry-operations.md with full operational guide
+  - Approval chain defined: Network Eng → Compliance Owner → PR Merge
+  - Security guardrails: no secret in policy, no apply, no NetBox writes
+  - **Deliverables:** docs/76-compliance-registry-operations.md, compliance_policy_impact_report.py
+
+**FASE 3.16 COMPLETE** — Web UI Convention Registry Integration Reconciliation
+  - Compliance Policy Registry (FASE 2.32) fully integrated with Web UI (FASE 3.9+)
+  - response_forms.py imports convention_validator, validates naming rules, returns convention_violations
+  - validators.py provides wrappers for convention_validator functions with backward compatibility
+  - app.js renders convention_violations with severity icons/colors (blocker 🔒, error ❌, warning ⚠️, info ℹ️)
+  - Blocker violations block POST save, error/warning/info permit save but show in modal
+  - 54/54 tests passing (39 existing + 15 new integration tests)
+  - Audit report, integration corrections, tests, and comprehensive documentation completed
+  - **Deliverables:** WEBUI-CONVENTION-REGISTRY-INTEGRATION-AUDIT.md, test_convention_registry_integration.py (15 tests), docs/75-webui-convention-registry-integration.md
 
 **FASE 3.14 COMPLETE** — Web UI Operational Usability Polish
   - Next-step guidance added to service engagement and validation screens

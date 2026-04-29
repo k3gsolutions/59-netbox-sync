@@ -347,6 +347,50 @@
     return response.json();
   }
 
+  function renderConventionViolations(violations) {
+    if (!violations || violations.length === 0) return "";
+
+    const severityMap = {
+      blocker: { icon: "🔒", color: "red", label: "BLOQUEADOR" },
+      error: { icon: "❌", color: "orange", label: "ERRO" },
+      warning: { icon: "⚠️", color: "yellow", label: "ALERTA" },
+      info: { icon: "ℹ️", color: "blue", label: "INFO" },
+    };
+
+    const violationHtml = violations
+      .map((v) => {
+        const severity = v.severity || "info";
+        const meta = severityMap[severity] || severityMap.info;
+        const ruleId = escapeHtml(v.rule_id || "UNKNOWN");
+        const message = escapeHtml(v.message_pt || v.message || "Violação de conformidade detectada");
+        return `
+          <div class="convention-violation" style="border-left: 4px solid ${meta.color}; padding: 8px 12px; margin: 8px 0; background-color: #f5f5f5;">
+            <div style="display: flex; gap: 8px; align-items: start;">
+              <span style="font-size: 18px;">${meta.icon}</span>
+              <div style="flex: 1;">
+                <div style="font-weight: bold; font-size: 12px; color: #666;">
+                  ${meta.label} — ${ruleId}
+                </div>
+                <div style="margin-top: 4px; font-size: 13px; color: #333;">
+                  ${message}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+
+    return `
+      <div class="convention-violations-section">
+        <div style="font-weight: bold; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; color: #666;">
+          Resultado da Validação de Conformidade
+        </div>
+        ${violationHtml}
+      </div>
+    `;
+  }
+
   async function submitPendingItemResponse(closeAfterSave, validateAfterSave) {
     if (!validatePendingItemForm()) {
       setModalMessage("Corrija os campos destacados antes de salvar.", "warning");
@@ -365,9 +409,21 @@
     });
 
     const data = await response.json();
+    const violations = data.convention_violations || [];
+
     if (!response.ok || !data.success) {
       const errors = data.errors || [data.error || "Falha ao salvar a resposta."];
-      errors.forEach((message) => setModalMessage(message, "danger"));
+      const violationsHtml = renderConventionViolations(violations);
+      const messageHtml = `
+        <div>${errors.map((e) => `<div>${escapeHtml(e)}</div>`).join("")}</div>
+        ${violationsHtml}
+      `;
+      const helper = $("pending-item-modal-message");
+      if (helper) {
+        helper.innerHTML = messageHtml;
+        helper.className = "alert alert-danger";
+        helper.classList.remove("hidden");
+      }
       return false;
     }
 
@@ -380,6 +436,7 @@
     const csvLink = `<a href="/reports/download?path=${escapeHtml(data.csv_path)}">Ver CSV gerado</a>`;
     const validationLink = `<a href="/service-engagement/${encodeURIComponent(state.device)}/validation">Ver validação</a>`;
     const finalizeLink = pipeline.week2_prepared ? `<a href="/service-engagement/${encodeURIComponent(state.device)}/week2-review">Abrir revisão da Semana 2</a>` : "";
+    const violationsHtml = renderConventionViolations(violations);
     const helper = $("pending-item-modal-message");
     if (helper) {
       const nextAction = escapeHtml(pipeline.next_action || "Validação local executada.");
@@ -389,6 +446,7 @@
         <div class="mono">${escapeHtml(data.csv_path)}</div>
         <div>${nextAction}</div>
         <div>${remaining > 0 ? `Ainda existem ${remaining} pendências.` : "Todas as pendências foram respondidas."}</div>
+        ${violationsHtml}
         <div class="pending-modal-links">${csvLink} ${validationLink} ${finalizeLink}</div>
       `;
       helper.className = "alert alert-success";

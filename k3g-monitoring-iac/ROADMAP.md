@@ -4,17 +4,22 @@
 
 Automated, read-only compliance analysis for network devices. Local report history, trend tracking, minimal secrets exposure.
 
-## Current UI Milestones
+## Current UI Milestones (Completed)
 
-- FASE 3.10.2: modal save/save-and-close + safe local pipeline
-- FASE 3.12: response validation dashboard + UAT audit view
-- FASE 2.25: UAT cleanup and Week 1 real-readiness guardrails
-- FASE 3.13: PT-BR friendly UI copy review
-- FASE 2.26: UAT decision / cleanup execution
-- FASE 2.27: real Week 1 activation flow
-- FASE 2.28: real Week 1 execution via Web UI
-- FASE 2.29: real Week 1 final validation + Week 2 gate
-- FASE 3.14: operational usability polish
+- FASE 3.10.2: modal save/save-and-close + safe local pipeline ✅
+- FASE 3.12: response validation dashboard + UAT audit view ✅
+- FASE 2.25: UAT cleanup and Week 1 real-readiness guardrails ✅
+- FASE 3.13: PT-BR friendly UI copy review ✅
+- FASE 2.26: UAT decision / cleanup execution ✅
+- FASE 2.27: real Week 1 activation flow ✅
+- FASE 2.28: real Week 1 execution via Web UI ✅
+- FASE 2.29: real Week 1 final validation + Week 2 gate ✅
+- FASE 3.14: operational usability polish ✅
+- **FASE 3.16: Web UI Convention Registry Integration Reconciliation ✅**
+- **FASE 3.16.1: Registry Fallback Hardening ✅**
+- **FASE 2.33: Compliance Registry Operationalization ✅**
+- **FASE 2.38: Manual Promotion to Proposed ApprovalRecords ✅**
+- **FASE 2.39: ApplyPlan Readiness Gate ✅**
 
 ## Timeline
 

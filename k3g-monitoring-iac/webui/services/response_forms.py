@@ -8,7 +8,7 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple, Any
 
 from .validators import (
     CRITICALITIES,
@@ -30,6 +30,19 @@ from .validators import (
     validate_tenant,
     validate_vrf,
 )
+
+try:
+    from .convention_validator import (
+        load_policy_registry,
+        validate_comment,
+        validate_bgp_metadata,
+        validate_ip_address_relation,
+        _make_registry_blocker,
+    )
+    HAS_CONVENTION_VALIDATOR = True
+except (ImportError, Exception):
+    HAS_CONVENTION_VALIDATOR = False
+    _make_registry_blocker = None  # type: ignore
 
 RESPONSES_ROOT_NAME = "week1-responses"
 AUDIT_DIR_NAME = "audit"
@@ -360,8 +373,66 @@ def _validate_payload_common(item: Dict[str, str], payload: Dict[str, object]) -
     return errors
 
 
-def validate_response_payload(item: Dict[str, str], payload: Dict[str, object]) -> Tuple[bool, List[str]]:
-    """Validate a response payload for a pending item."""
+def _collect_convention_violations(item: Dict[str, str], payload: Dict[str, object]) -> List[Dict[str, Any]]:
+    """Collect convention violations from policy registry.
+
+    If registry is unavailable, returns REGISTRY-001 blocker violation
+    to prevent silent fallback to hardcoded patterns.
+    """
+    violations: List[Dict[str, Any]] = []
+
+    if not HAS_CONVENTION_VALIDATOR:
+        # Registry unavailable = blocker violation, not silent allow
+        return [_make_registry_blocker("REGISTRY-001")] if _make_registry_blocker else []
+
+    object_type = _stringify(item.get("object_type")).lower()
+    responsible_team = _team_slug(item.get("responsible_team", ""))
+
+    # Validate notes/evidence fields via convention_validator
+    notes = _stringify(payload.get("notes"))
+    if notes:
+        result = validate_comment(notes, max_len=1024)
+        if not result.get("valid"):
+            violations.append(result)
+
+    evidence = _stringify(payload.get("evidence"))
+    if evidence:
+        result = validate_comment(evidence, max_len=1024)
+        if not result.get("valid"):
+            violations.append(result)
+
+    # BGP metadata validation
+    if object_type == "bgp_peer" or responsible_team == "bgp-team":
+        bgp_data = {
+            "remote_asn": payload.get("remote_asn"),
+            "owner": payload.get("owner"),
+            "policy_intent": payload.get("policy_intent"),
+            "service_type": payload.get("service_type"),
+            "criticality": payload.get("criticality"),
+            "notes": notes,
+        }
+        bgp_violations = validate_bgp_metadata(bgp_data)
+        violations.extend(bgp_violations)
+
+    # IP address relation validation
+    if object_type == "ip_address" or responsible_team == "network-ops":
+        ip_data = {
+            "relation_type": payload.get("relation_type"),
+            "service_relation": payload.get("service_relation"),
+            "notes": notes,
+        }
+        ip_violations = validate_ip_address_relation(ip_data)
+        violations.extend(ip_violations)
+
+    return violations
+
+
+def validate_response_payload(item: Dict[str, str], payload: Dict[str, object]) -> Tuple[bool, List[str], List[Dict[str, Any]]]:
+    """Validate a response payload for a pending item.
+
+    Returns:
+        Tuple[valid: bool, errors: List[str], convention_violations: List[Dict]]
+    """
     errors = _validate_payload_common(item, payload)
 
     object_type = _stringify(item.get("object_type")).lower()
@@ -371,7 +442,7 @@ def validate_response_payload(item: Dict[str, str], payload: Dict[str, object]) 
     valid_statuses = set(MODAL_STATUS_CHOICES)
     if status not in valid_statuses:
         errors.append(f"status: invalid value ({status})")
-        return False, errors
+        return False, errors, []
 
     if status == "answered":
         if object_type == "subinterface" or responsible_team == "service-team":
@@ -470,7 +541,10 @@ def validate_response_payload(item: Dict[str, str], payload: Dict[str, object]) 
         if not valid:
             errors.append(f"notes: {err}")
 
-    return len(errors) == 0, errors
+    # Collect convention violations (advisories, not blocking)
+    convention_violations = _collect_convention_violations(item, payload)
+
+    return len(errors) == 0, errors, convention_violations
 
 
 def save_response_csv(team: str, item: Dict[str, str], payload: Dict[str, object], root: Path) -> Path:

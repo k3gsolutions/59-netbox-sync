@@ -1,6 +1,21 @@
-# Next Actions — 2026-04-29 (FASE 3.14 + 2.29 + 2.28 + 3.13 + 2.26 + 2.27 + 3.12 + 3.10.2 + 3.10.1 + 3.10 Complete)
+# Next Actions — 2026-04-29 (FASE 2.38, 2.39, 3.14 + 2.29 + 2.28 + 3.13 + 2.26 + 2.27 + 3.12 + 3.10.2 + 3.10.1 + 3.10 Complete)
 
 ## Current State
+
+### FASE 2.39 ✅ **COMPLETE** — ApplyPlan Readiness Gate
+- ✅ Validates proposed ApprovalRecords for readiness
+- ✅ Checks status, reviewer, evidence, safety flags
+- ✅ Decision: READY_FOR_APPROVAL_REVIEW or NOT_READY_FOR_APPLYPLAN
+- ✅ No ApplyPlan creation (validation only)
+- ✅ 39/39 tests passing
+
+### FASE 2.38 ✅ **COMPLETE** — Manual Promotion to Proposed ApprovalRecords
+- ✅ Reads week2-review-decisions.csv
+- ✅ Promotes only rows with approval_record_allowed=true + reviewer + reviewed_at
+- ✅ Creates ApprovalRecords with status=proposed
+- ✅ Generates promotion report
+- ✅ Zero NetBox writes, manual_review_required enforced
+- ✅ 39/39 tests passing
 
 ### FASE 3.14 ✅ **COMPLETE** — Web UI Operational Usability Polish
 - ✅ Próximo passo visível em Service Engagement / Validation

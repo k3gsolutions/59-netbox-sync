@@ -21,6 +21,9 @@ except ImportError:
 
 # Rule ID explanations
 RULE_EXPLANATIONS = {
+    "REGISTRY-001": "Compliance policy registry unavailable or failed to load. Validation blocked for security.",
+    "REGISTRY-002": "Required policy YAML file missing or invalid. Registry cannot be loaded.",
+    "REGISTRY-003": "PyYAML module not installed. Registry depends on PyYAML.",
     "IFACE-001": "Base interface name does not match expected pattern (Eth-Trunk\\d+, GigabitEthernet\\d+/\\d+/\\d+, etc.)",
     "IFACE-002": "Service subinterface name does not match expected pattern (Eth-Trunk\\d+\\.\\d+, GigabitEthernet\\d+/\\d+/\\d+\\.\\d+)",
     "IFACE-003": "Service interface missing required fields (description, tenant, service_type, criticality, owner)",
@@ -494,3 +497,24 @@ def validate_ip_address_relation(data: Dict[str, Any]) -> List[Dict[str, Any]]:
 def explain_violation(rule_id: str) -> str:
     """Return explanation for a violation rule."""
     return RULE_EXPLANATIONS.get(rule_id, "Unknown rule")
+
+
+def _make_registry_blocker(rule_id: str) -> Dict[str, Any]:
+    """Create registry-level blocker violation.
+
+    Used when registry is unavailable, invalid, or PyYAML is missing.
+    Always severity=blocker to prevent silent fallback to hardcoded patterns.
+    """
+    msg_map = {
+        "REGISTRY-001": "Registry de compliance indisponível. A validação foi bloqueada por segurança.",
+        "REGISTRY-002": "Arquivo de policy obrigatório ausente ou inválido. Registry não pode ser carregado.",
+        "REGISTRY-003": "Módulo PyYAML não está instalado. Instale com: pip install pyyaml",
+    }
+    return {
+        "valid": False,
+        "rule_id": rule_id,
+        "message": RULE_EXPLANATIONS.get(rule_id, "Registry error"),
+        "message_pt": msg_map.get(rule_id, "Erro do registry de compliance"),
+        "severity": "blocker",
+        "details": {"registry_error": True},
+    }

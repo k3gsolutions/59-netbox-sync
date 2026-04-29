@@ -1,7 +1,22 @@
 """Response form validators for local pending-item editing."""
 
 import re
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any
+
+try:
+    from .convention_validator import (
+        load_policy_registry,
+        validate_comment as convention_validate_comment,
+        validate_interface_name as convention_validate_interface_name,
+        validate_vrf_name as convention_validate_vrf_name,
+        validate_bgp_metadata as convention_validate_bgp_metadata,
+        validate_ip_address_relation as convention_validate_ip_address_relation,
+        _make_registry_blocker,
+    )
+    HAS_CONVENTION_VALIDATOR = True
+except (ImportError, Exception):
+    HAS_CONVENTION_VALIDATOR = False
+    _make_registry_blocker = None  # type: ignore
 
 BLOCKED_KEYWORDS = {
     "password",
@@ -314,3 +329,105 @@ def validate_ip_response(data: Dict) -> Tuple[bool, List[str]]:
             errors.append(f"notes: {err}")
 
     return len(errors) == 0, errors
+
+
+# ============================================================================
+# Convention Validator Wrappers
+# (Convert convention_validator output to Tuple[bool, Optional[str]] format)
+# ============================================================================
+
+def validate_interface_name_registry(value: str, required: bool = False) -> Tuple[bool, Optional[str]]:
+    """Validate interface name using convention registry.
+
+    Returns Tuple[bool, Optional[str]] for backward compatibility.
+    Returns REGISTRY-001 blocker if registry unavailable.
+    """
+    if not HAS_CONVENTION_VALIDATOR:
+        # Registry unavailable = blocker, not fallback to hardcoded patterns
+        if _make_registry_blocker:
+            return False, "REGISTRY-001: " + _make_registry_blocker("REGISTRY-001").get("message_pt")
+        return False, "Registry unavailable"
+
+    if not value and required:
+        return False, "Interface required"
+    if not value:
+        return True, None
+
+    result = convention_validate_interface_name(value)
+    if result.get("valid"):
+        return True, None
+    return False, result.get("message_pt") or result.get("message")
+
+
+def validate_vrf_name_registry(value: str, required: bool = False) -> Tuple[bool, Optional[str]]:
+    """Validate VRF name using convention registry.
+
+    Returns Tuple[bool, Optional[str]] for backward compatibility.
+    Returns REGISTRY-001 blocker if registry unavailable.
+    """
+    if not HAS_CONVENTION_VALIDATOR:
+        # Registry unavailable = blocker, not fallback to hardcoded patterns
+        if _make_registry_blocker:
+            return False, "REGISTRY-001: " + _make_registry_blocker("REGISTRY-001").get("message_pt")
+        return False, "Registry unavailable"
+
+    if not value and required:
+        return False, "VRF required"
+    if not value:
+        return True, None
+
+    result = convention_validate_vrf_name(value)
+    if result.get("valid"):
+        return True, None
+    return False, result.get("message_pt") or result.get("message")
+
+
+def validate_comment_registry(value: str, max_len: int = 255) -> Tuple[bool, Optional[str]]:
+    """Validate comment field using convention registry.
+
+    Returns Tuple[bool, Optional[str]] for backward compatibility.
+    Returns REGISTRY-001 blocker if registry unavailable.
+    """
+    if not HAS_CONVENTION_VALIDATOR:
+        # Registry unavailable = blocker, not fallback to hardcoded patterns
+        if _make_registry_blocker:
+            return False, "REGISTRY-001: " + _make_registry_blocker("REGISTRY-001").get("message_pt")
+        return False, "Registry unavailable"
+
+    if not value:
+        return True, None
+
+    result = convention_validate_comment(value, max_len=max_len)
+    if result.get("valid"):
+        return True, None
+    return False, result.get("message_pt") or result.get("message")
+
+
+def validate_bgp_metadata_registry(data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Validate BGP metadata using convention registry.
+
+    Returns list of violation dicts with rule_id, message_pt, severity.
+    Returns REGISTRY-001 blocker if registry unavailable.
+    """
+    if not HAS_CONVENTION_VALIDATOR:
+        # Registry unavailable = blocker violation, not empty list silence
+        if _make_registry_blocker:
+            return [_make_registry_blocker("REGISTRY-001")]
+        return []
+
+    return convention_validate_bgp_metadata(data)
+
+
+def validate_ip_address_relation_registry(data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Validate IP address relation using convention registry.
+
+    Returns list of violation dicts with rule_id, message_pt, severity.
+    Returns REGISTRY-001 blocker if registry unavailable.
+    """
+    if not HAS_CONVENTION_VALIDATOR:
+        # Registry unavailable = blocker violation, not empty list silence
+        if _make_registry_blocker:
+            return [_make_registry_blocker("REGISTRY-001")]
+        return []
+
+    return convention_validate_ip_address_relation(data)
