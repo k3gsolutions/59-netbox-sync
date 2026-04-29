@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    {% include "base_header.html" %}
+
+    <main class="container">
+        <h2>{{ title }}</h2>
+
+        <div class="form-section">
+            <h3>Service Engagement Response — {{ device }}</h3>
+            <p>Fill in the required fields based on your team's information.</p>
+
+            <form id="responseForm">
+                <!-- Team selection -->
+                <div class="form-group">
+                    <label>Team *</label>
+                    <select id="team" name="team" required>
+                        <option value="">Select your team...</option>
+                        <option value="service-team">Service Team (Subinterfaces)</option>
+                        <option value="network-ops">Network Ops (IPs)</option>
+                        <option value="bgp-team">BGP Team (BGP Peers)</option>
+                    </select>
+                </div>
+
+                <!-- Object type (auto-selected based on team) -->
+                <input type="hidden" id="objectType" name="object_type" value="">
+
+                <!-- Object key -->
+                <div class="form-group">
+                    <label>Object Name/Key *</label>
+                    <input type="text" name="object_key" placeholder="e.g., Eth-Trunk1, 10.0.0.1, bgp-peer-001" required>
+                </div>
+
+                <!-- Status -->
+                <div class="form-group">
+                    <label>Status *</label>
+                    <select name="status" required>
+                        <option value="">Select status...</option>
+                        <option value="pending">Pending</option>
+                        <option value="answered">Answered</option>
+                        <option value="needs_clarification">Needs Clarification</option>
+                        <option value="blocked">Blocked</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <small>Select "Answered" to fill in required fields below.</small>
+                </div>
+
+                <!-- Service Team fields -->
+                <fieldset id="serviceTeamFields" style="display: none;" class="form-section">
+                    <legend>Service Team Information</legend>
+
+                    <div class="form-group">
+                        <label>Tenant *</label>
+                        <input type="text" name="tenant" placeholder="Customer or internal tenant" maxlength="100">
+                        <small>Required if status = Answered</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Service Type *</label>
+                        <select name="service_type">
+                            <option value="">Select...</option>
+                            <option value="customer-internet">Customer Internet</option>
+                            <option value="customer-l2vpn">Customer L2 VPN</option>
+                            <option value="customer-l3vpn">Customer L3 VPN</option>
+                            <option value="customer-transport">Customer Transport</option>
+                            <option value="carrier-transit">Carrier Transit</option>
+                            <option value="carrier-peering">Carrier Peering</option>
+                            <option value="ix-public">IX Public</option>
+                            <option value="cdn-cache">CDN Cache</option>
+                            <option value="infra-backbone">Infra Backbone</option>
+                            <option value="infra-management">Infra Management</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Criticality</label>
+                        <select name="criticality">
+                            <option value="">Select...</option>
+                            <option value="platinum">Platinum</option>
+                            <option value="gold">Gold</option>
+                            <option value="silver">Silver</option>
+                            <option value="bronze">Bronze</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Owner *</label>
+                        <input type="text" name="owner" placeholder="Team/person responsible" maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Evidence *</label>
+                        <textarea name="evidence" placeholder="Ticket, contract, reference, notes" maxlength="500" rows="3"></textarea>
+                    </div>
+                </fieldset>
+
+                <!-- Network Ops fields -->
+                <fieldset id="networkOpsFields" style="display: none;" class="form-section">
+                    <legend>Network Ops Information</legend>
+
+                    <div class="form-group">
+                        <label>Interface *</label>
+                        <input type="text" name="interface" placeholder="e.g., Eth-Trunk1, GigabitEthernet0/5/0">
+                        <small>Required if status = Answered</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>VRF *</label>
+                        <input type="text" name="vrf" placeholder="e.g., _public_, customer-vrf" maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Service Relation</label>
+                        <input type="text" name="service_relation" placeholder="Related service or tenant" maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Owner *</label>
+                        <input type="text" name="owner" placeholder="Team/person responsible" maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Evidence *</label>
+                        <textarea name="evidence" placeholder="Ticket, documentation, notes" maxlength="500" rows="3"></textarea>
+                    </div>
+                </fieldset>
+
+                <!-- BGP Team fields -->
+                <fieldset id="bgpTeamFields" style="display: none;" class="form-section">
+                    <legend>BGP Team Information</legend>
+
+                    <div class="form-group">
+                        <label>Remote ASN *</label>
+                        <input type="number" name="remote_asn" placeholder="e.g., 64512" min="1" max="4294967295">
+                        <small>Required if status = Answered</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Remote BGP Group *</label>
+                        <input type="text" name="remote_bgp_group" placeholder="e.g., carrier-peers, customer-01" maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Policy Intent *</label>
+                        <textarea name="policy_intent" placeholder="BGP policy objectives, route targets, etc." maxlength="500" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Owner *</label>
+                        <input type="text" name="owner" placeholder="Team/person responsible" maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Criticality</label>
+                        <select name="criticality">
+                            <option value="">Select...</option>
+                            <option value="platinum">Platinum</option>
+                            <option value="gold">Gold</option>
+                            <option value="silver">Silver</option>
+                            <option value="bronze">Bronze</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <!-- Common fields -->
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea name="notes" placeholder="Additional comments or context" maxlength="1000" rows="4"></textarea>
+                </div>
+
+                <!-- Buttons -->
+                <div class="form-buttons">
+                    <button type="submit" class="button">Save Response Locally</button>
+                    <button type="reset" class="button-secondary">Clear Form</button>
+                </div>
+
+                <div id="message" style="margin-top: 20px; display: none;"></div>
+            </form>
+
+            <div id="validation-errors" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.5);">
+                <h4 style="color: #ff4444; margin-bottom: 10px;">Validation Errors:</h4>
+                <ul id="error-list" style="color: #ff4444;"></ul>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: rgba(0, 217, 255, 0.05); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 8px;">
+            <h4>Important Notes:</h4>
+            <ul>
+                <li>This form saves responses <strong>locally only</strong> — no changes to NetBox.</li>
+                <li>Responses are saved as CSV in: <code>reports/pilot-device-compliance/week1-responses/</code></li>
+                <li>All required fields must be filled if status = "Answered".</li>
+                <li>Sensitive information (passwords, tokens) is not allowed.</li>
+                <li>Timestamps and audit trail are automatically recorded.</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('responseForm');
+        const teamSelect = document.getElementById('team');
+        const objectTypeInput = document.getElementById('objectType');
+
+        // Show/hide team-specific fields
+        teamSelect.addEventListener('change', function() {
+            document.getElementById('serviceTeamFields').style.display = 'none';
+            document.getElementById('networkOpsFields').style.display = 'none';
+            document.getElementById('bgpTeamFields').style.display = 'none';
+
+            if (this.value === 'service-team') {
+                document.getElementById('serviceTeamFields').style.display = 'block';
+                objectTypeInput.value = 'subinterface';
+            } else if (this.value === 'network-ops') {
+                document.getElementById('networkOpsFields').style.display = 'block';
+                objectTypeInput.value = 'ip_address';
+            } else if (this.value === 'bgp-team') {
+                document.getElementById('bgpTeamFields').style.display = 'block';
+                objectTypeInput.value = 'bgp_peer';
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                const messageDiv = document.getElementById('message');
+                const errorsDiv = document.getElementById('validation-errors');
+                const errorList = document.getElementById('error-list');
+
+                if (result.success) {
+                    messageDiv.style.display = 'block';
+                    messageDiv.style.background = 'rgba(0, 217, 150, 0.1)';
+                    messageDiv.style.border = '1px solid rgba(0, 217, 150, 0.5)';
+                    messageDiv.style.color = '#00d962';
+                    messageDiv.innerHTML = `✓ ${result.message}`;
+                    errorsDiv.style.display = 'none';
+                    form.reset();
+                } else {
+                    messageDiv.style.display = 'none';
+                    errorsDiv.style.display = 'block';
+                    errorList.innerHTML = result.errors.map(e => `<li>${e}</li>`).join('');
+                }
+            } catch (err) {
+                const messageDiv = document.getElementById('message');
+                messageDiv.style.display = 'block';
+                messageDiv.style.color = '#ff4444';
+                messageDiv.innerHTML = `✗ Error: ${err.message}`;
+            }
+        });
+    </script>
+
+    <style>
+        .form-section {
+            margin: 30px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            background: rgba(20, 30, 50, 0.8);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--neon-green);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        small {
+            display: block;
+            margin-top: 5px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        fieldset {
+            border: 1px solid var(--border-neon);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        legend {
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .button-secondary {
+            background: linear-gradient(135deg, #6b7494, #4a5575);
+            color: var(--text-primary);
+        }
+
+        .button-secondary:hover {
+            box-shadow: 0 6px 25px rgba(107, 116, 148, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .form-buttons {
+                flex-direction: column;
+            }
+
+            .button, .button-secondary {
+                width: 100%;
+            }
+        }
+    </style>
+</body>
+</html>

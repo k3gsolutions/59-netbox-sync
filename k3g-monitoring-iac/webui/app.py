@@ -1013,6 +1013,128 @@ async def operations_readiness(request: Request):
 
 
 # ============================================================================
+# Log modal viewer (FASE 3.9.2)
+# ============================================================================
+
+@app.get("/logs/view", response_class=HTMLResponse)
+async def logs_view(request: Request, path: str = ""):
+    """View log file in modal-compatible JSON."""
+    if not path:
+        return JSONResponse({"error": "path parameter required"}, status_code=400)
+
+    try:
+        resolved_path = safe_resolve_path(REPORTS_DIR, path)
+
+        if not resolved_path.exists():
+            return JSONResponse({"error": "file not found"}, status_code=404)
+
+        # Size check (max 500KB)
+        if resolved_path.stat().st_size > 500000:
+            return JSONResponse({
+                "error": "file too large (>500KB)",
+                "path": path,
+                "size": resolved_path.stat().st_size
+            }, status_code=413)
+
+        with open(resolved_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        return JSONResponse({
+            "success": True,
+            "path": path,
+            "name": resolved_path.name,
+            "size": len(content),
+            "content": content
+        })
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+# ============================================================================
+# Response edit forms (FASE 3.9.3)
+# ============================================================================
+
+from .services.response_forms import (
+    save_response_csv, save_response_audit, update_edit_audit_log, get_latest_response
+)
+from .services.validators import (
+    validate_subinterface_response, validate_bgp_response, validate_ip_response
+)
+
+@app.get("/service-engagement/{device}/responses/edit", response_class=HTMLResponse)
+async def response_edit_form(request: Request, device: str):
+    """Display response edit form."""
+    context = {
+        "request": request,
+        "title": f"Response Edit: {device}",
+        "device": device,
+        "service_types": [
+            'customer-internet', 'customer-l2vpn', 'customer-l3vpn', 'customer-transport',
+            'carrier-transit', 'carrier-peering', 'ix-public', 'cdn-cache',
+            'infra-backbone', 'infra-management'
+        ],
+        "criticalities": ['platinum', 'gold', 'silver', 'bronze'],
+        "statuses": ['pending', 'answered', 'needs_clarification', 'blocked', 'rejected'],
+    }
+    return templates.TemplateResponse("response_edit.html", context)
+
+@app.post("/service-engagement/{device}/responses/edit", response_class=JSONResponse)
+async def response_edit_submit(request: Request, device: str):
+    """Submit response edit form."""
+    try:
+        data = await request.json()
+        team = data.get('team')
+        object_type = data.get('object_type', '')
+
+        if not team:
+            return JSONResponse({"error": "team required"}, status_code=400)
+
+        # Validate based on type
+        if object_type == 'subinterface':
+            valid, errors = validate_subinterface_response(data)
+        elif object_type == 'bgp_peer':
+            valid, errors = validate_bgp_response(data)
+        elif object_type == 'ip_address':
+            valid, errors = validate_ip_response(data)
+        else:
+            return JSONResponse({"error": f"unknown object_type: {object_type}"}, status_code=400)
+
+        if not valid:
+            return JSONResponse({
+                "success": False,
+                "errors": errors
+            }, status_code=400)
+
+        # Save CSV
+        success, csv_path = save_response_csv(team, data, ROOT)
+        if not success:
+            return JSONResponse({
+                "success": False,
+                "error": f"Failed to save CSV: {csv_path}"
+            }, status_code=500)
+
+        # Save audit
+        save_response_audit(team, data, ROOT)
+
+        # Update audit log
+        fields_changed = [k for k, v in data.items() if v and k not in ['team', 'object_type']]
+        update_edit_audit_log(team, data.get('object_key', ''), fields_changed, 'valid', ROOT)
+
+        return JSONResponse({
+            "success": True,
+            "message": f"Response saved to {csv_path}",
+            "csv_path": csv_path,
+            "device": device
+        })
+
+    except Exception as e:
+        return JSONResponse({
+            "success": False,
+            "error": str(e)
+        }, status_code=500)
+
+
+# ============================================================================
 # Health check
 # ============================================================================
 
