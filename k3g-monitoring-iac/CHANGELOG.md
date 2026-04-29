@@ -651,3 +651,27 @@
 - Semana 2 review experience polish.
 - Validation and promotion helpers for human review.
 - Proposed ApprovalRecords only, no NetBox writes.
+
+### Added — FASE 2.40.1 / FASE 2.41.1
+
+**Manual Approval Review Hardening + Dry-Run ApplyPlan Gate Hardening**
+- FASE 2.40.1: review_proposed_approval_record.py (hardened manual review)
+  - All 5 safety_flags required and validated: no_netbox_write, no_apply_plan_created, manual_review_required, human_decision_required, proposed_only
+  - state_history explicitly records manual_approval_reviewed + approved_for_dry_run_applyplan transitions
+  - Secret scanning: token, password, secret, api_key, private key, bearer, authorization
+  - Metadata validation: reviewer, object_type, object_key, evidence_hash, proposed_payload
+  - Decisions: approve (adds both state transitions), reject, request_changes, defer, block
+  - docs/85-manual-approval-review.md (operational guide)
+  - Zero NetBox writes, no ApplyPlan, no automatic progressions
+- FASE 2.41.1: dryrun_applyplan_readiness_gate.py (hardened dry-run gate)
+  - Policy baseline validation REQUIRED (not optional)
+  - state_history validation: approved_for_dry_run_applyplan is BLOCKER if missing
+  - All hardened validations from FASE 2.40.1 enforced
+  - Policy baseline decision markers: BASELINE_OK / BASELINE_WITH_WARNINGS / BASELINE_BLOCKED
+  - Decisions: READY_FOR_DRYRUN_APPLYPLAN, READY_WITH_RESTRICTIONS, NOT_READY_FOR_DRYRUN_APPLYPLAN
+  - docs/86-dryrun-applyplan-readiness-gate.md (operational guide)
+  - Zero NetBox writes, no ApplyPlan creation, read-only validation only
+- Tools: review_proposed_approval_record.py, dryrun_applyplan_readiness_gate.py, list_proposed_approval_records.py
+- Tests: test_manual_approval_flow.py (18 tests, all passing)
+- Compliance: All 39/39 Web UI tests still passing, zero regressions
+- Security: No NetBox writes, tokens, apply operations, or automatic progressions verified

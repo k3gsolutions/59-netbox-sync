@@ -559,3 +559,23 @@ POST /compliance/import-plan/report (FASE 1.3)
 - Week 1 real execution done.
 - Week 2 review board generated.
 - Human review required before promotion.
+
+**FASE 2.40.1 COMPLETE** — Manual Approval Review Hardening
+  - review_proposed_approval_record.py with hardened validations
+  - All 5 safety_flags required (no_netbox_write, no_apply_plan_created, manual_review_required, human_decision_required, proposed_only)
+  - state_history explicitly tracks manual_approval_reviewed + approved_for_dry_run_applyplan
+  - Secret scanning (7 keywords: token, password, secret, api_key, private key, bearer, authorization)
+  - Decisions: approve, reject, request_changes, defer, block
+  - Zero NetBox writes, no ApplyPlan creation
+  - docs/85-manual-approval-review.md created
+
+**FASE 2.41.1 COMPLETE** — Dry-Run ApplyPlan Readiness Gate Hardening
+  - dryrun_applyplan_readiness_gate.py with policy baseline validation (REQUIRED)
+  - state_history validation: approved_for_dry_run_applyplan is BLOCKER if missing
+  - Policy baseline decision markers: BASELINE_OK / BASELINE_WITH_WARNINGS / BASELINE_BLOCKED
+  - Decisions: READY_FOR_DRYRUN_APPLYPLAN / READY_WITH_RESTRICTIONS / NOT_READY_FOR_DRYRUN_APPLYPLAN
+  - All hardened validations from FASE 2.40.1 enforced
+  - Zero NetBox writes, no ApplyPlan creation
+  - docs/86-dryrun-applyplan-readiness-gate.md created
+  - All 18/18 tests passing (test_manual_approval_flow.py)
+  - All 39/39 existing Web UI tests still passing
