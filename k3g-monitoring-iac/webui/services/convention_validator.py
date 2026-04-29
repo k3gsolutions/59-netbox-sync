@@ -1,17 +1,22 @@
-"""Convention validator for Huawei VRP configuration policies."""
+"""Convention validator for Huawei VRP configuration policies.
+
+CRITICAL: Registry YAML files are the official source of truth.
+No silent fallback to hardcoded rules if YAML is unavailable.
+PyYAML is REQUIRED.
+"""
 
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# Try to load yaml; fallback to inline dicts if unavailable
 try:
     import yaml
-    HAS_YAML = True
 except ImportError:
-    HAS_YAML = False
+    print("CRITICAL: PyYAML not installed. Install with: pip install pyyaml", file=sys.stderr)
+    sys.exit(1)
 
 
 # Rule ID explanations
@@ -37,67 +42,23 @@ RULE_EXPLANATIONS = {
     "COMMENT-002": "Comment exceeds maximum length",
 }
 
-# Inline policy registry (fallback if YAML not available)
-INLINE_POLICIES = {
-    "interface": {
-        "base_inventory_patterns": [
-            r"^Eth-Trunk\d+$",
-            r"^GigabitEthernet\d+/\d+/\d+$",
-            r"^10GE\d+/\d+/\d+$",
-            r"^LoopBack\d+$",
-            r"^NULL\d+$",
-            r"^Vlanif\d+$",
-            r"^Vlan\d+$",
-        ],
-        "service_interface_patterns": [
-            r"^Eth-Trunk\d+\.\d+$",
-            r"^GigabitEthernet\d+/\d+/\d+\.\d+$",
-            r"^10GE\d+/\d+/\d+\.\d+$",
-        ],
-    },
-    "vrf": {
-        "pattern": r"^[a-zA-Z0-9_\-]+$",
-        "max_length": 100,
-    },
-    "route_policy": {
-        "pattern": r"^AS\d+-[A-Z0-9]+-[A-Z0-9]+-\w+-IPv[46]-(Import|Export)$",
-    },
-    "ip_prefix": {
-        "patterns": [
-            r"^BOGONS-(IPv4|IPv6)$",
-            r"^CUSTOMER-[A-Z0-9_\-]+-IPv[46]$",
-            r"^CDN-[A-Z0-9_\-]+-IPv[46]$",
-            r"^IX-[A-Z0-9_\-]+-IPv[46]$",
-            r"^TRANSIT-[A-Z0-9_\-]+-IPv[46]$",
-            r"^INFRA-[A-Z0-9_\-]+-IPv[46]$",
-        ],
-    },
-    "community": {
-        "pattern": r"^\d+:\d+$",
-    },
-    "snmp": {
-        "blocked_communities": ["public", "private", "secret", "admin", "cisco", "snmp"],
-    },
-    "comment": {
-        "blocked_keywords": ["token", "password", "secret", "private key", "bearer", "api_key", "ssh_key"],
-        "max_length_short": 255,
-        "max_length_evidence": 1024,
-    },
-}
+# No inline policy fallback. YAML registry is mandatory.
+# If YAML is unavailable or invalid, the application FAILS.
+# This ensures the registry is the single source of truth.
+
+# DEPRECATED: INLINE_POLICIES was removed. All policies come from YAML.
+INLINE_POLICIES = {}
 
 
 def _load_policies() -> Dict[str, Any]:
-    """Load policy registry from YAML or inline."""
+    """Load policy registry from YAML files. YAML is mandatory."""
     policies_dir = Path(__file__).parent.parent.parent / "policies" / "compliance"
 
-    # Always start with inline policies
-    policies = {k: v.copy() if isinstance(v, dict) else v for k, v in INLINE_POLICIES.items()}
+    if not policies_dir.exists():
+        raise FileNotFoundError(f"Policies directory not found: {policies_dir}")
 
-    if not HAS_YAML or not policies_dir.exists():
-        return policies
-
-    # Try to load from YAML files and merge
-    yaml_files = {
+    # Required YAML files (no fallback)
+    required_files = {
         "interface": "naming-conventions.yaml",
         "vrf": "naming-conventions.yaml",
         "route_policy": "naming-conventions.yaml",
@@ -107,20 +68,33 @@ def _load_policies() -> Dict[str, Any]:
         "comment": "comments-policy.yaml",
     }
 
-    for key, filename in yaml_files.items():
+    policies = {}
+
+    for key, filename in required_files.items():
         filepath = policies_dir / filename
-        if filepath.exists():
-            try:
-                with filepath.open("r", encoding="utf-8") as f:
-                    data = yaml.safe_load(f) or {}
-                    if key in data:
-                        # Merge YAML data with inline, YAML takes precedence
-                        if isinstance(policies[key], dict) and isinstance(data[key], dict):
-                            policies[key].update(data[key])
-                        else:
-                            policies[key] = data[key]
-            except Exception:
-                pass  # Keep inline version
+        if not filepath.exists():
+            raise FileNotFoundError(f"Required policy file missing: {filepath}")
+
+        try:
+            with filepath.open("r", encoding="utf-8") as f:
+                data = yaml.safe_load(f) or {}
+                if key not in data:
+                    raise ValueError(f"{filename} missing key: {key}")
+                policies[key] = data[key]
+        except yaml.YAMLError as exc:
+            raise ValueError(f"YAML syntax error in {filename}: {exc}")
+
+    # Load severity policy
+    severity_path = policies_dir / "compliance-severity-policy.yaml"
+    if not severity_path.exists():
+        raise FileNotFoundError(f"Required severity policy file missing: {severity_path}")
+
+    try:
+        with severity_path.open("r", encoding="utf-8") as f:
+            severity_data = yaml.safe_load(f) or {}
+            policies["severity"] = severity_data
+    except yaml.YAMLError as exc:
+        raise ValueError(f"YAML syntax error in compliance-severity-policy.yaml: {exc}")
 
     return policies
 
@@ -143,7 +117,7 @@ def classify_interface(name: str) -> str:
         return "invalid"
 
     policies = load_policy_registry()
-    iface_policy = policies.get("interface", INLINE_POLICIES["interface"])
+    iface_policy = policies.get("interface", {})
 
     # Check service patterns first
     service_patterns = iface_policy.get("service_interface_patterns", [])
@@ -206,7 +180,7 @@ def validate_vrf_name(name: str) -> Dict[str, Any]:
         }
 
     policies = load_policy_registry()
-    vrf_policy = policies.get("vrf", INLINE_POLICIES["vrf"])
+    vrf_policy = policies.get("vrf", {})
     pattern = vrf_policy.get("pattern", r"^[a-zA-Z0-9_\-]+$")
     max_length = vrf_policy.get("max_length", 100)
 
@@ -253,7 +227,7 @@ def validate_route_policy_name(name: str, direction: Optional[str] = None) -> Di
         }
 
     policies = load_policy_registry()
-    rtpol_policy = policies.get("route_policy", INLINE_POLICIES.get("route_policy", {}))
+    rtpol_policy = policies.get("route_policy", {})
     pattern = rtpol_policy.get("pattern", r"^AS\d+-[A-Z0-9]+-[A-Z0-9]+-\w+-IPv[46]-(Import|Export)$")
 
     if re.match(pattern, name):
@@ -313,7 +287,7 @@ def validate_ip_prefix_name(name: str) -> Dict[str, Any]:
         }
 
     policies = load_policy_registry()
-    prefix_policy = policies.get("ip_prefix", INLINE_POLICIES.get("ip_prefix", {}))
+    prefix_policy = policies.get("ip_prefix", {})
     patterns = prefix_policy.get("patterns", [])
 
     for pattern in patterns:
@@ -350,7 +324,7 @@ def validate_community(value: str) -> Dict[str, Any]:
         }
 
     policies = load_policy_registry()
-    comm_policy = policies.get("community", INLINE_POLICIES.get("community", {}))
+    comm_policy = policies.get("community", {})
     pattern = comm_policy.get("pattern", r"^\d+:\d+$")
 
     if re.match(pattern, value):
@@ -393,7 +367,7 @@ def validate_comment(value: str, max_len: int = 255) -> Dict[str, Any]:
         }
 
     policies = load_policy_registry()
-    comment_policy = policies.get("comment", INLINE_POLICIES.get("comment", {}))
+    comment_policy = policies.get("comment", {})
     blocked_keywords = comment_policy.get("blocked_keywords", [])
 
     # Check for blocked keywords

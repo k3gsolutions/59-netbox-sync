@@ -1,5 +1,5 @@
 {
-  "draft_id": "4dd657f5-633c-48d3-b810-e0b0c96cc9d4",
+  "draft_id": "3e678b53-54ff-4cc3-836f-923763dff1b1",
   "status": "draft_review",
   "device": "4WNET-MNS-KTG-RX",
   "device_id": 1890,
@@ -7,7 +7,7 @@
   "object_key": "192.0.2.1/30",
   "action": "safe_create_staged",
   "category": "service_candidate",
-  "created_at": "2026-04-29T19:49:51.996439+00:00",
+  "created_at": "2026-04-29T19:54:54.155325+00:00",
   "allowed_to_promote": false,
   "promotion_requirements": {
     "reviewer_required": true,

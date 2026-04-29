@@ -3,28 +3,26 @@
 
 interface:
   description: "Interface naming patterns"
-  base_inventory:
-    patterns:
-      - "^Eth-Trunk\\d+$"
-      - "^GigabitEthernet\\d+/\\d+/\\d+$"
-      - "^10GE\\d+/\\d+/\\d+$"
-      - "^LoopBack\\d+$"
-      - "^NULL\\d+$"
-      - "^Vlanif\\d+$"
-    examples:
-      - "Eth-Trunk0"
-      - "GigabitEthernet0/0/1"
-      - "10GE0/1/0"
-      - "LoopBack0"
-      - "Vlanif100"
-  service_interface:
-    patterns:
-      - "^Eth-Trunk\\d+\\.\\d+$"
-      - "^GigabitEthernet\\d+/\\d+/\\d+\\.\\d+$"
-    examples:
-      - "Eth-Trunk0.147"
-      - "Eth-Trunk0.1580"
-      - "GigabitEthernet0/5/0.100"
+  base_inventory_patterns:
+    - "^Eth-Trunk\\d+$"
+    - "^GigabitEthernet\\d+/\\d+/\\d+$"
+    - "^10GE\\d+/\\d+/\\d+$"
+    - "^LoopBack\\d+$"
+    - "^NULL\\d+$"
+    - "^Vlanif\\d+$"
+  base_inventory_examples:
+    - "Eth-Trunk0"
+    - "GigabitEthernet0/0/1"
+    - "10GE0/1/0"
+    - "LoopBack0"
+    - "Vlanif100"
+  service_interface_patterns:
+    - "^Eth-Trunk\\d+\\.\\d+$"
+    - "^GigabitEthernet\\d+/\\d+/\\d+\\.\\d+$"
+  service_interface_examples:
+    - "Eth-Trunk0.147"
+    - "Eth-Trunk0.1580"
+    - "GigabitEthernet0/5/0.100"
 
 vrf:
   description: "VRF / VPN Instance naming"

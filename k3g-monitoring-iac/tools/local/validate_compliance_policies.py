@@ -18,15 +18,16 @@ except ImportError:
 def validate_yaml_files(policies_dir: Path) -> Dict[str, Any]:
     """Validate all YAML files in policies/compliance/."""
     results = {
-        "summary": {"total": 0, "valid": 0, "invalid": 0},
+        "summary": {"total": 0, "valid": 0, "invalid": 0, "expected": 13},
         "files": {},
         "errors": [],
     }
 
     if not HAS_YAML:
-        results["errors"].append("PyYAML not installed; skipping validation")
+        results["errors"].append("CRITICAL: PyYAML not installed. Install with: pip install pyyaml")
         return results
 
+    # Exactly 13 required YAML files
     yaml_files = [
         "discovery-elements.yaml",
         "dependency-map.yaml",
@@ -40,6 +41,7 @@ def validate_yaml_files(policies_dir: Path) -> Dict[str, Any]:
         "community-policy.yaml",
         "as-path-policy.yaml",
         "comments-policy.yaml",
+        "compliance-severity-policy.yaml",
     ]
 
     for filename in yaml_files:
@@ -70,6 +72,8 @@ def validate_yaml_files(policies_dir: Path) -> Dict[str, Any]:
                     _validate_discovery_elements(data, file_result)
                 elif "dependency-map" in filename:
                     _validate_dependency_map(data, file_result)
+                elif "compliance-severity" in filename:
+                    _validate_severity_policy(data, file_result)
                 elif "policy" in filename:
                     _validate_policy_file(data, filename, file_result)
 
@@ -166,6 +170,33 @@ def _validate_policy_file(data: Dict[str, Any], filename: str, result: Dict[str,
     for key, value in data.items():
         if not isinstance(value, (dict, list, str, int, bool, type(None))):
             result["errors"].append(f"Invalid type for {key}: {type(value)}")
+
+
+def _validate_severity_policy(data: Dict[str, Any], result: Dict[str, Any]) -> None:
+    """Validate compliance-severity-policy.yaml structure."""
+    if not isinstance(data, dict):
+        result["errors"].append("Root must be dict")
+        return
+
+    # Check required sections
+    required_sections = ["version", "severity", "default_mapping", "rule_severity_overrides"]
+    for section in required_sections:
+        if section not in data:
+            result["errors"].append(f"Missing required section: {section}")
+
+    # Validate severity section
+    if "severity" in data and isinstance(data["severity"], dict):
+        valid_severities = {"blocker", "error", "warning", "info"}
+        for sev in data["severity"]:
+            if sev not in valid_severities:
+                result["errors"].append(f"Invalid severity: {sev}")
+
+    # Validate rule_severity_overrides
+    if "rule_severity_overrides" in data and isinstance(data["rule_severity_overrides"], dict):
+        valid_severities = {"blocker", "error", "warning", "info"}
+        for rule_id, severity in data["rule_severity_overrides"].items():
+            if severity not in valid_severities:
+                result["errors"].append(f"Rule {rule_id} has invalid severity: {severity}")
 
 
 def generate_report(results: Dict[str, Any], output_file: Path) -> None:

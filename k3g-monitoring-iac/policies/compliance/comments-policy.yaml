@@ -1,87 +1,8 @@
 ---
 # Comment, evidence, and notes validation policy
 
-comment_fields:
-  description:
-    scope: "Interface, BGP peer, route-policy"
-    max_length: 255
-    required: false
-    validation:
-      blocked_keywords:
-        - "token"
-        - "password"
-        - "secret"
-        - "private key"
-        - "bearer"
-        - "api_key"
-        - "ssh_key"
-      min_length: 0
-      max_length: 255
-      pattern: "^[a-zA-Z0-9\\-_\\s:/.()]+$"
-    examples:
-      - "ISP-PRIMARY-UPLINK-AS64512"
-      - "Customer-A-PEERING-IX"
-
-  evidence:
-    scope: "Response forms, RFC items"
-    max_length: 1024
-    required: true
-    validation:
-      blocked_keywords:
-        - "token"
-        - "password"
-        - "secret"
-        - "private key"
-        - "bearer"
-        - "api_key"
-        - "ssh_key"
-      min_length: 5
-      max_length: 1024
-      allowed: "Reference tickets, NMS snapshots, config excerpts"
-    examples:
-      - "Ticket #1001 - service deployment approval"
-      - "NMS snapshot 2026-04-29 10:30:00 UTC"
-      - "Config validation: show bgp peer 203.0.113.1"
-
-  notes:
-    scope: "RFC responses, RFC items, corrections"
-    max_length: 1024
-    required: false
-    validation:
-      blocked_keywords:
-        - "token"
-        - "password"
-        - "secret"
-        - "private key"
-        - "bearer"
-        - "api_key"
-        - "ssh_key"
-      min_length: 0
-      max_length: 1024
-    examples:
-      - "Service migration scheduled for 2026-05-15"
-      - "Waiting for customer approval"
-      - "Blocked: missing interface mapping"
-
-  comments:
-    scope: "Configuration, policy, general documentation"
-    max_length: 255
-    required: false
-    validation:
-      blocked_keywords:
-        - "token"
-        - "password"
-        - "secret"
-        - "private key"
-        - "bearer"
-        - "api_key"
-        - "ssh_key"
-      min_length: 0
-      max_length: 255
-
-blocked_keywords:
-  description: "Sensitive information that should never be recorded"
-  keywords:
+comment:
+  blocked_keywords:
     - "token"
     - "password"
     - "secret"
@@ -90,14 +11,10 @@ blocked_keywords:
     - "api_key"
     - "ssh_key"
     - "netbox_write_token"
-  policy: "Case-insensitive match, block save if found"
-  examples_blocked:
-    - "token: abc123def456"
-    - "password = mySecret123"
-    - "private key content here"
-    - "NETBOX_WRITE_TOKEN=secret"
+  max_length_short: 255
+  max_length_evidence: 1024
 
-comment_validation_rules:
+validation_rules:
   - rule: "No blocked keywords in any comment field"
     severity: "error"
     enforcement: "Web UI blocks save if found"
@@ -114,20 +31,6 @@ comment_validation_rules:
     severity: "error"
     enforcement: "Web UI truncates or rejects"
 
-  - rule: "Description min length 10 characters recommended"
-    severity: "warning"
-    enforcement: "Web UI advisory"
-
-comment_best_practices:
-  - "Never commit credentials, tokens, or secrets"
-  - "Use ticket references instead of credentials"
-  - "Use NMS snapshot timestamps for evidence"
-  - "Document RFC decisions clearly"
-  - "Keep evidence traceable and reproducible"
-  - "Use consistent notation (Ticket #, NMS snapshot, Config excerpt)"
-  - "Explain blocked or deferred items in notes"
-  - "Link to external documentation when possible"
-
 evidence_formats:
   ticket_reference:
     format: "Ticket #<NUMBER>"
@@ -143,29 +46,3 @@ evidence_formats:
     examples:
       - "Config validation: show bgp peer"
       - "Config validation: display interface"
-  link:
-    format: "https://<SERVICE>/<PATH>"
-    examples:
-      - "https://netbox.example.com/dcim/devices/4/"
-
-audit_trail:
-  requirement: "All comment changes logged"
-  fields_logged:
-    - timestamp
-    - updated_by
-    - previous_value
-    - new_value
-    - change_reason
-  retention: "Permanent"
-  access: "Restricted to compliance team"
-
-comment_redaction:
-  rule: "If secret detected, redact in reports and archives"
-  method: "Replace with [REDACTED] marker"
-  logging: "Log redaction event with timestamp and reason"
-  notification: "Alert security team if secret found"
-
-comment_export:
-  restriction: "Do not export comments containing sensitive fields"
-  allowed_export: "Redacted or sanitized versions only"
-  external_sharing: "Requires security review"

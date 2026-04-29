@@ -1,0 +1,142 @@
+---
+# Compliance violation severity levels and mapping
+
+version: "1.0"
+updated: "2026-04-29"
+
+severity:
+  blocker:
+    label_pt: "Bloqueador"
+    description_pt: "Impede salvar/aprovar/promover até correção. Falha crítica."
+    action: "Bloqueia salvamento. Exige correção obrigatória."
+    examples:
+      - "Segredo detectado (token, password, secret)"
+      - "Path traversal tentado"
+      - "SNMP community bloqueada (public, private)"
+
+  error:
+    label_pt: "Erro"
+    description_pt: "Permite registrar com alerta, mas exige revisão humana."
+    action: "Permite salvar com alerta. Exige revisão antes de promoção."
+    examples:
+      - "Padrão de nomenclatura inválido"
+      - "Campo obrigatório ausente"
+      - "Referência quebrada (policy, prefix-list, filter)"
+
+  warning:
+    label_pt: "Alerta"
+    description_pt: "Permite seguir com restrição documentada."
+    action: "Permite salvar e prosseguir. Recomenda-se revisar."
+    examples:
+      - "Campo opcional ausente"
+      - "Referência orfã (não é usada)"
+
+  info:
+    label_pt: "Informativo"
+    description_pt: "Mensagem informativa para apoio operacional."
+    action: "Apenas informar. Não bloqueia fluxo."
+    examples:
+      - "Campo enriquecido com sugestão automática"
+      - "Documentação incompleta (comentário vazio)"
+
+default_mapping:
+  sensitive_value_detected: blocker
+  path_traversal_detected: blocker
+  forbidden_snmp_community: blocker
+  naming_invalid: error
+  missing_required_metadata: error
+  missing_required_policy_reference: error
+  optional_reference_missing: warning
+  orphan_policy: warning
+  optional_enrichment: info
+  documentation_missing: info
+
+rule_severity_overrides:
+  # Blocker severity
+  COMMENT-001: blocker
+  SNMP-001: blocker
+
+  # Error severity
+  IFACE-001: error
+  IFACE-002: error
+  IFACE-003: error
+  VRF-001: error
+  RTPOL-001: error
+  PREFIX-001: error
+  COMM-001: error
+  COMM-002: error
+  ASPATH-001: error
+  BGP-001: error
+  BGP-002: error
+  BGP-003: error
+  BGP-004: error
+  IPMAP-001: error
+  SNMP-002: error
+
+  # Warning severity
+  IPMAP-002: warning
+  COMMENT-002: error
+
+enforcement_by_context:
+  local_response_form:
+    blocker: "Bloqueia POST /service-engagement/{device}/pending-items/{safe_item_id}/response"
+    error: "Permite POST, retorna convention_violations, UI avisa"
+    warning: "Permite POST, retorna convention_violations, UI avisa"
+    info: "Permite POST, retorna convention_violations"
+
+  webui_validation_dashboard:
+    blocker: "Mostrar erro crítico, impedir salvar"
+    error: "Mostrar erro, permitir com revisão"
+    warning: "Mostrar alerta, permitir continuar"
+    info: "Mostrar informação"
+
+  week2_review_approval:
+    blocker: "Rejeitar imediatamente, não permitir aprovação"
+    error: "Exigir revisão antes de aprovar"
+    warning: "Permitir aprovar com documentação"
+    info: "Apenas informar"
+
+  promotion_to_approval_record:
+    blocker: "Bloquear promoção"
+    error: "Exigir revisão humana antes de promover"
+    warning: "Permitir promover com advertência"
+    info: "Promover normalmente"
+
+severity_workflow:
+  step1_intake:
+    severity_check: ["blocker", "error"]
+    action: "Rejeitar ou solicitar mudança"
+
+  step2_validation:
+    severity_check: ["blocker"]
+    action: "Bloquear se blocker presente"
+
+  step3_activation:
+    severity_check: ["blocker", "error"]
+    action: "Escalar para human review se não blocker"
+
+  step4_week2_review:
+    severity_check: ["blocker"]
+    action: "Revisão humana se blocker"
+
+  step5_approval:
+    severity_check: []
+    action: "Aprovar se tudo em ordem"
+
+pt_br_messages:
+  blocker: "🚫 Violação crítica. Impossível continuar sem correção."
+  error: "⚠️ Erro detectado. Permite registrar com alerta."
+  warning: "⚠️ Alerta. Permite prosseguir com cautela."
+  info: "ℹ️ Informação. Apenas notificativo."
+
+ui_color_mapping:
+  blocker: "red"
+  error: "orange"
+  warning: "yellow"
+  info: "blue"
+
+ui_icon_mapping:
+  blocker: "🔒"
+  error: "❌"
+  warning: "⚠️"
+  info: "ℹ️"

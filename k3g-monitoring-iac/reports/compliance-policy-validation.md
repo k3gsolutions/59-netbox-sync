@@ -4,8 +4,8 @@
 
 ## Summary
 
-- **Total Files:** 12
-- **Valid:** 12
+- **Total Files:** 13
+- **Valid:** 13
 - **Invalid:** 0
 
 ## File Validation Results
@@ -44,4 +44,7 @@
 **Status:** valid
 
 ### ✅ comments-policy.yaml
+**Status:** valid
+
+### ✅ compliance-severity-policy.yaml
 **Status:** valid
