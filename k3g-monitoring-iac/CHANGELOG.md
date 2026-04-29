@@ -298,6 +298,38 @@
 - ✅ Documentation: docs/50-week2-draft-promotion.md
 - ✅ Tests: 7/7 still passing (read-only confirmation)
 
+### Completed — FASE 2.15
+
+**Week 1 Outreach Pack + Response Tracking**
+- ✅ Created reports/pilot-device-compliance/outreach/ directory
+- ✅ Generated outreach-summary.md (overview, timeline, teams, status)
+- ✅ Generated message-service-team.md (ready-to-send email, 5 subinterfaces)
+- ✅ Generated message-network-ops.md (ready-to-send email, 1 IP address)
+- ✅ Generated message-bgp-team.md (ready-to-send email, 1 BGP peer)
+- ✅ Generated week1-response-tracker.md (status table, escalation rules, timeline)
+- ✅ Created tools/local/generate_week1_outreach_pack.py (pack generation script)
+- ✅ Created tools/local/check_week1_response_status.py (optional tracking script)
+- ✅ Zero NetBox writes, zero tokens, local file I/O only
+- ✅ Documentation: docs/51-week1-outreach-pack.md
+- ✅ Ready to distribute to teams (deadline: 2026-05-08 EOD)
+
+### Completed — FASE 3.7
+
+**Operations Dashboard Polish**
+- ✅ New route: /outreach (Week 1 outreach pack overview)
+- ✅ New route: /outreach/{team} (team-specific messages)
+- ✅ New route: /operations/handoff (operational procedures)
+- ✅ New route: /operations/readiness (pre-deployment checklist)
+- ✅ Templates: outreach.html, outreach_team.html, operations_handoff.html, operations_readiness.html
+- ✅ Pre-deployment checklist (10 items: API, token, approvals, plans, dry-run, risk, window, rollback, notifications, alerts)
+- ✅ GO/NO-GO decision criteria documented
+- ✅ All routes read-only (no POST/PATCH/DELETE)
+- ✅ Path traversal protection maintained
+- ✅ Whitelist validation (/outreach/{team} only accepts 3 teams)
+- ✅ Zero NetBox writes, zero tokens
+- ✅ Documentation: docs/52-operations-dashboard.md
+- ✅ Tests: 7/7 still passing (read-only confirmed)
+
 ### Completed — FASE 3.5
 
 **Service Engagement Response Viewer (Web UI)**

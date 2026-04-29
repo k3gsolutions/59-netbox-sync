@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Operations Readiness{% endblock %}
+
+{% block content %}
+<h2>Operations Readiness Status</h2>
+
+<div class="card">
+    <h3>✓ Pre-Deployment Checklist</h3>
+    <p>Verify system readiness before executing batch applies and approvals.</p>
+</div>
+
+{% if readiness_files %}
+<div class="section">
+    <h3>📋 Readiness Reports</h3>
+    <p>Available readiness reports:</p>
+
+    <table class="full-width">
+        <thead>
+            <tr>
+                <th>Report</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for file in readiness_files %}
+            <tr>
+                <td><strong>{{ file.name }}</strong></td>
+                <td>
+                    <a href="/reports/view?path={{ file.path }}" class="button small">View</a>
+                    <a href="/reports/download?path={{ file.path }}" class="button small">Download</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert">
+    <p>No readiness reports found yet.</p>
+    <p>Run operational readiness check to generate.</p>
+</div>
+{% endif %}
+
+<div class="section">
+    <h3>✓ Pre-Deployment Checklist</h3>
+    <ul style="font-size: 0.95em;">
+        <li>☑ NetBox API accessible</li>
+        <li>☑ Write token valid (NETBOX_WRITE_TOKEN)</li>
+        <li>☑ Approvals in approval queue</li>
+        <li>☑ ApplyPlans generated</li>
+        <li>☑ Dry-run validation passed</li>
+        <li>☑ Risk assessment complete</li>
+        <li>☑ Change window confirmed</li>
+        <li>☑ Rollback plan ready</li>
+        <li>☑ Notifications configured</li>
+        <li>☑ Monitoring alerts active</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h3>🟢 GO Criteria</h3>
+    <p>System is ready for deployment when:</p>
+    <ul>
+        <li>All checklist items passed</li>
+        <li>No blocking incidents open</li>
+        <li>Recent dry-run validated all changes</li>
+        <li>Approval authority confirmed</li>
+        <li>Maintenance window confirmed</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h3>🔴 NO-GO Criteria</h3>
+    <p>Do NOT deploy if:</p>
+    <ul>
+        <li>Any checklist item failed</li>
+        <li>Blocking incidents exist</li>
+        <li>Dry-run validation failed</li>
+        <li>Approvals incomplete</li>
+        <li>High-risk items not reviewed</li>
+    </ul>
+</div>
+
+<h3>Related</h3>
+<ul>
+    <li><a href="/operations/handoff">Operational Handoff</a></li>
+    <li><a href="/outreach">Week 1 Outreach</a></li>
+    <li><a href="/approval-queue">Approval Queue</a></li>
+    <li><a href="/apply-plans">Apply Plans</a></li>
+</ul>
+
+{% endblock %}

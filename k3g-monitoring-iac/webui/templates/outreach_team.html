@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Outreach: {{ team }}{% endblock %}
+
+{% block content %}
+<h2>Outreach Message: {{ team }}</h2>
+
+<div class="card">
+    <h3>Team Message</h3>
+    <p>Customized message for <strong>{{ team }}</strong> team.</p>
+    <p style="color: #666; font-size: 0.9em;">
+        Ready to copy and send. Includes deadline, CSV template, and instructions.
+    </p>
+</div>
+
+{% if message_content %}
+<div class="section">
+    <h3>📧 Message</h3>
+    <div class="message-content">
+        {{ message_content|safe }}
+    </div>
+
+    {% if message_file %}
+    <p style="margin-top: 20px;">
+        <a href="/reports/download?path={{ message_file.path }}" class="button">Download as Markdown</a>
+    </p>
+    {% endif %}
+</div>
+{% else %}
+<div class="alert">Message not found for this team.</div>
+{% endif %}
+
+<h3>Steps</h3>
+<ol>
+    <li>Copy message above (or download)</li>
+    <li>Attach corresponding CSV template</li>
+    <li>Send to team before 2026-05-02</li>
+    <li>Remind deadline: 2026-05-08 EOD</li>
+    <li>Monitor responses at /outreach</li>
+</ol>
+
+<h3>Related</h3>
+<ul>
+    <li><a href="/outreach">Back to Outreach Pack</a></li>
+    <li><a href="/service-engagement">Service Engagement</a></li>
+    <li><a href="/operations/handoff">Operational Handoff</a></li>
+</ul>
+
+{% endblock %}

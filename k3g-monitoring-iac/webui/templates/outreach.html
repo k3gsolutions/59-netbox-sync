@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Week 1 Outreach Pack{% endblock %}
+
+{% block content %}
+<h2>Week 1 Outreach Pack</h2>
+
+<div class="card">
+    <h3>📦 Outreach Materials</h3>
+    <p>Documents for collecting team responses during Week 1 (2026-05-02 to 2026-05-08).</p>
+    <p><strong>Status:</strong> Ready to distribute</p>
+</div>
+
+<div class="section">
+    <h3>📋 Outreach Files</h3>
+    <p>Total: {{ total_files }} files</p>
+
+    {% if outreach_files %}
+    <table class="full-width">
+        <thead>
+            <tr>
+                <th>File</th>
+                <th>Size</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for file in outreach_files %}
+            <tr>
+                <td><strong>{{ file.name }}</strong></td>
+                <td>{{ file.size }} bytes</td>
+                <td>
+                    <a href="/reports/view?path={{ file.path }}" class="button small">View</a>
+                    <a href="/reports/download?path={{ file.path }}" class="button small">Download</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert">No outreach files found. Run generate_week1_outreach_pack.py.</div>
+    {% endif %}
+</div>
+
+<div class="section">
+    <h3>📨 Send Messages to Teams</h3>
+    <p>Click below to view team-specific messages:</p>
+
+    <ul style="list-style: none;">
+        <li style="margin: 10px 0;">
+            <a href="/outreach/service-team" class="button">Service Team Message</a>
+            <span style="color: #666; font-size: 0.9em;"> — 5 subinterfaces</span>
+        </li>
+        <li style="margin: 10px 0;">
+            <a href="/outreach/network-ops" class="button">Network Ops Message</a>
+            <span style="color: #666; font-size: 0.9em;"> — 1 IP address</span>
+        </li>
+        <li style="margin: 10px 0;">
+            <a href="/outreach/bgp-team" class="button">BGP Team Message</a>
+            <span style="color: #666; font-size: 0.9em;"> — 1 BGP peer</span>
+        </li>
+    </ul>
+</div>
+
+<h3>Timeline</h3>
+<table class="full-width">
+    <tr>
+        <td><strong>2026-05-02</strong></td>
+        <td>Distribute messages + CSV templates to teams</td>
+    </tr>
+    <tr>
+        <td><strong>2026-05-02 to 2026-05-08</strong></td>
+        <td>Teams fill in responses</td>
+    </tr>
+    <tr>
+        <td><strong>2026-05-08 EOD</strong></td>
+        <td>Response deadline</td>
+    </tr>
+    <tr>
+        <td><strong>2026-05-09</strong></td>
+        <td>Validation + Week 2 review board</td>
+    </tr>
+</table>
+
+<h3>Related</h3>
+<ul>
+    <li><a href="/service-engagement">Service Engagement</a></li>
+    <li><a href="/operations/handoff">Operational Handoff</a></li>
+    <li><a href="/operations/readiness">Operations Readiness</a></li>
+</ul>
+
+{% endblock %}

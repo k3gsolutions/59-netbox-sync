@@ -732,6 +732,128 @@ async def promotion_report(request: Request, device: str):
 
 
 # ============================================================================
+# Outreach & Operations (FASE 2.15 + 3.7)
+# ============================================================================
+
+@app.get("/outreach", response_class=HTMLResponse)
+async def outreach(request: Request):
+    """Week 1 outreach pack overview."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    outreach_dir = compliance_dir / "outreach"
+    outreach_files = []
+
+    if outreach_dir.exists():
+        for f in outreach_dir.glob("*.md"):
+            outreach_files.append({
+                "name": f.name,
+                "path": str(f.relative_to(REPORTS_DIR)),
+                "size": f.stat().st_size,
+            })
+
+    context = {
+        "request": request,
+        "title": "Week 1 Outreach Pack",
+        "outreach_files": sorted(outreach_files, key=lambda x: x["name"]),
+        "total_files": len(outreach_files),
+    }
+
+    return templates.TemplateResponse("outreach.html", context)
+
+
+@app.get("/outreach/{team}", response_class=HTMLResponse)
+async def outreach_team(request: Request, team: str):
+    """Team-specific outreach message."""
+    valid_teams = ["service-team", "network-ops", "bgp-team"]
+    if team not in valid_teams:
+        return HTMLResponse("<h1>Invalid team</h1>", status_code=404)
+
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    outreach_dir = compliance_dir / "outreach"
+    message_file = None
+    message_content = None
+
+    if outreach_dir.exists():
+        msg = outreach_dir / f"message-{team}.md"
+        if msg.exists():
+            message_file = {
+                "name": msg.name,
+                "path": str(msg.relative_to(REPORTS_DIR)),
+            }
+            try:
+                message_content = load_markdown(msg)
+                if message_content:
+                    message_content = render_markdown(message_content)
+            except Exception:
+                pass
+
+    context = {
+        "request": request,
+        "title": f"Outreach: {team}",
+        "team": team,
+        "message_file": message_file,
+        "message_content": message_content,
+    }
+
+    return templates.TemplateResponse("outreach_team.html", context)
+
+
+@app.get("/operations/handoff", response_class=HTMLResponse)
+async def operations_handoff(request: Request):
+    """Operational handoff package."""
+    handoff_file = None
+    handoff_content = None
+
+    reports_dir = REPORTS_DIR
+    if reports_dir.exists():
+        handoff = reports_dir / "OPERATIONAL-HANDOFF-PACKAGE.md"
+        if handoff.exists():
+            handoff_file = {
+                "name": handoff.name,
+                "path": str(handoff.relative_to(REPORTS_DIR)),
+            }
+            try:
+                handoff_content = load_markdown(handoff)
+                if handoff_content:
+                    handoff_content = render_markdown(handoff_content)
+            except Exception:
+                pass
+
+    context = {
+        "request": request,
+        "title": "Operational Handoff",
+        "handoff_file": handoff_file,
+        "handoff_content": handoff_content,
+    }
+
+    return templates.TemplateResponse("operations_handoff.html", context)
+
+
+@app.get("/operations/readiness", response_class=HTMLResponse)
+async def operations_readiness(request: Request):
+    """Operations readiness status."""
+    readiness_files = []
+    readiness_summary = None
+
+    reports_dir = REPORTS_DIR
+    if reports_dir.exists():
+        # Look for readiness reports
+        for f in reports_dir.glob("*readiness*.md"):
+            readiness_files.append({
+                "name": f.name,
+                "path": str(f.relative_to(REPORTS_DIR)),
+            })
+
+    context = {
+        "request": request,
+        "title": "Operations Readiness",
+        "readiness_files": readiness_files,
+        "total_files": len(readiness_files),
+    }
+
+    return templates.TemplateResponse("operations_readiness.html", context)
+
+
+# ============================================================================
 # Health check
 # ============================================================================
 

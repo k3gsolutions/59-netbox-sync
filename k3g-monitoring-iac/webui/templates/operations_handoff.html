@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Operational Handoff{% endblock %}
+
+{% block content %}
+<h2>Operational Handoff Package</h2>
+
+<div class="card">
+    <h3>🚀 Deployment & Operations Guide</h3>
+    <p>Complete runbook for NOC operators, procedures, emergency stops, and success metrics.</p>
+</div>
+
+{% if handoff_content %}
+<div class="section">
+    <div class="report-content">
+        {{ handoff_content|safe }}
+    </div>
+
+    {% if handoff_file %}
+    <p style="margin-top: 20px;">
+        <a href="/reports/download?path={{ handoff_file.path }}" class="button">Download Package</a>
+    </p>
+    {% endif %}
+</div>
+{% else %}
+<div class="alert">
+    <p>Operational handoff package not found.</p>
+    <p>See: docs/47-operational-handoff.md</p>
+</div>
+{% endif %}
+
+<h3>Key Sections</h3>
+<ul>
+    <li>Roles & Responsibilities (NOC, Approver, Operations)</li>
+    <li>Workflow Procedures (approval, batch apply, monitoring)</li>
+    <li>Deployment Steps (readiness, gates, execution)</li>
+    <li>Emergency Procedures (stops, rollbacks, escalation)</li>
+    <li>Monitoring Checklist (success metrics, alerts)</li>
+</ul>
+
+<h3>Related</h3>
+<ul>
+    <li><a href="/outreach">Week 1 Outreach</a></li>
+    <li><a href="/operations/readiness">Operations Readiness</a></li>
+    <li><a href="/approval-queue">Approval Queue</a></li>
+</ul>
+
+{% endblock %}
