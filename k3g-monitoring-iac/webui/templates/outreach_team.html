@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Outreach: {{ team }}{% endblock %}
+{% block title %}Comunicação: {{ team }}{% endblock %}
 
 {% block content %}
-<h2>Outreach Message: {{ team }}</h2>
+<h2>Mensagem de comunicação: {{ team }}</h2>
 
 <div class="card">
-    <h3>Team Message</h3>
-    <p>Customized message for <strong>{{ team }}</strong> team.</p>
+    <h3>Mensagem do time</h3>
+    <p>Mensagem personalizada para o time <strong>{{ team }}</strong>.</p>
     <p style="color: #666; font-size: 0.9em;">
-        Ready to copy and send. Includes deadline, CSV template, and instructions.
+        Pronta para copiar e enviar. Inclui prazo, template CSV e instruções.
     </p>
 </div>
 
@@ -22,28 +22,28 @@
 
     {% if message_file %}
     <p style="margin-top: 20px;">
-        <a href="/reports/download?path={{ message_file.path }}" class="button">Download as Markdown</a>
+        <a href="/reports/download?path={{ message_file.path }}" class="button">Baixar em Markdown</a>
     </p>
     {% endif %}
 </div>
 {% else %}
-<div class="alert">Message not found for this team.</div>
+<div class="alert">Mensagem não encontrada para este time.</div>
 {% endif %}
 
-<h3>Steps</h3>
+<h3>Passos</h3>
 <ol>
-    <li>Copy message above (or download)</li>
-    <li>Attach corresponding CSV template</li>
-    <li>Send to team before 2026-05-02</li>
-    <li>Remind deadline: 2026-05-08 EOD</li>
-    <li>Monitor responses at /outreach</li>
+    <li>Copiar a mensagem acima (ou baixar)</li>
+    <li>Anexar o template CSV correspondente</li>
+    <li>Enviar ao time antes de 2026-05-02</li>
+    <li>Reforçar o prazo: 2026-05-08 no fim do dia</li>
+    <li>Acompanhar as respostas em /outreach</li>
 </ol>
 
-<h3>Related</h3>
+<h3>Relacionados</h3>
 <ul>
-    <li><a href="/outreach">Back to Outreach Pack</a></li>
-    <li><a href="/service-engagement">Service Engagement</a></li>
-    <li><a href="/operations/handoff">Operational Handoff</a></li>
+    <li><a href="/outreach">Voltar ao pacote de comunicação</a></li>
+    <li><a href="/service-engagement">Pendências de serviço</a></li>
+    <li><a href="/operations/handoff">Passagem operacional</a></li>
 </ul>
 
 {% endblock %}

@@ -19,7 +19,7 @@ DENYLIST_PATTERNS = [
     "_raw_",
 ]
 
-ALLOWED_EXTENSIONS = {".md", ".json", ".txt"}
+ALLOWED_EXTENSIONS = {".md", ".txt", ".json", ".csv", ".log"}
 
 
 def normalize_report_path(path: str) -> Optional[str]:
@@ -99,6 +99,27 @@ def safe_resolve_path(base: Path, requested_path: str) -> Optional[Path]:
         return None
 
 
+def safe_resolve_download_path(base: Path, requested_path: str) -> Optional[Path]:
+    """Resolve a download path with extension and sensitivity checks."""
+    resolved = safe_resolve_path(base, requested_path)
+    if not resolved or not resolved.exists() or not resolved.is_file():
+        return None
+
+    suffix = resolved.suffix.lower()
+    if suffix not in ALLOWED_EXTENSIONS:
+        return None
+
+    lowered = resolved.name.lower()
+    if lowered in DENYLIST:
+        return None
+    if any(token in lowered for token in ("token", "password", "secret", ".env")):
+        return None
+    if "payload.local" in lowered or "raw" in lowered:
+        return None
+
+    return resolved
+
+
 def list_reports(root: Path) -> List[Dict]:
     """List all compliance reports."""
     reports_dir = root / "reports" / "pilot-device-compliance"
@@ -169,6 +190,46 @@ def list_approvals(root: Path) -> List[Dict]:
                 pass
 
     return sorted(approvals, key=lambda x: x["mtime"], reverse=True)
+
+
+def list_proposed_approvals(root: Path) -> List[Dict]:
+    """List approval records waiting human review in the pending queue."""
+    pending_dir = root / "reports" / "pilot-device-compliance" / "approvals" / "pending"
+    proposed = []
+
+    if not pending_dir.exists():
+        return proposed
+
+    for json_file in pending_dir.glob("*.json"):
+        try:
+            with open(json_file, "r", encoding="utf-8") as handle:
+                data = json.load(handle)
+        except Exception:
+            continue
+
+        review = data.get("review") or {}
+        review_status = str(review.get("status") or data.get("status") or "").strip().lower()
+        if review_status not in {"proposed", "pending"}:
+            continue
+
+        proposal = data.get("proposal") or {}
+        audit = data.get("audit") or {}
+        proposed.append({
+            "name": json_file.name,
+            "path": f"reports/pilot-device-compliance/approvals/pending/{json_file.name}",
+            "mtime": json_file.stat().st_mtime,
+            "approval_id": data.get("approval_id") or data.get("approval_record_id") or json_file.stem,
+            "object_key": proposal.get("object_key") or data.get("object_key") or "",
+            "object_type": proposal.get("object_type") or data.get("object_type") or "",
+            "category": proposal.get("category") or "",
+            "status": review_status,
+            "origin": audit.get("report_path") or data.get("source_draft") or "draft_review",
+            "reviewer": review.get("reviewed_by") or review.get("reviewer") or "",
+            "next_action": proposal.get("preferred_next_step") or "Revisar e decidir manualmente",
+            "reviewed_at": review.get("reviewed_at") or "",
+        })
+
+    return sorted(proposed, key=lambda x: x["mtime"], reverse=True)
 
 
 def list_apply_plans(root: Path) -> List[Dict]:

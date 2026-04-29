@@ -1,0 +1,123 @@
+---
+# VRF / VPN Instance policy
+
+vrf:
+  definition: "Virtual Routing and Forwarding instance for traffic isolation"
+  reserved_names:
+    - "default"
+    - "_public_"
+  naming_rules:
+    pattern: "^[a-zA-Z0-9_\\-]+$"
+    min_length: 1
+    max_length: 100
+    allowed_chars: "alphanumeric, hyphen, underscore"
+    examples:
+      - "customer-a"
+      - "mpls-backbone"
+      - "management"
+      - "infra_monitoring"
+
+  structure:
+    route_distinguisher:
+      definition: "Unique identifier for VPN instance"
+      format: "ASN:VALUE or IP:VALUE"
+      pattern: "^(\\d+:\\d+|\\d+\\.\\d+\\.\\d+\\.\\d+:\\d+)$"
+      required_for: "VPN instances only"
+      optional_for: "default VRF"
+      examples:
+        - "263934:100"
+        - "10.0.0.1:100"
+
+    route_target_import:
+      definition: "Communities for import filtering"
+      format: "ASN:VALUE or IP:VALUE"
+      type: "list"
+      min_items: 1
+      examples:
+        - ["263934:100", "263934:200"]
+
+    route_target_export:
+      definition: "Communities for export filtering"
+      format: "ASN:VALUE or IP:VALUE"
+      type: "list"
+      min_items: 1
+      examples:
+        - ["263934:100"]
+
+    description:
+      definition: "Human-readable VRF purpose"
+      min_length: 5
+      max_length: 255
+      required: false
+      examples:
+        - "Customer A MPLS L3VPN"
+        - "Management and OOB network"
+
+    tenant:
+      definition: "NetBox tenant owning this VRF"
+      type: "reference"
+      required: false
+
+vrf_types:
+  management:
+    description: "Out-of-band management VRF"
+    typical_rd: "Optional"
+    typical_rt: "Optional"
+    service_criticality: "platinum"
+    examples:
+      - "management"
+      - "oob"
+
+  infrastructure:
+    description: "Internal infrastructure VRF"
+    typical_rd: "Required"
+    typical_rt: "Required"
+    service_criticality: "platinum, gold"
+    examples:
+      - "mpls-backbone"
+      - "infra-backbone"
+
+  customer:
+    description: "Customer L3VPN instance"
+    typical_rd: "Required"
+    typical_rt: "Required"
+    service_criticality: "varies (platinum to bronze)"
+    examples:
+      - "customer-a"
+      - "customer-b"
+
+  public:
+    description: "Public or default routing context"
+    typical_rd: "Not applicable"
+    typical_rt: "Not applicable"
+    service_criticality: "varies"
+    special: "_public_ is reserved name"
+
+vrf_validation_rules:
+  - rule: "VPN instance RD must be unique within device"
+    severity: "error"
+    enforcement: "Config validation"
+
+  - rule: "Route targets must be valid ASN:VALUE format"
+    severity: "error"
+    enforcement: "Web UI form validation"
+
+  - rule: "Each VRF should have at least one export RT"
+    severity: "warning"
+    enforcement: "Compliance check"
+
+  - rule: "Customer VRFs should have explicit tenant reference"
+    severity: "warning"
+    enforcement: "Web UI recommendation"
+
+vrf_bgp_binding:
+  requirement: "BGP peers are bound to VRF via neighbor statement"
+  default_vrf_peers: "Peers without explicit VRF are in default VRF"
+  vpn_peers: "Peers in VRF use VPNv4/VPNv6 AFI"
+  unicast_only: "Default VRF uses IPv4/IPv6 unicast AFI"
+
+vrf_interface_binding:
+  requirement: "Interfaces are bound to VRF via ip binding or subinterface"
+  subinterface_vlan: "Vlan subinterface is primary method"
+  vlanif: "Vlanif interface is bound to VRF"
+  loopback: "Loopback typically in default, can be in management VRF"

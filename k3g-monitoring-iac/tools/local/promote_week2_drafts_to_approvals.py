@@ -26,11 +26,16 @@ Usage:
 
 import argparse
 import csv
+import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple
 import uuid
+
+
+def calculate_hash(content: str) -> str:
+    return "sha256:" + hashlib.sha256(content.encode("utf-8")).hexdigest()
 
 
 def parse_args():
@@ -42,6 +47,7 @@ def parse_args():
     parser.add_argument("--decisions", required=True, help="Decisions CSV file")
     parser.add_argument("--drafts-dir", required=True, help="Drafts directory")
     parser.add_argument("--output-dir", required=True, help="Output directory")
+    parser.add_argument("--report", help="Optional promotion report path")
     return parser.parse_args()
 
 
@@ -51,7 +57,7 @@ def read_decisions(decisions_file: str) -> List[Dict]:
     with open(decisions_file, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row and row.get("object_key"):
+            if row and row.get("object_key") and row.get("decision"):
                 decisions.append(row)
     return decisions
 
@@ -67,6 +73,8 @@ def validate_decision_row(row: Dict) -> Tuple[bool, str]:
     approval_allowed = row.get("approval_record_allowed", "").strip().lower()
     reviewer = row.get("reviewer", "").strip()
     reviewed_at = row.get("reviewed_at", "").strip()
+    reason = row.get("reason", "").strip()
+    notes = row.get("notes", "").strip()
 
     # Check decision
     if decision != "approve_for_approval_record":
@@ -89,6 +97,9 @@ def validate_decision_row(row: Dict) -> Tuple[bool, str]:
         datetime.fromisoformat(reviewed_at.replace("Z", "+00:00"))
     except (ValueError, AttributeError):
         return False, f"reviewed_at='{reviewed_at}', not valid ISO datetime"
+
+    if not (reason or notes):
+        return False, "reason or notes field is empty"
 
     return True, "All criteria met"
 
@@ -122,19 +133,61 @@ def create_approval_record(draft: Dict, reviewer: str, reviewed_at: str) -> Dict
     approval_record_id = str(uuid.uuid4())
 
     record = {
+        "approval_id": approval_record_id,
         "approval_record_id": approval_record_id,
-        "status": "proposed",  # Not auto-approved
+        "status": "proposed",
         "device": draft["device"],
         "device_id": draft["device_id"],
         "object_type": draft["object_type"],
         "object_key": draft["object_key"],
         "action": draft["action"],
         "category": draft["category"],
+        "source_draft": draft["draft_id"],
+        "source_decision_csv": "",
+        "evidence_hash": calculate_hash(json.dumps(draft, sort_keys=True)),
         "reviewer": reviewer,
         "reviewed_at": reviewed_at,
         "created_at": datetime.utcnow().isoformat() + "+00:00",
         "source_draft_id": draft["draft_id"],
         "promotion_timestamp": datetime.utcnow().isoformat() + "+00:00",
+        "state_history": [
+            {
+                "from": "draft_review",
+                "to": "draft_review_created",
+                "by": "week2-review",
+                "at": draft.get("created_at", datetime.utcnow().isoformat() + "+00:00"),
+            },
+            {
+                "from": "draft_review",
+                "to": "human_review_approved_for_approval_record",
+                "by": reviewer,
+                "at": reviewed_at,
+            },
+            {
+                "from": "draft_review",
+                "to": "promoted_to_proposed",
+                "by": reviewer,
+                "at": datetime.utcnow().isoformat() + "+00:00",
+            },
+        ],
+        "review": {
+            "status": "proposed",
+            "reviewed_by": reviewer,
+            "reviewed_at": reviewed_at,
+            "decision": "approve_for_approval_record",
+            "comment": "",
+            "changes_requested": [],
+        },
+        "audit": {
+            "created_at": datetime.utcnow().isoformat() + "+00:00",
+            "updated_at": datetime.utcnow().isoformat() + "+00:00",
+            "created_by": reviewer,
+            "report_path": "",
+            "report_timestamp": "",
+            "evidence_hash": calculate_hash(json.dumps(draft, sort_keys=True)),
+            "source_draft": draft["draft_id"],
+            "source_decision_csv": "",
+        },
         "safety": {
             "no_netbox_write": True,
             "no_apply_plan_created": True,
@@ -210,6 +263,14 @@ def main():
         reviewed_at = row.get("reviewed_at", "").strip()
 
         approval_record = create_approval_record(draft, reviewer, reviewed_at)
+        decision_csv = str(Path(args.decisions).resolve())
+        approval_record["source_decision_csv"] = decision_csv
+        approval_record["audit"]["report_path"] = str(draft_file)
+        approval_record["audit"]["report_timestamp"] = reviewed_at
+        approval_record["audit"]["source_decision_csv"] = decision_csv
+        approval_record["review"]["comment"] = row.get("reason", "").strip() or row.get("notes", "").strip()
+        if row.get("reason", "").strip():
+            approval_record["review"]["changes_requested"] = [row.get("reason", "").strip()]
 
         # Save approval record
         record_file = promoted_dir / f"approval-record-{approval_record['approval_record_id']}.json"
@@ -332,7 +393,8 @@ Approval workflow:
 """
 
     # Save report
-    report_file = output_dir / "week2-promotion-report.md"
+    report_file = Path(args.report) if args.report else output_dir / "week2-promotion-report.md"
+    report_file.parent.mkdir(parents=True, exist_ok=True)
     with open(report_file, "w", encoding="utf-8") as f:
         f.write(report)
 

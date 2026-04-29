@@ -122,10 +122,10 @@ Gerado em: 2026-04-28 14:41:21 UTC
 ## Índice detalhado (auto)
 | Arquivo | Título | Seções (H2) | Linhas |
 | --- | --- | --- | --- |
-| context/CURRENT_STATE.md | Current State — FASE 2.0 (First Real Write Ready) | Completed; In Progress; Blocked; Known Limitations; Metrics | 292 |
+| context/CURRENT_STATE.md | Current State — 2026-04-29 (FASE 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10 Complete) | Latest Status; Completed; In Progress; Blocked; Known Limitations | 515 |
 | context/FASE-2-7-READY-FOR-APPROVAL.md | FASE 2.7 — First Real Batch POST (Ready for Approval) | Current Situation; FASE 2.7 Readiness Checklist; Approval Requirements; Execution Command (Once Approved); Expected Outcome | 156 |
 | context/GLOSSARY.md | GLOSSARY | - | 12 |
-| context/NEXT_ACTIONS.md | Next Actions — FASE 1.7+ | FASE 1.6 Complete ✅; FASE 1.7 Complete ✅; FASE 1.8 Complete ✅; FASE 1.9 — Staged Apply Dry-Run Engine; FASE 1.7.1 — `/compliance/approve` HTTP Endpoint | 245 |
+| context/NEXT_ACTIONS.md | Next Actions — 2026-04-29 (FASE 3.14 + 2.29 + 2.28 + 3.13 + 2.26 + 2.27 + 3.12 + 3.10.2 + 3.10.1 + 3.10 Complete) | Current State; Earlier Completed; Just Completed; Previously Completed; Immediate Next Steps | 423 |
 | context/OPEN_QUESTIONS.md | OPEN_QUESTIONS | - | 20 |
 | context/PHASE_1_ROADMAP.md | FASE 1 Roadmap — Report Tooling | FASE 1.0 ✅ Core Analysis; FASE 1.1 ✅ Report History; FASE 1.2 ✅ Report Comparison & Cleanup; FASE 1.3 ✅ ImportPlan Read-Only; After FASE 1 | 110 |
 | context/SYSTEM_MAP.md | SYSTEM_MAP | - | 29 |
@@ -163,6 +163,34 @@ Gerado em: 2026-04-28 14:41:21 UTC
 | docs/31-controlled-batch-staged-apply.md | Controlled Batch Staged Apply | 1. Princípio; 2. Escopo Permitido; 3. Escopo Proibido; 4. Política de Lote; 5. Gates por Item | 193 |
 | docs/32-batch-apply-runbook.md | Batch Apply Runbook | 1. Pré-Requisitos; 2. Seleção de Candidatos; 3. Preparação de cada Candidato; 4. Construir Batch ApplyPlan; 5. Validar BatchApplyPlan | 361 |
 | docs/33-service-candidate-readiness.md | Service Candidate Readiness Analysis | 1. Objetivo; 2. O que é Service Candidate; 3. Diferença: Base Inventory vs Service; 4. Campos Obrigatórios por Tipo; 5. Classificação de Readiness | 311 |
+| docs/34-web-ui-readonly.md | FASE 3.0 — Read-Only Web UI for Compliance & Governance | Objective; Scope; Architecture; Security Features; Installation & Running | 393 |
+| docs/45-service-candidate-enrichment-workflow.md | Service Candidate Enrichment Workflow | Objective; Scope; Background; Readiness Categories; Enrichment Fields by Type | 258 |
+| docs/46-service-owner-engagement.md | Service Owner Engagement Process | Objective; Background; Process Overview; Roles & Responsibilities; Engagement Package Contents | 264 |
+| docs/47-operational-handoff.md | Operational Handoff Procedures | Overview; Pre-Handoff Checklist; Deployment Steps; Role-Based Permissions; Emergency Procedures | 427 |
+| docs/48-week1-response-intake.md | Week 1 Response Intake Process | Overview; Response Collection (Week 1: 2026-05-02 to 2026-05-08); Response Format; Validation Process (Week 1 EOW + Week 2 Monday); Classification | 267 |
+| docs/49-week2-review-board-prep.md | FASE 2.13 — Week 2 Review Board Preparation | Overview; Inputs; Execution; Outputs; Safety Confirmations | 279 |
+| docs/50-week2-draft-promotion.md | FASE 2.14 — Week 2 Draft Promotion to ApprovalRecords | Overview; Promotion Criteria (ALL Required); Execution; Input: week2-review-decisions.csv; Promotion Logic | 399 |
+| docs/51-week1-outreach-pack.md | FASE 2.15 — Week 1 Outreach Pack | Overview; What is Outreach Pack?; Deliverables; Execution; Timeline | 265 |
+| docs/52-operations-dashboard.md | FASE 3.7 — Operations Dashboard Polish | Overview; New Routes; Templates (4 new); Pre-Deployment Checklist (UI); GO / NO-GO Decision | 329 |
+| docs/56-week1-operational-execution.md | FASE 2.18 — Week 1 Operational Execution | Overview; Step 1 — Validate Web UI; Step 2 — Prepare Manual Distribution; Step 3 — Register Manual Sends; Step 4 — Generate Post-Send Snapshot | 353 |
+| docs/57-week1-daily-monitoring.md | FASE 2.19 — Week 1 Daily Monitoring / Reminder Execution | Daily Routine (2026-05-02 through 2026-05-08); 2. Snapshot Summary; Response Intake (When CSVs Arrive); 3. Response Tracking; Reminder Cycle (2026-05-06) | 630 |
+| docs/58-week1-response-intake.md | FASE 2.21 — Week 1 Response Intake After First Team Replies | Overview; Process; 3. Response Tracking; Summary; Per-Team Status | 253 |
+| docs/59-week1-final-validation-week2-activation.md | FASE 2.22 — Week 1 Final Validation / Week 2 Activation | Overview; Process; Summary; Per-Team Breakdown; Items Advancing to Week 2 | 241 |
+| docs/60-week2-human-review-execution.md | FASE 2.23 — Week 2 Human Review Execution | Overview; Process; Summary; Approved for ApprovalRecord (Pending Promotion); Request Changes | 326 |
+| docs/61-webui-futuristic-redesign.md | FASE 3.9.1 — Web UI Futuristic Redesign | Objetivo; Design Principles; Mudanças Implementadas; Compatibilidade; Arquivo CSS | 127 |
+| docs/62-webui-response-edit-forms.md | FASE 3.9.3 — Web UI Response Edit Forms | Objetivo; Importante; Rotas Implementadas; Campos por Time/Object Type; Validações Implementadas | 287 |
+| docs/62-webui-response-form.md | FASE 3.10 — Web UI Pending Item Editor Modal | Goal; Routes; UX; Validation Rules; Storage | 192 |
+| docs/63-week1-uat-response-handling.md | FASE 2.25 - Week 1 UAT Response Handling | Modes; Detection; Reports; Safety | 32 |
+| docs/64-webui-response-validation-dashboard.md | FASE 3.12 - Web UI Response Validation Dashboard | Route; Shows; Actions; Safety | 27 |
+| docs/65-webui-auto-local-pipeline.md | FASE 3.10.2 - Web UI Auto Local Pipeline | Flow; UI Actions; Endpoints; Safety | 32 |
+| docs/66-webui-ptbr-ux-copy.md | Web UI PT-BR UX Copy | Objetivo; Diretriz; Termos sugeridos; Mensagens padrão; Campos do modal | 47 |
+| docs/67-real-week1-activation-flow.md | Real Week 1 Activation Flow | Objetivo; Fluxo; O que não acontece; Resultado esperado; Artefatos locais | 35 |
+| docs/68-real-week1-execution.md | Real Week 1 Execution | Objetivo; Fonte; O que o log mostra; Segurança; Uso | 34 |
+| docs/69-real-week1-final-validation.md | Real Week 1 Final Validation | Objetivo; Decisões; Regras; Saídas; Segurança | 26 |
+| docs/70-webui-operational-usability.md | Web UI Operational Usability | Objetivo; Melhorias; Termos preferidos; Termos que viram linguagem simples; Limites | 33 |
+| docs/71-week2-human-review-execution.md | Revisão Humana da Semana 2 | Entradas; Regras; Saídas | 19 |
+| docs/72-week2-promote-to-proposed-approvalrecords.md | Promoção para ApprovalRecords Propostos | Regras; Garantias | 17 |
+| docs/73-webui-week2-review-experience.md | Experiência de Revisão da Semana 2 | Texto para operador | 14 |
 | docs/FASE_0_8_1_NETBOX_DEEP_MAPPING.md | Fase 0 8 1 Netbox Deep Mapping | Objetivo; Componentes coletados; Core obrigatório; Plugin BGP; Limitações atuais | 30 |
 | docs/adr/0001-netbox-as-single-sot.md | ADR 0001 — NetBox como single source of truth técnico | Status; Contexto; Decisão; Consequências; Referências | 19 |
 | docs/adr/0002-n8n-as-orchestrator.md | ADR 0002 — N8N como orquestrador principal | Status; Contexto; Decisão; Consequências; Referências | 19 |

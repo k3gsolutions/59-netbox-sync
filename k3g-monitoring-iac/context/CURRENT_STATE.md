@@ -1,6 +1,82 @@
-# Current State — 2026-04-29 (FASE 3.9, 2.7, 3.0.1 Complete)
+# Current State — 2026-04-29 (FASE 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10 Complete)
 
 ## Latest Status
+
+**FASE 3.14 COMPLETE** — Web UI Operational Usability Polish
+  - Next-step guidance added to service engagement and validation screens
+  - Real Week 1 execution card added to dashboard
+  - Modal success message now shows next action and validation link
+  - Menu labels revised to PT-BR operational wording
+
+**FASE 2.29 COMPLETE** — Real Week 1 Final Validation + Week 2 Gate
+  - Final real validation saved to `REAL-WEEK1-FINAL-VALIDATION.md`
+  - Week 2 gate updated to `GO_WEEK2_REVIEW_WITH_RESTRICTIONS`
+  - Week 2 board prepared with validated items and pending items kept visible
+
+**FASE 2.28 COMPLETE** — Real Week 1 Execution via Web UI
+  - Real execution log saved to `REAL-WEEK1-EXECUTION-LOG.md`
+  - CSVs and audit JSONs remain local only
+  - UAT archive did not interfere with active responses
+
+**FASE 3.13 COMPLETE** — Web UI PT-BR Friendly Translation + UX Copy Review
+  - Web UI visible copy translated to PT-BR on core pages
+  - Modal, validation, outreach, approvals, reports, and dashboard labels reviewed
+  - Safety terms and internal enums preserved
+
+**FASE 2.27 COMPLETE** — Real Week 1 Activation Flow
+  - Real activation flow documented in `reports/pilot-device-compliance/REAL-WEEK1-ACTIVATION-FLOW.md`
+  - Operator flow now centers on modal save, local CSV, local validation, and Week 2 preparation
+  - Review remains human-gated
+
+**FASE 2.26 COMPLETE** — UAT Decision / Cleanup Execution
+  - UAT rows moved out of active `week1-responses/`
+  - `GO_REAL_WEEK1_CLEAN` reached after archive
+  - UAT archive preserved under `week1-responses/uat-archive/`
+
+**FASE 3.12 COMPLETE** — Web UI Response Validation Dashboard
+  - `/service-engagement/{device}/validation` added
+  - summary cards, item table, local validation button, finalize button
+  - `/service-engagement/{device}/uat-audit` added
+  - validation dashboard links to CSVs, audit, gate, and Week 2 board
+
+**FASE 3.10.2 COMPLETE** — Pending Modal Save & Close + Auto Local Pipeline
+  - Modal buttons: `Salvar`, `Salvar e fechar`
+  - Save now runs safe local pipeline
+  - New local endpoints: `run-validation` and `finalize`
+  - Week 2 board prepares automatically when all required responses are complete
+
+**FASE 2.25 COMPLETE** — UAT Cleanup / Real Week 1 Readiness
+  - `manage_week1_uat_responses.py` added
+  - UAT audit report and readiness report generated
+  - UAT archive/reset/keep-as-real require confirmation
+  - UAT is not silently treated as real
+
+**FASE 3.11 COMPLETE** — Web UI Pending Editor UAT
+  - UAT executed for Service Team, Network Ops, and BGP Team
+  - Local CSVs and audit JSON generated in `reports/pilot-device-compliance/week1-responses/`
+  - `validate_week1_responses.py` passed with 3 validated / 4 still pending
+  - CSV download fix verified for safe local artifacts
+  - `ip_address` intelligence verified for detected interface/VRF handling
+  - Documentation: `reports/pilot-device-compliance/WEBUI-PENDING-EDITOR-UAT.md`
+  - Confirmations: no NetBox write, no apply, no /sync, no ApprovalRecord auto-create, no ApplyPlan auto-create
+
+**FASE 3.10.1 COMPLETE** — CSV Download Fix + IP Address Form Intelligence
+  - Safe report download now allows `.csv`, `.json`, `.txt`, `.log`, `.md`
+  - Sensitive downloads remain blocked
+  - `ip_address` modal supports detected interface/VRF and `relation_type`
+  - `service_relation` is conditional on `relation_type=service`
+  - Tests: `tools/local/test_webui_safety.py` 26/26 passing
+
+**FASE 3.10 COMPLETE** — Web UI Pending Item Editor Modal + Backend CSV Generation
+  - Pending-item queue on `/service-engagement/{device}/pending-items`
+  - Modal editor with dynamic fields by team/object type
+  - Local-only POST saves unified CSV and append-only audit JSON
+  - CSV path: `reports/pilot-device-compliance/week1-responses/<team>-response.csv`
+  - Audit path: `reports/pilot-device-compliance/week1-responses/audit/<team>-response-audit.json`
+  - Secret keyword blocking and traversal blocking enforced
+  - Tests: `tools/local/test_webui_safety.py` 26/26 passing
+  - Documentation: `docs/62-webui-response-form.md`
+  - Confirmations: no NetBox write, no apply, no /sync, no ApprovalRecord auto-create, no ApplyPlan auto-create
 
 **FASE 3.9 COMPLETE** — Web UI Futuristic Redesign + Response Forms
   - Redesign CSS: dark mode, neon accents (cyan/green), premium cards
@@ -431,3 +507,9 @@ POST /compliance/import-plan/report (FASE 1.3)
 - Trend analysis & alertas baseado em histórico
 - Audit log persistence com immutability guarantees
 - Scheduled apply (time-based execution)
+
+## Estado Atual
+
+- Week 1 real execution done.
+- Week 2 review board generated.
+- Human review required before promotion.

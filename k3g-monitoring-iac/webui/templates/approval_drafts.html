@@ -1,28 +1,30 @@
 {% extends "base.html" %}
 
-{% block title %}Approval Drafts: {{ device }}{% endblock %}
+{% block title %}Rascunhos de aprovação: {{ device }}{% endblock %}
 
 {% block content %}
-<h2>Approval Drafts: {{ device }}</h2>
+<h2>Rascunhos de aprovação: {{ device }}</h2>
 
 <div class="card">
-    <h3>Draft Status</h3>
-    <p>Approval drafts in <code>draft_review</code> status pending promotion to ApprovalRecords.</p>
-    <p><strong>Total Drafts:</strong> {{ total_drafts }}</p>
+    <h3>Status do rascunho</h3>
+    <p>Rascunhos de aprovação com status <code>draft_review</code> aguardando decisão humana.</p>
+    <p><strong>Atenção:</strong> Rascunhos não são aprovações. Eles só viram Registro de Aprovação após decisão humana.</p>
+    <p><strong>Total de rascunhos:</strong> {{ total_drafts }}</p>
 </div>
 
 {% if drafts %}
 <div class="section">
-    <h3>📋 Drafts Pending Promotion</h3>
+    <h3>📋 Rascunhos pendentes de promoção</h3>
 
     <table class="full-width">
         <thead>
             <tr>
-                <th>Object Key</th>
-                <th>Action</th>
+                <th>Chave do objeto</th>
+                <th>Ação</th>
                 <th>Status</th>
-                <th>Created At</th>
-                <th>File</th>
+                <th>Decisão</th>
+                <th>Criado em</th>
+                <th>Arquivo</th>
             </tr>
         </thead>
         <tbody>
@@ -30,7 +32,8 @@
             <tr>
                 <td><code>{{ draft.object_key }}</code></td>
                 <td>{{ draft.action }}</td>
-                <td><span class="badge">{{ draft.status }}</span></td>
+                <td><span class="badge badge-{{ 'success' if draft.allowed_to_promote else 'warning' }}">{{ 'Pode ser promovido' if draft.allowed_to_promote else 'Precisa ajuste' }}</span></td>
+                <td>{{ draft.review_state }}</td>
                 <td>{{ draft.created_at }}</td>
                 <td><small>{{ draft.name }}</small></td>
             </tr>
@@ -40,32 +43,32 @@
 </div>
 
 <div class="alert">
-    <strong>Next Step:</strong> Once you have made decisions in the week2-review-decisions.csv file,
-    run the promotion script to create ApprovalRecords from these drafts.
+    <strong>Próximo passo:</strong> Depois de registrar as decisões no arquivo week2-review-decisions.csv,
+    execute o script de promoção para criar registros de aprovação a partir destes rascunhos.
 </div>
 
 {% else %}
 <div class="alert">
-    <p>No approval drafts found yet.</p>
-    <p>Drafts will be created in <code>week2-review/week2-approval-drafts/</code> after running prepare_week2_review.py.</p>
+    <p>Ainda não há rascunhos de aprovação.</p>
+    <p>Os rascunhos serão criados em <code>week2-review/week2-approval-drafts/</code> após rodar prepare_week2_review.py.</p>
 </div>
 {% endif %}
 
-<h3>Workflow</h3>
+<h3>Fluxo</h3>
 <ol>
-    <li>Drafts created in <code>draft_review</code> status</li>
-    <li>Human review and decisions recorded in CSV</li>
-    <li>Promotion script reads CSV and creates ApprovalRecords</li>
-    <li>ApprovalRecords created with status <code>proposed</code> (not auto-approved)</li>
-    <li>Separate approval/rejection workflow applied</li>
+    <li>Rascunhos criados com status <code>draft_review</code></li>
+    <li>Revisão humana e decisões registradas no CSV</li>
+    <li>O script de promoção lê o CSV e cria registros de aprovação propostos</li>
+    <li>Registros criados com status <code>proposed</code> ou ficam em <code>pending</code></li>
+    <li>Fluxo separado de aprovação/rejeição aplicado depois</li>
 </ol>
 
-<h3>Related</h3>
+<h3>Relacionados</h3>
 <ul>
-    <li><a href="/service-engagement/{{ device }}/week2-review">Week 2 Review Board</a></li>
-    <li><a href="/service-engagement/{{ device }}/promotion-report">Promotion Report</a></li>
-    <li><a href="/service-engagement/{{ device }}">Service Engagement</a></li>
-    <li><a href="/approval-queue">Approval Queue</a></li>
+    <li><a href="/service-engagement/{{ device }}/week2-review">Painel de revisão da Semana 2</a></li>
+    <li><a href="/service-engagement/{{ device }}/promotion-report">Relatório de promoção</a></li>
+    <li><a href="/service-engagement/{{ device }}">Pendências de serviço</a></li>
+    <li><a href="/approval-queue">Fila de aprovação</a></li>
 </ul>
 
 {% endblock %}

@@ -81,8 +81,19 @@ def validate_response(item: Dict, response: Dict) -> Tuple[str, str]:
         return ("validated", "All required fields present")
 
     elif object_type == "ip_address":
-        required = ["interface", "vrf", "owner"]
+        relation_type = response.get("relation_type", "").strip()
+        detected_interface = response.get("detected_interface", "").strip()
+        detected_vrf = response.get("detected_vrf", "").strip()
+        required = ["owner", "evidence", "relation_type"]
         missing = [f for f in required if not response.get(f, "").strip()]
+        if not response.get("interface", "").strip() and not detected_interface:
+            missing.append("interface")
+        if not response.get("vrf", "").strip() and not detected_vrf:
+            missing.append("vrf")
+        if relation_type == "service" and not response.get("service_relation", "").strip():
+            missing.append("service_relation")
+        if relation_type == "unknown" and not response.get("notes", "").strip():
+            missing.append("notes")
         if missing:
             return ("needs_clarification", f"Missing: {', '.join(missing)}")
         return ("validated", "All required fields present")

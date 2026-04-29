@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Approval: {{ approval.id }}{% endblock %}
+{% block title %}Aprovação: {{ approval.id }}{% endblock %}
 
 {% block content %}
-<h2>Approval: {{ approval.id }}</h2>
+<h2>Aprovação: {{ approval.id }}</h2>
 
 <p><span class="badge badge-{{ approval.status }}">{{ approval.status }}</span></p>
 
-<h3>Details</h3>
+<h3>Detalhes</h3>
 <pre>{{ approval.data | tojson(indent=2) }}</pre>
 
 <p>
-    <a href="/reports/download?path={{ approval.path }}" class="button">Download JSON</a>
-    <a href="/approvals" class="button">Back to Approvals</a>
+    <a href="/reports/download?path={{ approval.path }}" class="button">Baixar JSON</a>
+    <a href="/approvals" class="button">Voltar às aprovações</a>
 </p>
 {% endblock %}

@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}Week 2 Review Board: {{ device }}{% endblock %}
+{% block title %}Painel de revisão da Semana 2: {{ device }}{% endblock %}
 
 {% block content %}
-<h2>Week 2 Review Board: {{ device }}</h2>
+<h2>Painel de revisão da Semana 2: {{ device }}</h2>
 
 <div class="card">
-    <h3>Review Board Status</h3>
-    <p>Items ready for human review and decision.</p>
+    <h3>Critério de liberação da Semana 2</h3>
+    <p><strong>{{ gate_label }}</strong></p>
+    <p>Rascunhos: {{ draft_items | length }}</p>
+    <p>Registros propostos: {{ proposed_approvals | length }}</p>
+    <p>Itens com restrição: {{ validation_summary.needs_clarification + validation_summary.blocked + validation_summary.rejected }}</p>
+    {% if gate_file %}
+    <p><a href="/reports/view?path={{ gate_file.path }}" class="button">Ver critério de liberação</a></p>
+    {% endif %}
 </div>
 
 {% if review_file %}
 <div class="section">
-    <h3>📋 Review Board</h3>
+    <h3>📋 Painel de revisão</h3>
     <p><strong>{{ review_file.name }}</strong></p>
 
     <div class="review-board">
@@ -20,43 +26,65 @@
     </div>
 
     <p style="margin-top: 20px;">
-        <a href="/reports/download?path={{ review_file.path }}" class="button">Download Board</a>
+        <a href="/reports/download?path={{ review_file.path }}" class="button">Baixar painel</a>
     </p>
 </div>
 {% else %}
-<div class="alert">No review board generated yet.</div>
+<div class="alert">Nenhum painel de revisão gerado ainda.</div>
 {% endif %}
+
+<div class="section">
+    <h3>🧭 Candidatos da revisão</h3>
+    <table class="full-width">
+        <thead>
+            <tr>
+                <th>Object Key</th>
+                <th>Tipo</th>
+                <th>Time</th>
+                <th>Ação recomendada</th>
+                <th>Decisão humana</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for draft in draft_items %}
+            <tr>
+                <td><code>{{ draft.object_key }}</code></td>
+                <td>{{ draft.object_type }}</td>
+                <td>{{ draft.category }}</td>
+                <td>{{ draft.recommended_action }}</td>
+                <td>{{ draft.human_decision or 'Pendente' }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% if decisions_file %}
 <div class="section">
-    <h3>✏️ Decisions Template</h3>
+    <h3>✏️ Template de decisões</h3>
     <p><strong>{{ decisions_file.name }}</strong></p>
-    <p>Fill this CSV with your decisions (approve_for_approval_record, request_changes, reject, defer, block)</p>
-
-    <p>
-        <a href="/reports/view?path={{ decisions_file.path }}" class="button">View</a>
-        <a href="/reports/download?path={{ decisions_file.path }}" class="button">Download</a>
-    </p>
+    <p>Preencha este CSV com suas decisões (approve_for_approval_record, request_changes, reject, defer, block)</p>
+    <p><a href="/reports/view?path={{ decisions_file.path }}" class="button">Ver CSV</a> <a href="/reports/download?path={{ decisions_file.path }}" class="button">Baixar CSV</a></p>
 </div>
 {% endif %}
 
-<h3>Next Steps</h3>
+<h3>Próximos passos</h3>
 <ol>
-    <li>Review each item in the Review Board</li>
-    <li>Fill decisions in the CSV (approve_for_approval_record, request_changes, reject, defer, block)</li>
-    <li>Fill reviewer name and reviewed_at timestamp</li>
-    <li>Set approval_record_allowed=true for items to promote</li>
-    <li>Run: python3 promote_week2_drafts_to_approvals.py</li>
-    <li>Verify promoted ApprovalRecords in approval-drafts section</li>
+    <li>Revisar cada item no painel de revisão</li>
+    <li>Preencher as decisões no CSV (approve_for_approval_record, request_changes, reject, defer, block)</li>
+    <li>Informar o nome do revisor e o timestamp reviewed_at</li>
+    <li>Definir approval_record_allowed=true para os itens que podem promover</li>
+    <li>Rodar a promoção apenas depois da decisão humana explícita</li>
+    <li>Verificar os registros propostos na fila de aprovação</li>
 </ol>
 
-<h3>Related</h3>
+<h3>Relacionados</h3>
 <ul>
-    <li><a href="/service-engagement/{{ device }}/responses">Week 1 Responses</a></li>
-    <li><a href="/service-engagement/{{ device }}/week2-candidates">Week 2 Candidates</a></li>
-    <li><a href="/service-engagement/{{ device }}/approval-drafts">Approval Drafts</a></li>
-    <li><a href="/service-engagement/{{ device }}/promotion-report">Promotion Report</a></li>
-    <li><a href="/service-engagement/{{ device }}">Service Engagement</a></li>
+    <li><a href="/service-engagement/{{ device }}/responses">Respostas da Semana 1</a></li>
+    <li><a href="/service-engagement/{{ device }}/week2-candidates">Candidatos da Semana 2</a></li>
+    <li><a href="/service-engagement/{{ device }}/approval-drafts">Rascunhos de aprovação</a></li>
+    <li><a href="/service-engagement/{{ device }}/promotion-report">Relatório de promoção</a></li>
+    <li><a href="/service-engagement/{{ device }}">Pendências de serviço</a></li>
 </ul>
 
 {% endblock %}

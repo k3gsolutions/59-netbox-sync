@@ -1,35 +1,35 @@
 {% extends "base.html" %}
-{% block title %}Reminder: {{ reminder_type }}{% endblock %}
+{% block title %}Lembrete: {{ reminder_type }}{% endblock %}
 {% block content %}
-<h2>Reminder Message: {{ reminder_type }}</h2>
+<h2>Mensagem de lembrete: {{ reminder_type }}</h2>
 <div class="card">
-    <h3>📧 Ready to Send</h3>
-    <p>Copy message below. Send manually on 2026-05-06 (or 2026-05-08 EOD for escalation).</p>
+    <h3>📧 Pronta para envio</h3>
+    <p>Copie a mensagem abaixo. Envie manualmente em 2026-05-06 (ou 2026-05-08 no fim do dia para escalonamento).</p>
 </div>
 {% if reminder_content %}
 <div class="section">
     <div class="message-content">{{ reminder_content|safe }}</div>
     {% if reminder_file %}
     <p style="margin-top: 20px;">
-        <a href="/reports/download?path={{ reminder_file.path }}" class="button">Download as Markdown</a>
+        <a href="/reports/download?path={{ reminder_file.path }}" class="button">Baixar em Markdown</a>
     </p>
     {% endif %}
 </div>
 {% else %}
-<div class="alert">Reminder message not found for this type.</div>
+<div class="alert">Mensagem de lembrete não encontrada para este tipo.</div>
 {% endif %}
-<h3>Next Steps</h3>
+<h3>Próximos passos</h3>
 <ol>
-    <li>Copy message above (or download)</li>
-    <li>Customize contact info if needed</li>
-    <li>Send manually via email/Slack/Teams</li>
-    <li>Update outreach-distribution-log.md</li>
-    <li>Re-run status snapshot</li>
+    <li>Copiar a mensagem acima (ou baixar)</li>
+    <li>Ajustar contato se necessário</li>
+    <li>Enviar manualmente por e-mail/Slack/Teams</li>
+    <li>Atualizar outreach-distribution-log.md</li>
+    <li>Regerar o retrato do status</li>
 </ol>
-<h3>Related</h3>
+<h3>Relacionados</h3>
 <ul>
-    <li><a href="/outreach/reminders">All Reminders</a></li>
+    <li><a href="/outreach/reminders">Todos os lembretes</a></li>
     <li><a href="/outreach/status">Status</a></li>
-    <li><a href="/outreach/execution-log">Execution Log</a></li>
+    <li><a href="/outreach/execution-log">Log de execução</a></li>
 </ul>
 {% endblock %}

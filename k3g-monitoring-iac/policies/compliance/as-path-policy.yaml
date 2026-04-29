@@ -1,0 +1,126 @@
+---
+# AS-path filter policy
+
+as_path_filter:
+  definition: "Filter for matching BGP AS-path patterns"
+  identifier:
+    numeric: "1-500"
+    named: "alphanumeric-underscore"
+  structure:
+    filter_id:
+      description: "Filter identifier"
+      format: "numeric or named"
+      examples:
+        - "1 (numeric)"
+        - "AS-PATH-CUSTOMER-A (named)"
+
+    action:
+      description: "Match action"
+      allowed_values:
+        - "permit"
+        - "deny"
+
+    regex_pattern:
+      description: "Regular expression for AS-path matching"
+      syntax: "Huawei VRP AS-path regex"
+      required: true
+      constraints:
+        - "Must be valid regex"
+        - "Special characters: . * + ? | [ ] ( ) ^"
+
+as_path_regex_syntax:
+  anchors:
+    "^": "Start of AS-path"
+    "$": "End of AS-path"
+    "_": "AS-path separator"
+  quantifiers:
+    ".": "Any character"
+    "*": "Zero or more"
+    "+": "One or more"
+    "?": "Zero or one"
+  logical:
+    "|": "OR operator"
+    "[]": "Character class"
+    "()": "Group"
+
+as_path_examples:
+  direct_peer:
+    pattern: "^65000$"
+    meaning: "Direct peer from ASN 65000"
+  direct_or_via_one:
+    pattern: "^65000(_\\d+)?$"
+    meaning: "Routes from 65000 or 65000 with one intermediate"
+  avoid_asn:
+    pattern: "^(?!.*65000).*$"
+    meaning: "Avoid routes via ASN 65000"
+  length_one:
+    pattern: "^\\d+_\\d+$"
+    meaning: "Routes from exactly 2 ASNs"
+  customer_routes:
+    pattern: "^263934_65000"
+    meaning: "Routes advertised by customer via our peer"
+
+as_path_validation_rules:
+  - rule: "AS-path filter regex must be valid"
+    severity: "error"
+    enforcement: "Regex compilation check"
+
+  - rule: "Filter must be referenced by route-policy if defined"
+    severity: "warning"
+    enforcement: "Compliance check"
+
+  - rule: "Complex regex should be documented"
+    severity: "info"
+    enforcement: "Documentation guideline"
+
+  - rule: "Test regex against known AS-paths"
+    severity: "info"
+    enforcement: "Best practice"
+
+as_path_best_practices:
+  - "Use anchors (^ $) to match exact sequences"
+  - "Use _ as AS-path separator"
+  - "Avoid complex regex if simple patterns work"
+  - "Document regex purpose in comments"
+  - "Test regex with known AS-paths"
+  - "Use named filters for clarity"
+  - "Consider maintenance burden of complex patterns"
+
+as_path_filter_references:
+  used_by: "route-policy nodes via if-match"
+  constraint: "All referenced filters must be defined"
+  scope: "Device or global configuration"
+
+standard_as_path_filters:
+  direct_peer:
+    name: "DIRECT-PEER-FILTER"
+    filter_id: 100
+    action: "permit"
+    pattern: "^65000$"
+    purpose: "Match routes directly from peer AS65000"
+
+  avoid_specific_asn:
+    name: "AVOID-AS64512"
+    filter_id: 101
+    action: "deny"
+    pattern: "64512"
+    purpose: "Block routes through AS64512"
+
+  customer_loop_prevention:
+    name: "CUSTOMER-LOOP-PREVENT"
+    filter_id: 102
+    action: "deny"
+    pattern: "^263934_"
+    purpose: "Prevent re-advertisement of customer routes"
+
+as_path_filter_debugging:
+  test_command: "display bgp routing-table as-path-filter <filter_id>"
+  output: "Shows matching routes"
+  iteration: "Refine regex based on results"
+
+as_path_performance_notes:
+  - "Complex regex has higher CPU impact"
+  - "Use . instead of .* when possible"
+  - "Anchor patterns at start (^) for efficiency"
+  - "Test on quiet periods before production"
+  - "Monitor CPU during high BGP churn"

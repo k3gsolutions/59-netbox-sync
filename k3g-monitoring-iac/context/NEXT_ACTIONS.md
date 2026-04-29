@@ -1,4 +1,78 @@
-# Next Actions — 2026-04-29 (FASE 2.11 + 3.3 + 3.4 Complete)
+# Next Actions — 2026-04-29 (FASE 3.14 + 2.29 + 2.28 + 3.13 + 2.26 + 2.27 + 3.12 + 3.10.2 + 3.10.1 + 3.10 Complete)
+
+## Current State
+
+### FASE 3.14 ✅ **COMPLETE** — Web UI Operational Usability Polish
+- ✅ Próximo passo visível em Service Engagement / Validation
+- ✅ Card de Execução Real da Semana 1 no painel
+- ✅ Mensagem pós-salvar do modal mostra status e próximo passo
+- ✅ Menus e rótulos revisados em PT-BR operacional
+
+### FASE 2.29 ✅ **COMPLETE** — Real Week 1 Final Validation + Week 2 Gate
+- ✅ Validação final real gerada
+- ✅ Gate Week 2 atualizado para GO_WEEK2_REVIEW_WITH_RESTRICTIONS
+- ✅ Week 2 board preparado
+
+### FASE 2.28 ✅ **COMPLETE** — Real Week 1 Execution via Web UI
+- ✅ Execution log gerado
+- ✅ UAT arquivado não interferiu no fluxo real
+- ✅ CSVs e audits permaneceram locais
+
+### FASE 3.13 ✅ **COMPLETE** — Web UI PT-BR Friendly Translation + UX Copy Review
+- ✅ Core UI copy translated to PT-BR
+- ✅ Modal, validation, outreach, approvals, reports, and dashboard labels reviewed
+- ✅ Internal routes, enums, and technical names preserved
+
+### FASE 2.27 ✅ **COMPLETE** — Real Week 1 Activation Flow
+- ✅ Real activation flow documented
+- ✅ Operator path centers on modal save, local CSV, local validation, and Week 2 prep
+- ✅ Human review remains mandatory
+
+### FASE 2.26 ✅ **COMPLETE** — UAT Decision / Cleanup Execution
+- ✅ UAT rows archived out of active `week1-responses/`
+- ✅ Readiness now reports `GO_REAL_WEEK1_CLEAN`
+- ✅ Archive kept under `week1-responses/uat-archive/`
+
+### FASE 3.12 ✅ **COMPLETE** — Web UI Response Validation Dashboard
+- ✅ Validation dashboard route and audit route added
+- ✅ Summary cards and item table available
+- ✅ Finalize and validation actions exposed
+
+### FASE 3.10.2 ✅ **COMPLETE** — Pending Modal Save & Close + Auto Local Pipeline
+- ✅ Modal has Save and Save & Close
+- ✅ Save triggers safe local pipeline
+- ✅ Local validation and finalize endpoints added
+- ✅ Week 2 board can prepare automatically when ready
+
+### FASE 2.25 ✅ **COMPLETE** — UAT Cleanup / Real Week 1 Readiness
+- ✅ UAT audit report generated
+- ✅ Readiness report generated
+- ✅ UAT archive/reset/keep-as-real guarded by confirmation
+- ✅ Active UAT state cleaned to real-ready
+
+### FASE 3.11 ✅ **COMPLETE** — Web UI Pending Editor UAT
+- ✅ Service Team / Network Ops / BGP Team items saved locally
+- ✅ CSV and audit JSON generated in week1-responses/
+- ✅ Week 1 validation executed successfully
+- ✅ Controlled UAT documented in WEBUI-PENDING-EDITOR-UAT.md
+
+### FASE 3.10.1 ✅ **COMPLETE** — CSV Download Fix + IP Address Form Intelligence
+- ✅ Safe CSV download fixed for `/reports/download`
+- ✅ Allowed extensions: `.csv`, `.json`, `.txt`, `.log`, `.md`
+- ✅ Sensitive files and traversal remain blocked
+- ✅ `ip_address` form prefill/validation updated for detected interface/VRF
+- ✅ `relation_type` added and `service_relation` is conditional
+
+## Earlier Completed
+
+### FASE 3.10 ✅ **COMPLETE** — Web UI Pending Item Editor Modal + Backend CSV Generation
+- ✅ Pending queue routes added for device / response / week2 pages
+- ✅ Modal editor renders team-specific fields
+- ✅ Local-only POST saves unified CSV and audit JSON
+- ✅ Secret blocking + path traversal blocking confirmed
+- ✅ 19/19 safety tests passing
+- ✅ Week 1 validation command shown in UI
+- ✅ No NetBox writes, no apply, no /sync, no ApprovalRecord auto-create, no ApplyPlan auto-create
 
 ## Just Completed
 
@@ -341,3 +415,9 @@ Interface básica para revisão de approvals.
 - [ApprovalRecord Schema](../docs/24-approval-record-schema.md)
 - [Approval Dry-Run](../docs/25-approval-dry-run.md)
 - [Pilot Report](../reports/pilot-device-compliance/approvals/pending/PILOT-FASE-1-6-RESULT.md)
+
+## Próximos Passos
+
+- Revisar a Semana 2 manualmente.
+- Promover apenas itens aprovados para proposed/pending.
+- Manter NetBox fora do fluxo local.

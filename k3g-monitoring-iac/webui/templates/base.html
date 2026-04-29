@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,12 +11,16 @@
         <header>
             <h1><a href="/">⚙️ k3g Compliance & Governance</a></h1>
             <nav>
-                <a href="/">Dashboard</a>
-                <a href="/devices">Devices</a>
-                <a href="/approvals">Approvals</a>
-                <a href="/incidents">Incidents</a>
-                <a href="/apply-plans">Apply Plans</a>
-                <a href="/batch-results">Batch Results</a>
+                <a href="/">Painel</a>
+                <a href="/devices">Dispositivos</a>
+                <a href="/service-engagement">Pendências de Serviço</a>
+                <a href="/outreach">Comunicação com Times</a>
+                <a href="/approvals">Aprovações</a>
+                <a href="/incidents">Incidentes</a>
+                <a href="/outreach/execution-log">Logs</a>
+                <a href="/operations/handoff">Operação</a>
+                <a href="/apply-plans">Planos de Aplicação</a>
+                <a href="/batch-results">Resultados em Lote</a>
             </nav>
         </header>
 
@@ -25,8 +29,9 @@
         </main>
 
         <footer>
-            <p>Read-only compliance dashboard v3.0 — No writes, no tokens</p>
+            <p>Painel de compliance somente leitura v3.0 — sem escrita, sem tokens</p>
         </footer>
     </div>
+    <script src="{{ url_for('static', path='app.js') }}"></script>
 </body>
 </html>

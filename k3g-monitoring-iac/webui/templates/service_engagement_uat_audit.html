@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Auditoria do teste controlado: {{ device }}{% endblock %}
+
+{% block content %}
+<h2>Auditoria do teste controlado: {{ device }}</h2>
+
+<div class="card">
+    <div class="pending-validation-links">
+        <a href="/service-engagement/{{ device }}/validation" class="btn btn-primary btn-small">Painel de validação</a>
+        <a href="/service-engagement/{{ device }}/responses" class="btn btn-small">Respostas da Semana 1</a>
+    </div>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Estado do teste controlado</div><div class="summary-value">{{ uat_state.status }}</div></div>
+    <div class="summary-card"><div class="summary-label">Arquivado</div><div class="summary-value">{{ 'sim' if uat_state.status == 'archived' else 'não' }}</div></div>
+    <div class="summary-card"><div class="summary-label">Manter como real</div><div class="summary-value">{{ 'sim' if uat_state.status == 'keep-as-real' else 'não' }}</div></div>
+    <div class="summary-card"><div class="summary-label">Arquivos ativos</div><div class="summary-value">{{ uat_state.files | length }}</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Relatório de auditoria do teste controlado</div>
+    {% if audit_report %}
+        <p><a href="/reports/view?path={{ audit_report.path }}">{{ audit_report.name }}</a> | <a href="/reports/download?path={{ audit_report.path }}">Baixar</a></p>
+        {% if report_content %}
+        <pre class="mono pre-wrap">{{ report_content }}</pre>
+        {% endif %}
+    {% else %}
+        <p>Ainda não há relatório de auditoria do teste controlado.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Prontidão real</div>
+    {% if readiness_report %}
+        <p><a href="/reports/view?path={{ readiness_report.path }}">{{ readiness_report.name }}</a> | <a href="/reports/download?path={{ readiness_report.path }}">Baixar</a></p>
+        {% if readiness_content %}
+        <pre class="mono pre-wrap">{{ readiness_content }}</pre>
+        {% endif %}
+    {% else %}
+        <p>Ainda não há relatório de prontidão.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

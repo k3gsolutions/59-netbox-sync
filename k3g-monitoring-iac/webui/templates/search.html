@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Search{% endblock %}
+{% block title %}Pesquisa{% endblock %}
 
 {% block content %}
-<h2>Search Results</h2>
+<h2>Resultados da pesquisa</h2>
 
-<p>Query: <strong>{{ query }}</strong></p>
+<p>Consulta: <strong>{{ query }}</strong></p>
 
 {% if results %}
-    <p>Found <strong>{{ total }}</strong> file(s) with {{ results | map(attribute='matches') | sum }} match(es)</p>
+    <p>Encontrado(s) <strong>{{ total }}</strong> arquivo(s) com {{ results | map(attribute='matches') | sum }} correspondência(s)</p>
     {% for result in results %}
         <div class="card">
             <h3><a href="/reports/view?path={{ result.path }}">{{ result.file }}</a></h3>
-            <p><strong>Matches:</strong> {{ result.matches }}</p>
+            <p><strong>Correspondências:</strong> {{ result.matches }}</p>
             {% if result.lines %}
                 <div class="search-matches" style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">
                     {% for match in result.lines %}
@@ -23,13 +23,13 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            <a href="/reports/view?path={{ result.path }}" class="button">View File</a>
-            <a href="/reports/download?path={{ result.path }}" class="button">Download</a>
+            <a href="/reports/view?path={{ result.path }}" class="button">Ver arquivo</a>
+            <a href="/reports/download?path={{ result.path }}" class="button">Baixar</a>
         </div>
     {% endfor %}
 {% else %}
-    <p>No results found for "<strong>{{ query }}</strong>"</p>
+    <p>Nenhum resultado encontrado para "<strong>{{ query }}</strong>"</p>
 {% endif %}
 
-<p><a href="/" class="button">Back to Dashboard</a></p>
+<p><a href="/" class="button">Voltar ao painel</a></p>
 {% endblock %}

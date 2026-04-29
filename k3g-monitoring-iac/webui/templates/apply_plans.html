@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Apply Plans{% endblock %}
+{% block title %}Planos de aplicação{% endblock %}
 
 {% block content %}
-<h2>Apply Plans</h2>
+<h2>Planos de aplicação</h2>
 
 {% if apply_plans %}
     <table>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Path</th>
-                <th>Actions</th>
+                <th>Nome</th>
+                <th>Caminho</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -20,14 +20,14 @@
                     <td>{{ plan.name }}</td>
                     <td>{{ plan.path }}</td>
                     <td>
-                        <a href="/reports/view?path={{ plan.path }}" class="button-small">View</a>
-                        <a href="/reports/download?path={{ plan.path }}" class="button-small">Download</a>
+                        <a href="/reports/view?path={{ plan.path }}" class="button-small">Ver</a>
+                        <a href="/reports/download?path={{ plan.path }}" class="button-small">Baixar</a>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 {% else %}
-    <p>No apply plans found</p>
+    <p>Nenhum plano de aplicação encontrado</p>
 {% endif %}
 {% endblock %}

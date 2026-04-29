@@ -1,0 +1,150 @@
+---
+# IP prefix list policy
+
+ip_prefix_list:
+  definition: "Named list of IP prefixes for filtering"
+  naming_convention: "(BOGONS|CUSTOMER|CDN|IX|TRANSIT|INFRA)-<NAME>-IPv[46]"
+  required_fields:
+    - name
+    - afi
+  optional_fields:
+    - index
+    - action
+    - prefix
+    - greater_equal
+    - less_equal
+
+  structure:
+    name:
+      pattern: "^(BOGONS|CUSTOMER|CDN|IX|TRANSIT|INFRA)-[A-Z0-9_\\-]+-IPv[46]$"
+      required: true
+      examples:
+        - "BOGONS-IPv4"
+        - "CUSTOMER-CLIENTEABC-IPv4"
+        - "CDN-AKAMAI-IPv6"
+        - "IX-NANOG-IPv4"
+
+    afi:
+      description: "Address family (IPv4 or IPv6)"
+      allowed_values:
+        - "ipv4"
+        - "ipv6"
+      required: true
+
+    description:
+      description: "Purpose of prefix list"
+      min_length: 5
+      max_length: 255
+      optional: true
+      examples:
+        - "Customer A internal subnets"
+        - "Akamai CDN edge IPs"
+
+ip_prefix_entry:
+  definition: "Individual prefix entry within a list"
+  required_fields:
+    - action
+    - prefix
+  optional_fields:
+    - greater_equal
+    - less_equal
+    - index
+
+  structure:
+    index:
+      description: "Sequence number (implicit if not specified)"
+      type: "integer"
+      range: "1-4294967295"
+      optional: true
+
+    action:
+      description: "Action for matching prefix"
+      allowed_values:
+        - "permit"
+        - "deny"
+      required: true
+
+    prefix:
+      description: "IPv4 or IPv6 prefix in CIDR notation"
+      format: "CIDR notation (x.x.x.x/nn or xxxx:xxxx::.../nn)"
+      examples:
+        - "10.0.0.0/8"
+        - "192.0.2.0/24"
+        - "2001:db8::/32"
+
+    greater_equal:
+      description: "Minimum prefix length (ge)"
+      type: "integer"
+      range: "0-32 (IPv4) or 0-128 (IPv6)"
+      optional: true
+      examples:
+        - "20 (match /20 to /32)"
+
+    less_equal:
+      description: "Maximum prefix length (le)"
+      type: "integer"
+      range: "0-32 (IPv4) or 0-128 (IPv6)"
+      optional: true
+      examples:
+        - "24 (match /20 to /24)"
+
+ip_prefix_validation_rules:
+  - rule: "Prefix must be valid CIDR notation"
+    severity: "error"
+    enforcement: "Web UI blocks save if invalid"
+
+  - rule: "greater_equal must be <= less_equal (if both present)"
+    severity: "error"
+    enforcement: "Validation check"
+
+  - rule: "Prefix length must be within AFI range"
+    severity: "error"
+    enforcement: "IPv4: /0-/32, IPv6: /0-/128"
+
+  - rule: "All prefixes in list should be action-consistent"
+    severity: "warning"
+    enforcement: "Best practice check"
+
+  - rule: "Named lists should have description"
+    severity: "info"
+    enforcement: "Documentation guideline"
+
+standard_prefix_lists:
+  bogons:
+    name: "BOGONS-IPv4"
+    purpose: "Block bogon and martian addresses"
+    entries:
+      - action: "deny"
+        prefix: "0.0.0.0/8"
+      - action: "deny"
+        prefix: "10.0.0.0/8"
+      - action: "deny"
+        prefix: "127.0.0.0/8"
+      - action: "deny"
+        prefix: "172.16.0.0/12"
+      - action: "deny"
+        prefix: "192.0.2.0/24"
+      - action: "deny"
+        prefix: "192.168.0.0/16"
+
+  customer_a:
+    name: "CUSTOMER-CLIENTEABC-IPv4"
+    purpose: "Customer A internal subnets"
+    entries:
+      - action: "permit"
+        prefix: "203.0.113.0/24"
+      - action: "permit"
+        prefix: "198.51.100.0/24"
+
+prefix_list_reuse:
+  shared_lists:
+    - "BOGONS-IPv4, BOGONS-IPv6 (shared globally)"
+  customer_specific:
+    - "CUSTOMER-* lists (per customer)"
+  service_specific:
+    - "CDN-*, IX-*, TRANSIT-* lists (per service)"
+
+prefix_list_references:
+  used_by: "route-policy nodes"
+  constraint: "All referenced prefix lists must be defined"
+  scope: "Device or global configuration"

@@ -1,0 +1,130 @@
+---
+# Interface inventory and service interface policies
+
+interface:
+  base_inventory:
+    description: "Base interface in device inventory"
+    required_fields: []
+    optional_fields:
+      - "description"
+      - "mtu"
+      - "enabled"
+      - "type"
+    examples:
+      - "Eth-Trunk0"
+      - "GigabitEthernet0/0/1"
+      - "LoopBack0"
+
+  service_interface:
+    description: "Interface carrying operational services"
+    required_fields:
+      - "description"
+      - "tenant"
+      - "service_type"
+      - "criticality"
+      - "owner"
+    optional_fields:
+      - "vrf"
+      - "vlan_id"
+      - "parent_interface"
+      - "protocol_status"
+    examples:
+      - "Eth-Trunk0.147"
+      - "Eth-Trunk0.1580"
+      - "GigabitEthernet0/5/0.100"
+    validation_rules:
+      description:
+        min_length: 10
+        max_length: 200
+        pattern: "^[a-zA-Z0-9\\-_\\s:/.()]+$"
+      tenant:
+        min_length: 3
+        max_length: 100
+        allowed_chars: "alphanumeric, hyphen, underscore, space"
+      service_type:
+        allowed_values:
+          - "customer-internet"
+          - "customer-l2vpn"
+          - "customer-l3vpn"
+          - "customer-transport"
+          - "carrier-transit"
+          - "carrier-peering"
+          - "ix-public"
+          - "cdn-cache"
+          - "infra-backbone"
+          - "infra-management"
+      criticality:
+        allowed_values:
+          - "platinum"
+          - "gold"
+          - "silver"
+          - "bronze"
+      owner:
+        min_length: 3
+        max_length: 100
+
+interface_naming:
+  vlan_subinterface:
+    pattern: "^[A-Za-z0-9-]+\\.\\d{1,4}$"
+    vlan_id_range: "1-4094"
+    examples:
+      - "Eth-Trunk0.147"
+      - "GigabitEthernet0/5/0.100"
+
+  vlan_interface:
+    pattern: "^Vlanif\\d{1,4}$"
+    vlan_id_range: "1-4094"
+    examples:
+      - "Vlanif100"
+      - "Vlanif1580"
+
+  loopback:
+    pattern: "^LoopBack\\d+$"
+    examples:
+      - "LoopBack0"
+      - "LoopBack1"
+
+interface_inventory_rules:
+  - rule: "All service interfaces must have a tenant"
+    severity: "error"
+    enforcement: "Web UI blocks save if missing"
+
+  - rule: "All service interfaces must have an owner"
+    severity: "error"
+    enforcement: "Web UI blocks save if missing"
+
+  - rule: "Service type must be from allowed list"
+    severity: "error"
+    enforcement: "Web UI enforces dropdown"
+
+  - rule: "Criticality must be from allowed list"
+    severity: "error"
+    enforcement: "Web UI enforces dropdown"
+
+  - rule: "Description length min 10 chars"
+    severity: "warning"
+    enforcement: "Warning shown in Web UI"
+
+interface_vrf_binding:
+  - base_interface: "can be unbound or bound to VRF"
+  - service_interface: "must be explicitly bound to VRF (vlan subinterface)"
+  - loopback: "typically in default VRF or management VRF"
+
+interface_port_roles:
+  uplink:
+    typical_interfaces:
+      - "Eth-Trunk"
+      - "GigabitEthernet (high bandwidth)"
+    service_criticality: "platinum, gold"
+
+  peering:
+    typical_interfaces:
+      - "Eth-Trunk subinterface"
+      - "GigabitEthernet subinterface"
+    service_criticality: "gold, silver"
+
+  access:
+    typical_interfaces:
+      - "Vlanif"
+      - "GigabitEthernet"
+    service_criticality: "silver, bronze"

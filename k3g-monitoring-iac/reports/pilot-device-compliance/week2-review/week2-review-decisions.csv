@@ -1,1 +1,8 @@
 device,device_id,object_type,object_key,responsible_team,tenant,service_type,criticality,owner,reviewer,decision,reason,notes,reviewed_at,approval_record_allowed
+4WNET-MNS-KTG-RX,1890,subinterface,Eth-Trunk0.10,service team,,,,,,[DECISION],[reason],[notes],[datetime],
+4WNET-MNS-KTG-RX,1890,subinterface,Eth-Trunk0.147,service team,,,,,,[DECISION],[reason],[notes],[datetime],
+4WNET-MNS-KTG-RX,1890,subinterface,Eth-Trunk0.1580,service team,,,,,,[DECISION],[reason],[notes],[datetime],
+4WNET-MNS-KTG-RX,1890,subinterface,Eth-Trunk0.1589,service team,,,,,,[DECISION],[reason],[notes],[datetime],
+4WNET-MNS-KTG-RX,1890,subinterface,Eth-Trunk0.1606,service team,,,,,,[DECISION],[reason],[notes],[datetime],
+4WNET-MNS-KTG-RX,1890,ip_address,192.0.2.1/30,network ops,,,,,,[DECISION],[reason],[notes],[datetime],
+4WNET-MNS-KTG-RX,1890,bgp_peer,203.0.113.1,bgp team,,,,,,[DECISION],[reason],[notes],[datetime],

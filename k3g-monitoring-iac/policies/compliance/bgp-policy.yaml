@@ -1,0 +1,164 @@
+---
+# BGP peer and session policy
+
+bgp_peer:
+  required_metadata:
+    - peer_ip
+    - remote_asn
+    - description
+    - owner
+  optional_metadata:
+    - connect_interface
+    - local_asn
+    - peer_group
+    - import_policy
+    - export_policy
+    - criticality
+
+  validation_rules:
+    peer_ip:
+      description: "IP address of BGP peer"
+      format: "valid IPv4 or IPv6"
+      examples:
+        - "203.0.113.1"
+        - "2001:db8::1"
+
+    remote_asn:
+      description: "Peer autonomous system number"
+      type: "integer"
+      range: "1-4294967295"
+      required: true
+      examples:
+        - "65000"
+        - "64512"
+
+    description:
+      description: "Peer purpose and context"
+      min_length: 10
+      max_length: 200
+      pattern: "^[a-zA-Z0-9\\-_\\s:/.()]+$"
+      required: true
+      examples:
+        - "ISP-PRIMARY-UPLINK-AS64512"
+        - "Customer-A-PEERING-IX"
+
+    owner:
+      description: "Team or individual responsible"
+      min_length: 3
+      max_length: 100
+      required: true
+
+    criticality:
+      description: "Service criticality level"
+      allowed_values:
+        - "platinum"
+        - "gold"
+        - "silver"
+        - "bronze"
+      required_for: "service peers"
+      optional_for: "internal peers"
+
+bgp_session_types:
+  external_ebgp:
+    description: "External BGP to different ASN"
+    typical_criticality: "platinum, gold"
+    requires_import_policy: true
+    requires_export_policy: true
+    policy_direction: "bidirectional"
+    examples:
+      - "ISP uplink"
+      - "Transit peer"
+
+  internal_ibgp:
+    description: "Internal BGP within same ASN"
+    typical_criticality: "platinum, gold"
+    requires_import_policy: false
+    requires_export_policy: false
+    policy_direction: "unidirectional or none"
+    examples:
+      - "Route reflector client"
+      - "Mesh peer"
+
+  peering:
+    description: "BGP peer at Internet Exchange"
+    typical_criticality: "silver, gold"
+    requires_import_policy: true
+    requires_export_policy: true
+    policy_direction: "bidirectional"
+    examples:
+      - "IX public peering"
+      - "IX private peering"
+
+bgp_policy_requirements:
+  import_policy:
+    description: "Inbound route filtering and modification"
+    required_for: "external EBGP, peering"
+    optional_for: "iBGP"
+    policy_name_format: "Route-policy naming conventions"
+
+  export_policy:
+    description: "Outbound route filtering and modification"
+    required_for: "external EBGP, peering"
+    optional_for: "iBGP"
+    policy_name_format: "Route-policy naming conventions"
+
+  route_reflector_client:
+    description: "Route reflector client configuration"
+    optional: true
+    typical_use: "iBGP mesh optimization"
+
+bgp_peer_group:
+  description: "Grouping of peers with common configuration"
+  recommended: true
+  naming_convention: "alphanumeric-underscore"
+  benefits:
+    - "Simplified bulk updates"
+    - "Consistent policy application"
+    - "Cleaner configuration"
+  examples:
+    - "EBGP-UPLINK"
+    - "IBGP-CORE"
+
+bgp_validation_rules:
+  - rule: "BGP peer must have remote_asn"
+    severity: "error"
+    enforcement: "Web UI blocks save if missing"
+
+  - rule: "BGP peer must have owner"
+    severity: "error"
+    enforcement: "Web UI blocks save if missing"
+
+  - rule: "Service peers must have criticality"
+    severity: "error"
+    enforcement: "Web UI blocks save if missing"
+
+  - rule: "External BGP peer should have import and export policy"
+    severity: "warning"
+    enforcement: "Web UI recommendation"
+
+  - rule: "Peer description should document ASN and purpose"
+    severity: "info"
+    enforcement: "Best practice guidance"
+
+  - rule: "Policy names must conform to convention"
+    severity: "warning"
+    enforcement: "Compliance check"
+
+bgp_prefix_handling:
+  received_prefixes:
+    controlled_by: "import_policy"
+    typical_action: "accept, community-add, local-preference-set"
+    filtering_required: "yes"
+
+  advertised_prefixes:
+    controlled_by: "export_policy"
+    typical_action: "permit, deny, community-add"
+    filtering_required: "yes"
+
+bgp_community_handling:
+  recommended: "All external peers use communities"
+  community_assignment:
+    - "Peer-specific community"
+    - "Service-specific community"
+    - "Criticality-specific community"
+  community_filter_required: "if using community-based policies"

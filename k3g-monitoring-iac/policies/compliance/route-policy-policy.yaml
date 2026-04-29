@@ -1,0 +1,164 @@
+---
+# Route-policy definition and node validation policy
+
+route_policy:
+  definition: "Named policy for BGP route filtering and modification"
+  naming_convention: "AS<ASN>-<SITE>-<CONTEXT>-<SERVICE>-IPv[46]-<Import|Export>"
+  required_fields:
+    - name
+  optional_fields:
+    - description
+    - nodes
+    - referenced_by_peers
+
+  structure:
+    name:
+      pattern: "^AS\\d+-[A-Z0-9]+-[A-Z0-9]+-\\w+-IPv[46]-(Import|Export)$"
+      required: true
+      examples:
+        - "AS263934-INFORR-BVA-InterCDN-IPv4-Export"
+        - "AS263934-INFORR-BACKBONE-IPv4-Import"
+
+    description:
+      min_length: 10
+      max_length: 255
+      optional: true
+      examples:
+        - "Export policies for CDN customer"
+        - "Import BGP routes from ISP primary uplink"
+
+route_policy_node:
+  definition: "Route-policy node with if-match conditions and apply actions"
+  required_fields:
+    - node_id
+    - action
+  optional_fields:
+    - if_match_ip_prefix
+    - if_match_community_filter
+    - if_match_as_path_filter
+    - apply_community
+    - apply_community_list
+    - apply_local_preference
+    - apply_med
+
+  structure:
+    node_id:
+      description: "Sequence number in route-policy"
+      type: "integer"
+      range: "1-65535"
+      examples:
+        - "10"
+        - "20"
+        - "30"
+
+    action:
+      description: "Node action if conditions match"
+      allowed_values:
+        - "permit"
+        - "deny"
+      required: true
+
+    if_match_ip_prefix:
+      description: "Match against IP prefix list"
+      type: "reference to ip_prefix_list"
+      optional: true
+      constraint: "Referenced prefix list must exist"
+
+    if_match_community_filter:
+      description: "Match against community filter"
+      type: "reference to community_filter"
+      optional: true
+      constraint: "Referenced filter must exist"
+      max_per_node: 1
+
+    if_match_as_path_filter:
+      description: "Match against AS-path filter"
+      type: "reference to as_path_filter"
+      optional: true
+      constraint: "Referenced filter must exist"
+
+    apply_community:
+      description: "Add specific community"
+      format: "ASN:VALUE"
+      pattern: "^\\d+:\\d+$"
+      optional: true
+      examples:
+        - "263934:100"
+
+    apply_community_list:
+      description: "Add community list"
+      type: "reference to community_filter"
+      optional: true
+      constraint: "Referenced filter must exist"
+      max_per_node: 1
+
+    apply_local_preference:
+      description: "Set BGP local preference"
+      type: "integer"
+      range: "0-4294967295"
+      optional: true
+      examples:
+        - "300 (prefer this route)"
+        - "100 (deprioritize)"
+
+    apply_med:
+      description: "Set Multi-Exit Discriminator"
+      type: "integer"
+      range: "0-4294967295"
+      optional: true
+
+route_policy_validation_rules:
+  - rule: "Route-policy name must follow convention"
+    severity: "error"
+    enforcement: "Web UI enforces naming pattern"
+
+  - rule: "Each referenced filter must be defined"
+    severity: "error"
+    enforcement: "Policy load fails if reference broken"
+
+  - rule: "Node IDs should be in ascending order"
+    severity: "warning"
+    enforcement: "Best practice check"
+
+  - rule: "Apply actions should match import/export direction"
+    severity: "info"
+    enforcement: "Documentation guideline"
+
+  - rule: "Export policies should filter bogons and martians"
+    severity: "warning"
+    enforcement: "Security best practice"
+
+  - rule: "Import policies should set appropriate local preference"
+    severity: "warning"
+    enforcement: "Best practice guidance"
+
+route_policy_best_practices:
+  - "Import policy: Match prefix list, apply local-preference, apply community"
+  - "Export policy: Match prefix list or community, apply community, permit or deny"
+  - "Always include prefix-list match for specificity"
+  - "Use community-based policies for flexible matching"
+  - "Include permit or deny default at end of policy"
+  - "Document policy purpose in description"
+
+route_policy_examples:
+  import:
+    name: "AS263934-INFORR-ISP-UPLINK-IPv4-Import"
+    nodes:
+      - node_id: 10
+        action: "permit"
+        if_match_ip_prefix: "BOGONS-IPv4"
+      - node_id: 20
+        action: "deny"
+      - node_id: 30
+        action: "permit"
+        apply_local_preference: "300"
+
+  export:
+    name: "AS263934-INFORR-CUSTOMER-IPv4-Export"
+    nodes:
+      - node_id: 10
+        action: "permit"
+        if_match_ip_prefix: "CUSTOMER-A-IPv4"
+        apply_community: "263934:100"
+      - node_id: 20
+        action: "deny"

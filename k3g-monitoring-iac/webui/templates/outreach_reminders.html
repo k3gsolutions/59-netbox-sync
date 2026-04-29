@@ -1,19 +1,19 @@
 {% extends "base.html" %}
-{% block title %}Reminders{% endblock %}
+{% block title %}Lembretes{% endblock %}
 {% block content %}
-<h2>Week 1 Reminders & Escalation</h2>
+<h2>Lembretes e escalonamento da Semana 1</h2>
 <div class="card">
     <h3>📨 Ready-to-Send Messages</h3>
-    <p>Use on 2026-05-06 for non-responders. Escalation on 2026-05-08 EOD.</p>
+    <p>Use em 2026-05-06 para quem não respondeu. Escalonamento em 2026-05-08 no fim do dia.</p>
 </div>
 {% if reminder_plan %}
 <div class="section">
-    <h3>📋 Reminder Policy</h3>
-    <p><a href="/reports/view?path={{ reminder_plan.path }}" class="button">View Policy</a></p>
+    <h3>📋 Política de lembretes</h3>
+    <p><a href="/reports/view?path={{ reminder_plan.path }}" class="button">Ver política</a></p>
 </div>
 {% endif %}
 <div class="section">
-    <h3>💌 Reminder Messages</h3>
+    <h3>💌 Mensagens de lembrete</h3>
     <ul style="list-style: none;">
     {% for team in teams %}
         <li style="margin: 10px 0;">
@@ -26,11 +26,11 @@
 <table class="full-width">
     <tr><td><strong>2026-05-06</strong></td><td>Send reminders to non-responders</td></tr>
     <tr><td><strong>2026-05-08 EOD</strong></td><td>Escalate to director if still no response</td></tr>
-    <tr><td><strong>2026-05-09</strong></td><td>Final validation + Week 2 review</td></tr>
+    <tr><td><strong>2026-05-09</strong></td><td>Validação final + revisão da Semana 2</td></tr>
 </table>
-<h3>Related</h3>
+<h3>Relacionados</h3>
 <ul>
     <li><a href="/outreach/status">Status</a></li>
-    <li><a href="/outreach">Outreach Pack</a></li>
+    <li><a href="/outreach">Pacote de comunicação</a></li>
 </ul>
 {% endblock %}

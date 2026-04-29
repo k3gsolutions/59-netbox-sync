@@ -1,7 +1,7 @@
 # Week 1 Response Validation — 4WNET-MNS-KTG-RX
 
 **Device:** 4WNET-MNS-KTG-RX
-**Generated:** 2026-04-29T14:02:25.966346+00:00
+**Generated:** 2026-04-29T19:49:51.745492+00:00
 **Status:** Response intake + validation
 
 ---
@@ -10,9 +10,9 @@
 
 | Status | Count |
 |--------|-------|
-| Validated | 0 |
+| Validated | 7 |
 | Needs Clarification | 0 |
-| Still Pending | 7 |
+| Still Pending | 0 |
 | Blocked | 0 |
 | Rejected | 0 |
 | **TOTAL** | **7** |
@@ -23,7 +23,15 @@
 
 Items with all required fields present and valid:
 
-No validated items yet.
+| Object Key | Type | Team | Status |
+|------------|------|------|--------|
+| Eth-Trunk0.10 | subinterface | service team | ✓ |
+| Eth-Trunk0.147 | subinterface | service team | ✓ |
+| Eth-Trunk0.1580 | subinterface | service team | ✓ |
+| Eth-Trunk0.1589 | subinterface | service team | ✓ |
+| Eth-Trunk0.1606 | subinterface | service team | ✓ |
+| 192.0.2.1/30 | ip_address | network ops | ✓ |
+| 203.0.113.1 | bgp_peer | bgp team | ✓ |
 
 ---
 
@@ -39,23 +47,15 @@ No clarification needed.
 
 Items without responses yet:
 
-| Object Key | Type | Team |
-|------------|------|------|
-| Eth-Trunk0.10 | subinterface | service team |
-| Eth-Trunk0.147 | subinterface | service team |
-| Eth-Trunk0.1580 | subinterface | service team |
-| Eth-Trunk0.1589 | subinterface | service team |
-| Eth-Trunk0.1606 | subinterface | service team |
-| 192.0.2.1/30 | ip_address | network ops |
-| 203.0.113.1 | bgp_peer | bgp team |
+All items have responses.
 
 ---
 
 ## 5. Next Steps
 
-- **Validated:** 0 item(s) ready for Week 2 review
+- **Validated:** 7 item(s) ready for Week 2 review
 - **Needs Clarification:** 0 item(s) — request updates from teams
-- **Still Pending:** 7 item(s) — follow up with teams
+- **Still Pending:** 0 item(s) — follow up with teams
 
 ### Week 2 (2026-05-09+) Tasks:
 1. Review validated items

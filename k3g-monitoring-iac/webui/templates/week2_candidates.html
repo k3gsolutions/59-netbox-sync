@@ -1,13 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Week 2 Candidates{% endblock %}
+{% block title %}Candidatos da Semana 2{% endblock %}
 
 {% block content %}
-<h2>Week 2 Review Candidates: {{ device }}</h2>
+<h2>Candidatos para revisão da Semana 2: {{ device }}</h2>
 
 <div class="card">
-    <h3>Items Ready for Review</h3>
-    <p>Service candidate items validated in Week 1 and ready for Week 2 review process.</p>
+    <h3>Itens prontos para revisão</h3>
+    <p>Itens validados na Semana 1 e prontos para o processo de revisão da Semana 2.</p>
+    <div class="pending-validation-links">
+        <a href="/service-engagement/{{ device }}/pending-items" class="btn btn-primary btn-small">Completar pendências</a>
+        <a href="/service-engagement/{{ device }}/pending-items?format=json" class="btn btn-small">Pendências em JSON</a>
+        <a href="/service-engagement/{{ device }}/validation" class="btn btn-small">Painel de validação</a>
+        <button type="button" class="btn btn-small" onclick="finalizeResponsesAndRefresh('{{ device }}')">Finalizar respostas e preparar Semana 2</button>
+    </div>
 
     {% if candidates_file %}
         <div>
@@ -16,44 +22,63 @@
                 {{ candidates_content }}
             </div>
             <p style="margin-top: 10px;">
-                <a href="/reports/view?path={{ candidates_file.path }}" class="button">View Full Document</a>
-                <a href="/reports/download?path={{ candidates_file.path }}" class="button">Download</a>
+                <a href="/reports/view?path={{ candidates_file.path }}" class="button">Ver documento completo</a>
+                <a href="/reports/download?path={{ candidates_file.path }}" class="button">Baixar</a>
             </p>
         </div>
     {% else %}
-        <p><em>No validated candidates yet. Awaiting Week 1 response intake (expected 2026-05-09).</em></p>
+        <p><em>Nenhum candidato validado ainda. Aguardando a coleta de respostas da Semana 1 (esperado em 2026-05-09).</em></p>
     {% endif %}
 </div>
 
-<h3>Week 2 Review Process</h3>
+<h3>Processo de revisão da Semana 2</h3>
 <ol>
-    <li><strong>Item Summary</strong> — Object type, key, enriched metadata, owner, evidence</li>
-    <li><strong>Risk Assessment</strong> — Naming, parents, consistency, secrets check</li>
-    <li><strong>Approval Recommendation</strong> — Low/medium/high risk → approval tier</li>
-    <li><strong>ApprovalRecord Creation</strong> — Manual only, no automation</li>
+    <li><strong>Resumo do item</strong> — Tipo, chave, metadados enriquecidos, responsável e evidência</li>
+    <li><strong>Análise de risco</strong> — Nome, vínculos, consistência e verificação de segredos</li>
+    <li><strong>Recomendação de aprovação</strong> — Baixo/médio/alto risco → nível de aprovação</li>
+    <li><strong>Criação de registro de aprovação</strong> — Somente manual, sem automação</li>
 </ol>
 
-<h3>Week 2 Timeline</h3>
+<h3>Linha do tempo da Semana 2</h3>
 <ul>
-    <li><strong>Monday (2026-05-09):</strong> Validate Week 1 responses</li>
-    <li><strong>Tuesday-Thursday:</strong> Review validated items</li>
-    <li><strong>Friday:</strong> ApprovalRecord recommendations ready</li>
+    <li><strong>Segunda (2026-05-09):</strong> Validar respostas da Semana 1</li>
+    <li><strong>Terça a quinta:</strong> Revisar itens validados</li>
+    <li><strong>Sexta:</strong> Recomendações de aprovação prontas</li>
 </ul>
 
-<h3>Key Points</h3>
+<h3>Pontos-chave</h3>
 <ul>
-    <li>✅ No automatic ApprovalRecord creation</li>
-    <li>✅ Manual review required for each item</li>
-    <li>✅ Risk assessment before approval</li>
-    <li>✅ Zero NetBox API calls</li>
-    <li>✅ All decisions audit-trailed</li>
+    <li>✅ Nenhuma criação automática de registro de aprovação</li>
+    <li>✅ Revisão manual exigida para cada item</li>
+    <li>✅ Análise de risco antes da aprovação</li>
+    <li>✅ Nenhuma chamada à API do NetBox</li>
+    <li>✅ Todas as decisões com trilha de auditoria</li>
 </ul>
 
-<h3>Quick Links</h3>
+<h3>Atalhos</h3>
 <ul>
-    <li><a href="/service-engagement/{{ device }}/responses">Week 1 Responses</a></li>
-    <li><a href="/service-engagement/{{ device }}">Back to Engagement</a></li>
-    <li><a href="/approval-queue">Approval Queue</a></li>
+    <li><a href="/service-engagement/{{ device }}/responses">Respostas da Semana 1</a></li>
+    <li><a href="/service-engagement/{{ device }}">Voltar para pendências</a></li>
+    <li><a href="/approval-queue">Fila de aprovação</a></li>
 </ul>
+
+<div class="card">
+    <div class="card-header">Pendências</div>
+    {% include "partials/pending_items_table.html" %}
+</div>
+
+<div class="card">
+    <div class="card-header">Resumo da validação</div>
+    <div class="summary-grid">
+        <div class="summary-card"><div class="summary-label">Validadas</div><div class="summary-value" id="validation-count-validated">{{ validation_summary.validated }}</div></div>
+        <div class="summary-card"><div class="summary-label">Prontas para revisão</div><div class="summary-value" id="validation-count-ready_for_review">{{ validation_summary.ready_for_review }}</div></div>
+        <div class="summary-card"><div class="summary-label">Ainda pendentes</div><div class="summary-value" id="validation-count-still_pending">{{ validation_summary.still_pending }}</div></div>
+        <div class="summary-card"><div class="summary-label">Precisam de esclarecimento</div><div class="summary-value" id="validation-count-needs_clarification">{{ validation_summary.needs_clarification }}</div></div>
+        <div class="summary-card"><div class="summary-label">Bloqueadas</div><div class="summary-value" id="validation-count-blocked">{{ validation_summary.blocked }}</div></div>
+        <div class="summary-card"><div class="summary-label">Rejeitadas</div><div class="summary-value" id="validation-count-rejected">{{ validation_summary.rejected }}</div></div>
+    </div>
+</div>
+
+{% include "partials/pending_item_modal.html" %}
 
 {% endblock %}

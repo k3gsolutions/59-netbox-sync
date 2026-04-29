@@ -1,6 +1,6 @@
 # Week 1 Outreach Status Snapshot — 4WNET-MNS-KTG-RX
 
-**Generated:** 2026-04-29T16:20:40.221237+00:00
+**Generated:** 2026-04-29T19:49:51.867241+00:00
 **Device:** 4WNET-MNS-KTG-RX (device_id: 1890)
 **Deadline:** 2026-05-08
 **Reminder Date:** 2026-05-06
@@ -12,8 +12,8 @@
 | Metric | Value |
 |--------|-------|
 | Total Teams | 3 |
-| Responses Received | 0 |
-| Pending Items | 7 |
+| Responses Received | 8 |
+| Pending Items | -1 |
 | Partial Responses | 0 |
 | Status | Mixed |
 
@@ -23,9 +23,9 @@
 
 | Team | Expected | Received | Status | Next Action |
 |---|---:|---:|---|---|
-| Service Team | 5 | 0 | not_sent | 📬 Awaiting |
-| Network Ops | 1 | 0 | not_sent | 📬 Awaiting |
-| BGP Team | 1 | 0 | not_sent | 📬 Awaiting |
+| Service Team | 5 | 5 | complete | ✅ Complete |
+| Network Ops | 1 | 1 | complete | ✅ Complete |
+| BGP Team | 1 | 2 | partial_response | ⚠️ Clarification |
 
 ---
 

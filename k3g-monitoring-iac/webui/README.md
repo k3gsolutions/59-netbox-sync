@@ -14,7 +14,7 @@ Local web interface for reviewing compliance reports, approval records, apply pl
 - Static CSS (no JavaScript framework)
 - Path traversal protection
 - Denylist for sensitive files
-- No POST/PATCH/DELETE endpoints
+- Local-only POST for pending-item responses
 - No NetBox API integration
 
 ---
@@ -75,6 +75,7 @@ Then open: **http://127.0.0.1:8890**
 ### Reports
 - View markdown reports (formatted HTML)
 - Download as .md
+- Download local CSV/JSON/TXT/LOG artifacts with safe extension checks
 - Search across reports
 
 ### Approvals
@@ -101,6 +102,18 @@ Then open: **http://127.0.0.1:8890**
 - List device comparisons
 - View and download
 
+### Service Engagement
+- Device-level pending item queue
+- Modal editor for Week 1 responses
+- Unified CSV output for Week 1 validation
+- Local audit trail for each save
+- `ip_address` items can prefill detected interface/VRF and use `relation_type`
+- Validation dashboard for Week 1 progress
+- Local finalize action to prepare Week 2 when ready
+- PT-BR-friendly copy for operators and NOC users
+- Real Week 1 execution status and final validation are documented locally
+- Next-step guidance is shown after save and on the device dashboard
+
 ### Search
 - Simple search across .md files
 - Search in reports/, docs/, context/
@@ -115,14 +128,16 @@ Then open: **http://127.0.0.1:8890**
   - `payload.local.json`
   - Files with "raw" in name
   - Files with "token", "password", "secret"
-- ✅ No POST/PATCH/DELETE endpoints
+- ✅ POST only for local response saving
+- ✅ POST only for local validation/finalize pipeline
 - ✅ Read-only only
 - ✅ No NetBox API calls
 - ✅ No write tokens needed
+- ✅ Secret terms blocked in pending-item forms
 
 ### Safe File Access
 - Paths validated against `reports/` directory only
-- Extensions whitelist: `.md`, `.json`, `.txt`
+- Extensions whitelist: `.md`, `.json`, `.txt`, `.csv`, `.log`
 - Markdown rendered to HTML (prevents script injection)
 - File downloads blocked for sensitive extensions
 
@@ -152,8 +167,11 @@ webui/
     comparisons.html    # Comparison list
     report_view.html    # Report viewer
     search.html         # Search results
+    service_engagement_pending_items.html # Pending queue page
+    partials/           # Shared pending-item fragments
   static/
     style.css           # Stylesheet
+    app.js              # Modal editor behavior
 ```
 
 ---
@@ -173,7 +191,7 @@ python3 tools/local/test_webui_readonly.py
 Tests verify:
 - ✅ Path traversal blocked
 - ✅ Sensitive files blocked
-- ✅ No POST routes
+- ✅ Local-only POST routes
 - ✅ No write keywords in code
 - ✅ Read-only enforced
 
@@ -277,6 +295,12 @@ python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 8890 --reload
 - **Local only** — No external access by default
 - **Safe downloads** — Sensitive files blocked
 - **FREEZE honored** — UI respects project freeze status (informational only)
+
+## Week 2 Review
+
+- Tela de revisão humana da Semana 2 em PT-BR.
+- Registros propostos ficam em `approvals/pending/`.
+- Nenhuma ação aplica mudanças no NetBox.
 
 ---
 

@@ -1,0 +1,127 @@
+---
+# Naming conventions and patterns for Huawei VRP elements
+
+interface:
+  description: "Interface naming patterns"
+  base_inventory:
+    patterns:
+      - "^Eth-Trunk\\d+$"
+      - "^GigabitEthernet\\d+/\\d+/\\d+$"
+      - "^10GE\\d+/\\d+/\\d+$"
+      - "^LoopBack\\d+$"
+      - "^NULL\\d+$"
+      - "^Vlanif\\d+$"
+    examples:
+      - "Eth-Trunk0"
+      - "GigabitEthernet0/0/1"
+      - "10GE0/1/0"
+      - "LoopBack0"
+      - "Vlanif100"
+  service_interface:
+    patterns:
+      - "^Eth-Trunk\\d+\\.\\d+$"
+      - "^GigabitEthernet\\d+/\\d+/\\d+\\.\\d+$"
+    examples:
+      - "Eth-Trunk0.147"
+      - "Eth-Trunk0.1580"
+      - "GigabitEthernet0/5/0.100"
+
+vrf:
+  description: "VRF / VPN Instance naming"
+  patterns:
+    - "^[a-zA-Z0-9_\\-]+$"
+  reserved:
+    - "_public_"
+    - "default"
+  examples:
+    - "customer-a"
+    - "mpls-backbone"
+    - "management"
+  max_length: 100
+
+route_policy:
+  description: "Route-policy naming convention"
+  pattern: "^AS\\d+-[A-Z0-9]+-[A-Z0-9]+-\\w+-IPv[46]-(Import|Export)$"
+  parts:
+    - name: "asn"
+      pattern: "\\d+"
+      description: "Local ASN"
+    - name: "site"
+      pattern: "[A-Z0-9]+"
+      description: "Site code (e.g., INFORR)"
+    - name: "context"
+      pattern: "[A-Z0-9]+"
+      description: "Context or service (e.g., BVA, InterCDN)"
+    - name: "service"
+      pattern: "\\w+"
+      description: "Service name"
+    - name: "afi"
+      pattern: "IPv[46]"
+      description: "Address family"
+    - name: "direction"
+      pattern: "Import|Export"
+      description: "Policy direction"
+  examples:
+    - "AS263934-INFORR-BVA-InterCDN-IPv4-Export"
+    - "AS263934-INFORR-BACKBONE-IPv4-Import"
+
+ip_prefix:
+  description: "IP prefix list naming"
+  patterns:
+    - "^BOGONS-(IPv4|IPv6)$"
+    - "^CUSTOMER-[A-Z0-9_\\-]+-IPv[46]$"
+    - "^CDN-[A-Z0-9_\\-]+-IPv[46]$"
+    - "^IX-[A-Z0-9_\\-]+-IPv[46]$"
+    - "^TRANSIT-[A-Z0-9_\\-]+-IPv[46]$"
+    - "^INFRA-[A-Z0-9_\\-]+-IPv[46]$"
+  examples:
+    - "BOGONS-IPv4"
+    - "CUSTOMER-CLIENTEABC-IPv4"
+    - "CDN-AKAMAI-IPv6"
+    - "IX-NANOG-IPv4"
+
+community:
+  description: "BGP community format"
+  format: "ASN:VALUE"
+  pattern: "^\\d+:\\d+$"
+  asn_range: "1-4294967295"
+  value_range: "0-65535"
+  well_known:
+    - "0:0 (no_export)"
+    - "0:65281 (no_advertise)"
+    - "0:65282 (no_export_subconfed)"
+  examples:
+    - "263934:100"
+    - "64512:1000"
+
+as_path:
+  description: "AS-path filter regex"
+  min_length: 1
+  pattern_constraints:
+    - "Must be valid regex"
+    - "Typical: ^<ASN>_<ASN>$"
+  examples:
+    - "^65000_"
+    - "_65000_"
+    - "^(65000|65001)_"
+
+community_filter:
+  description: "Community filter naming"
+  type: "named or numeric"
+  named_pattern: "^[a-zA-Z0-9_\\-]+$"
+  examples:
+    - "CUSTOMER-A-COMMUNITIES"
+    - "TRANSIT-UPLINK"
+
+comments:
+  description: "General comment field constraints"
+  max_length_short: 255
+  max_length_evidence: 1024
+  blocked_keywords:
+    - "token"
+    - "password"
+    - "secret"
+    - "private key"
+    - "bearer"
+    - "api_key"
+    - "ssh_key"

@@ -1,6 +1,6 @@
 # Week 2 Review Board — 4WNET-MNS-KTG-RX
 
-**Generated:** 2026-04-29T14:16:53.096775+00:00
+**Generated:** 2026-04-29T19:49:51.994067+00:00
 **Status:** Ready for human review
 
 ---
@@ -9,11 +9,11 @@
 
 | Category | Count |
 |----------|-------|
-| Ready for review | 0 |
+| Ready for review | 7 |
 | Needs clarification | 0 |
-| Still pending | 8 |
+| Still pending | 0 |
 | Blocked | 0 |
-| **Total candidates** | **8** |
+| **Total candidates** | **7** |
 
 ---
 
@@ -21,6 +21,13 @@
 
 | Object Key | Type | Team | Draft | Status |
 |------------|------|------|-------|--------|
+| Eth-Trunk0.10 | subinterface | service team | approval-draft-Eth-Trunk0-10.json | draft_review |
+| Eth-Trunk0.147 | subinterface | service team | approval-draft-Eth-Trunk0-147.json | draft_review |
+| Eth-Trunk0.1580 | subinterface | service team | approval-draft-Eth-Trunk0-1580.json | draft_review |
+| Eth-Trunk0.1589 | subinterface | service team | approval-draft-Eth-Trunk0-1589.json | draft_review |
+| Eth-Trunk0.1606 | subinterface | service team | approval-draft-Eth-Trunk0-1606.json | draft_review |
+| 192.0.2.1/30 | ip_address | network ops | approval-draft-192-0-2-1-30.json | draft_review |
+| 203.0.113.1 | bgp_peer | bgp team | approval-draft-203-0-113-1.json | draft_review |
 
 ---
 
@@ -28,14 +35,6 @@
 
 | Object Key | Reason | Action |
 |------------|--------|--------|
-| Object Key | No response | Follow up with team |
-| Eth-Trunk0.10 | No response | Follow up with team |
-| Eth-Trunk0.147 | No response | Follow up with team |
-| Eth-Trunk0.1580 | No response | Follow up with team |
-| Eth-Trunk0.1589 | No response | Follow up with team |
-| Eth-Trunk0.1606 | No response | Follow up with team |
-| 192.0.2.1/30 | No response | Follow up with team |
-| 203.0.113.1 | No response | Follow up with team |
 
 ---
 

@@ -1,50 +1,50 @@
 {% extends "base.html" %}
 
-{% block title %}Promotion Report: {{ device }}{% endblock %}
+{% block title %}Relatório de promoção: {{ device }}{% endblock %}
 
 {% block content %}
-<h2>Week 2 Draft Promotion Report: {{ device }}</h2>
+<h2>Relatório de promoção dos rascunhos da Semana 2: {{ device }}</h2>
 
 <div class="card">
-    <h3>Promotion Status</h3>
-    <p>Report of drafts promoted from <code>draft_review</code> to <code>proposed</code> ApprovalRecords.</p>
+    <h3>Status da promoção</h3>
+    <p>Relatório dos rascunhos promovidos de <code>draft_review</code> para registros de aprovação <code>proposed</code>.</p>
 </div>
 
 {% if report_file %}
 <div class="section">
-    <h3>📊 Promotion Report</h3>
+    <h3>📊 Relatório de promoção</h3>
 
     <div class="report-content">
         {{ report_content|safe }}
     </div>
 
     <p style="margin-top: 20px;">
-        <a href="/reports/download?path={{ report_file.path }}" class="button">Download Report</a>
+        <a href="/reports/download?path={{ report_file.path }}" class="button">Baixar relatório</a>
     </p>
 </div>
 {% else %}
 <div class="alert">
-    <p>No promotion report found yet.</p>
-    <p>Run the promotion script to generate a report:</p>
+    <p>Ainda não há relatório de promoção.</p>
+    <p>Rode o script de promoção para gerar um relatório:</p>
     <code>python3 promote_week2_drafts_to_approvals.py ...</code>
 </div>
 {% endif %}
 
-<h3>What Happens Next</h3>
+<h3>O que acontece depois</h3>
 <ol>
-    <li>Promoted ApprovalRecords have status: <code>proposed</code></li>
-    <li>ApprovalRecords are NOT auto-approved</li>
-    <li>Manual approval/rejection workflow applied</li>
+    <li>Registros promovidos ficam com status: <code>proposed</code></li>
+    <li>Registros de aprovação NÃO são aprovados automaticamente</li>
+    <li>Fluxo manual de aprovação/rejeição aplicado</li>
     <li>State transitions tracked with audit trail</li>
-    <li>Monitor via Approval Queue dashboard</li>
+    <li>Acompanhar pela fila de aprovação</li>
 </ol>
 
-<h3>Related</h3>
+<h3>Relacionados</h3>
 <ul>
-    <li><a href="/service-engagement/{{ device }}/week2-review">Week 2 Review Board</a></li>
-    <li><a href="/service-engagement/{{ device }}/approval-drafts">Approval Drafts</a></li>
-    <li><a href="/service-engagement/{{ device }}">Service Engagement</a></li>
-    <li><a href="/approval-queue">Approval Queue</a></li>
+    <li><a href="/service-engagement/{{ device }}/week2-review">Painel de revisão da Semana 2</a></li>
+    <li><a href="/service-engagement/{{ device }}/approval-drafts">Rascunhos de aprovação</a></li>
+    <li><a href="/service-engagement/{{ device }}">Pendências de serviço</a></li>
+    <li><a href="/approval-queue">Fila de aprovação</a></li>
 </ul>
 
 {% endblock %}

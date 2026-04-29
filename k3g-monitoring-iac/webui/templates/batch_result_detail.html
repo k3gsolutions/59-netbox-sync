@@ -7,8 +7,8 @@
 
 <div class="card">
     <p><strong>Name:</strong> {{ batch.name }}</p>
-    <p><strong>File:</strong> {{ batch.path }}</p>
-    <a href="/reports/download?path={{ batch.path }}" class="button">Download</a>
+    <p><strong>Arquivo:</strong> {{ batch.path }}</p>
+    <a href="/reports/download?path={{ batch.path }}" class="button">Baixar</a>
 </div>
 
 <h3>Content</h3>
@@ -16,5 +16,5 @@
     {{ batch.content | safe }}
 </div>
 
-<a href="/batch-results" class="button">Back to Batch Results</a>
+<a href="/batch-results" class="button">Voltar aos resultados em lote</a>
 {% endblock %}

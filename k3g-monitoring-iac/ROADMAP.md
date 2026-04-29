@@ -4,6 +4,18 @@
 
 Automated, read-only compliance analysis for network devices. Local report history, trend tracking, minimal secrets exposure.
 
+## Current UI Milestones
+
+- FASE 3.10.2: modal save/save-and-close + safe local pipeline
+- FASE 3.12: response validation dashboard + UAT audit view
+- FASE 2.25: UAT cleanup and Week 1 real-readiness guardrails
+- FASE 3.13: PT-BR friendly UI copy review
+- FASE 2.26: UAT decision / cleanup execution
+- FASE 2.27: real Week 1 activation flow
+- FASE 2.28: real Week 1 execution via Web UI
+- FASE 2.29: real Week 1 final validation + Week 2 gate
+- FASE 3.14: operational usability polish
+
 ## Timeline
 
 ### ✅ FASE 1.0 — Core Read-Only Analysis (2026-04-28)
@@ -130,6 +142,15 @@ Dashboard & alerts:
 - Incident 18201/18202 from 2026-04-04 closed, no rollback needed
 - Post-batch compliance and before/after comparison generated
 
+### ✅ FASE 3.10 — Web UI Pending Item Editor Modal + Backend CSV Generation (2026-04-29)
+
+**Completed:**
+- Device-level pending-item queue added to Service Engagement / Responses / Week 2 pages
+- Modal editor renders only the fields needed by team/object type
+- Local-only POST saves unified Week 1 CSV and append-only audit JSON
+- Secret keyword blocking and traversal blocking enforced
+- No NetBox writes, no apply, no `/sync`, no ApprovalRecord auto-create, no ApplyPlan auto-create
+
 ### FASE 2.1 — Tag Bootstrap & Batch Staged Apply (Q2-Q3 2026)
 
 **Planned:**
@@ -196,3 +217,9 @@ Read-write mode beyond staged apply:
 - Maintain read-only compliance through FASE 1.3
 - FASE 2.0 introduces write capability (requires approval workflow)
 - Web UI designed to work without backend changes (read-only data)
+
+## Semana 2 atual
+
+- Revisão humana em PT-BR.
+- ApprovalRecords apenas proposed/pending.
+- Nenhuma escrita NetBox.

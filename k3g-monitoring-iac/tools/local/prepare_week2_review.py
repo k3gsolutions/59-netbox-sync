@@ -72,7 +72,7 @@ def extract_items_from_validation(validation_file: str) -> Dict[str, List[Dict]]
                         "type": parts[2] if len(parts) > 2 else "",
                         "team": parts[3] if len(parts) > 3 else "",
                     }
-                    if item["object_key"]:
+                    if item["object_key"] and item["object_key"].lower() not in {"object key", "object_key"}:
                         if "validated" in section_title:
                             items["validated"].append(item)
                         elif "clarif" in section_title:
@@ -256,6 +256,8 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     drafts_dir = output_dir / "week2-approval-drafts"
     drafts_dir.mkdir(exist_ok=True)
+    for stale_draft in drafts_dir.glob("approval-draft-*.json"):
+        stale_draft.unlink()
 
     # Generate review board
     board = create_review_board(args.device, items)

@@ -1,0 +1,91 @@
+---
+# SNMP credential and discovery policy
+
+snmp:
+  preferred_version: "v3"
+  allowed_versions:
+    - "v3"
+    - "v2c (legacy only)"
+
+  v3:
+    required_fields:
+      - "username"
+      - "auth_protocol"
+      - "auth_password"
+      - "privacy_protocol"
+      - "privacy_password"
+    auth_protocols:
+      - "MD5"
+      - "SHA"
+      - "SHA-224"
+      - "SHA-256"
+      - "SHA-384"
+      - "SHA-512"
+    privacy_protocols:
+      - "DES"
+      - "AES"
+      - "AES-192"
+      - "AES-256"
+    status: "REQUIRED"
+
+  v2c:
+    community_string: "community"
+    blocked_communities:
+      - "public"
+      - "private"
+      - "secret"
+      - "admin"
+      - "cisco"
+      - "snmp"
+    status: "LEGACY_ONLY"
+    use_case: "Backward compatibility with legacy devices"
+    requires_exception: true
+
+  credential_source:
+    - type: "NetBox"
+      field: "secret"
+      scope: "device"
+      constraint: "Encrypted, access controlled"
+    - type: "NetBox"
+      field: "custom_field"
+      scope: "device"
+      constraint: "Device custom field with restricted view"
+    - type: "NetBox"
+      field: "tenant_custom_field"
+      scope: "tenant"
+      constraint: "Tenant-level custom field"
+    - type: "Local"
+      location: "k3g-monitoring/.secrets/snmp.yaml"
+      constraint: "Encrypted at rest, not committed to git"
+
+discovery_oids:
+  system:
+    sysDescr: "1.3.6.1.2.1.1.1.0"
+    sysObjectID: "1.3.6.1.2.1.1.2.0"
+    sysUpTime: "1.3.6.1.2.1.1.3.0"
+    sysContact: "1.3.6.1.2.1.1.4.0"
+    sysName: "1.3.6.1.2.1.1.5.0"
+    sysLocation: "1.3.6.1.2.1.1.6.0"
+
+  interfaces:
+    ifIndex: "1.3.6.1.2.1.2.2.1.1"
+    ifDescr: "1.3.6.1.2.1.2.2.1.2"
+    ifType: "1.3.6.1.2.1.2.2.1.3"
+    ifMtu: "1.3.6.1.2.1.2.2.1.4"
+    ifSpeed: "1.3.6.1.2.1.2.2.1.5"
+    ifPhysAddress: "1.3.6.1.2.1.2.2.1.6"
+    ifAdminStatus: "1.3.6.1.2.1.2.2.1.7"
+    ifOperStatus: "1.3.6.1.2.1.2.2.1.8"
+
+  ip:
+    ipAdEntAddr: "1.3.6.1.2.1.4.20.1.1"
+    ipAdEntIfIndex: "1.3.6.1.2.1.4.20.1.2"
+    ipAdEntNetMask: "1.3.6.1.2.1.4.20.1.3"
+
+recommendations:
+  - "Use SNMPv3 for all production devices"
+  - "Store credentials in NetBox secret or encrypted local file"
+  - "Never commit SNMP credentials to Git"
+  - "Rotate community strings annually"
+  - "Use strong auth/privacy passwords (min 15 chars)"
+  - "Log all SNMP queries for audit trail"

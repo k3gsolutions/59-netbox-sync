@@ -1,0 +1,195 @@
+---
+# Huawei VRP Configuration Element Definitions
+# Each element defines: keys, discovery methods
+
+device:
+  description: "Network device system"
+  keys:
+    - hostname
+    - sys_name
+    - sys_descr
+    - uptime
+    - vendor
+    - platform
+    - model
+  discovery:
+    - method: "SNMP sysDescr"
+      oid: "1.3.6.1.2.1.1.1.0"
+    - method: "SNMP sysUpTime"
+      oid: "1.3.6.1.2.1.1.3.0"
+    - method: "SNMP sysName"
+      oid: "1.3.6.1.2.1.1.5.0"
+    - method: "CLI display version"
+      command: "display version"
+
+interface:
+  description: "Network interface"
+  keys:
+    - name
+    - type
+    - admin_status
+    - oper_status
+    - protocol_status
+    - description
+    - ip_addresses
+    - vrf
+    - parent_interface
+    - vlan_id
+  discovery:
+    - method: "CLI display interface brief"
+      command: "display interface brief"
+    - method: "CLI display interface"
+      command: "display interface"
+    - method: "CLI display current-configuration interface"
+      command: "display current-configuration | include interface"
+
+vrf:
+  description: "VRF or VPN Instance"
+  keys:
+    - name
+    - rd
+    - route_targets_import
+    - route_targets_export
+    - description
+    - tenant
+  discovery:
+    - method: "CLI display current-configuration vpn-instance"
+      command: "display current-configuration | include ip vpn-instance"
+
+bgp_global:
+  description: "BGP global configuration"
+  keys:
+    - local_asn
+    - router_id
+    - address_families
+  discovery:
+    - method: "CLI display bgp peer summary"
+      command: "display bgp peer"
+    - method: "CLI display bgp ipv6 peer"
+      command: "display bgp ipv6 peer"
+    - method: "CLI display bgp configuration"
+      command: "display current-configuration | include bgp"
+
+bgp_peer:
+  description: "BGP peer session"
+  keys:
+    - peer_ip
+    - afi
+    - safi
+    - remote_asn
+    - local_asn
+    - state
+    - description
+    - connect_interface
+    - vrf
+    - peer_group
+    - import_policy
+    - export_policy
+    - received_prefixes
+    - advertised_prefixes
+    - uptime
+    - last_error
+    - service_type
+    - criticality
+    - owner
+  discovery:
+    - method: "CLI display bgp peer"
+      command: "display bgp peer"
+    - method: "CLI display bgp ipv6 peer"
+      command: "display bgp ipv6 peer"
+    - method: "CLI display bgp peer verbose"
+      command: "display bgp peer <peer> verbose"
+    - method: "CLI display bgp vpnv4 peer"
+      command: "display bgp vpnv4 vpn-instance <vrf> peer"
+    - method: "CLI display bgp vpnv6 peer"
+      command: "display bgp vpnv6 vpn-instance <vrf> peer"
+
+bgp_prefix_observation:
+  description: "BGP prefix routing observation"
+  keys:
+    - peer_ip
+    - vrf
+    - afi
+    - direction
+    - prefix
+    - as_path
+    - next_hop
+    - local_pref
+    - med
+    - community
+    - valid
+    - best
+  discovery:
+    - method: "CLI display bgp received-routes"
+      command: "display bgp routing-table peer <peer> received-routes"
+    - method: "CLI display bgp advertised-routes"
+      command: "display bgp routing-table peer <peer> advertised-routes"
+
+route_policy:
+  description: "Route-policy definition"
+  keys:
+    - name
+    - nodes
+    - referenced_by_peers
+  discovery:
+    - method: "CLI display route-policy"
+      command: "display current-configuration | include route-policy"
+
+route_policy_node:
+  description: "Route-policy node with conditions and actions"
+  keys:
+    - policy_name
+    - node_id
+    - action
+    - if_match_ip_prefix
+    - if_match_community_filter
+    - if_match_as_path_filter
+    - apply_community
+    - apply_community_list
+    - apply_local_preference
+    - apply_med
+    - comments
+  discovery:
+    - method: "CLI display route-policy details"
+      command: "display current-configuration | include 'route-policy|if-match|apply'"
+
+ip_prefix_list:
+  description: "IP prefix list for filtering"
+  keys:
+    - name
+    - afi
+    - index
+    - action
+    - prefix
+    - greater_equal
+    - less_equal
+    - referenced_by_route_policy
+  discovery:
+    - method: "CLI display prefix list"
+      command: "display current-configuration | include 'ip ip-prefix'"
+
+community_filter:
+  description: "Community filter definition"
+  keys:
+    - filter_id
+    - name
+    - type
+    - action
+    - community
+    - regex
+    - referenced_by_route_policy
+  discovery:
+    - method: "CLI display community-filter"
+      command: "display current-configuration | include 'community-filter'"
+
+as_path_filter:
+  description: "AS-path filter definition"
+  keys:
+    - filter_id
+    - name
+    - action
+    - regex
+    - referenced_by_route_policy
+  discovery:
+    - method: "CLI display as-path filter"
+      command: "display current-configuration | include 'ip as-path-filter'"

@@ -1,0 +1,80 @@
+---
+# Cross-element dependency map
+# Defines required and optional dependencies
+
+bgp_peer:
+  required:
+    - device
+    - bgp_global
+    - peer_ip
+    - remote_asn
+  optional:
+    - connect_interface
+    - vrf
+    - import_policy
+    - export_policy
+    - peer_group
+
+bgp_vpn_peer:
+  required:
+    - device
+    - bgp_global
+    - vrf
+    - peer_ip
+    - remote_asn
+
+route_policy_node:
+  required:
+    - route_policy
+    - node_id
+    - action
+  optional:
+    - if_match_ip_prefix
+    - if_match_community_filter
+    - if_match_as_path_filter
+    - apply_community
+    - apply_community_list
+    - apply_local_preference
+    - apply_med
+
+route_policy:
+  required:
+    - name
+  optional:
+    - nodes
+    - referenced_by_peers
+
+filter_reference:
+  route_policy_can_reference:
+    - ip_prefix_list
+    - community_filter
+    - as_path_filter
+  constraint: "All referenced filters must be defined"
+
+ip_address_mapping:
+  required:
+    - address
+    - relation_type
+  optional:
+    - interface
+    - vrf
+  conditional:
+    - if: "relation_type = service"
+      then: "service_relation required"
+    - if: "relation_type = unknown"
+      then: "notes required"
+
+interface:
+  required:
+    - name
+  optional:
+    - description
+    - vrf
+    - parent_interface
+    - vlan_id
+  service_interface_required:
+    - description
+    - tenant
+    - service_type
+    - criticality
+    - owner

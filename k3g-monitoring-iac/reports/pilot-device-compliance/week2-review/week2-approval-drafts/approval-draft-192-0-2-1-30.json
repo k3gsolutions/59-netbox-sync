@@ -1,0 +1,28 @@
+{
+  "draft_id": "4dd657f5-633c-48d3-b810-e0b0c96cc9d4",
+  "status": "draft_review",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 1890,
+  "object_type": "ip_address",
+  "object_key": "192.0.2.1/30",
+  "action": "safe_create_staged",
+  "category": "service_candidate",
+  "created_at": "2026-04-29T19:49:51.996439+00:00",
+  "allowed_to_promote": false,
+  "promotion_requirements": {
+    "reviewer_required": true,
+    "decision_required": true,
+    "approval_record_allowed_required": true,
+    "reviewed_at_required": true
+  },
+  "warnings": [
+    "This is a draft. Not an official ApprovalRecord.",
+    "Can only be promoted with explicit human decision.",
+    "Must complete: reviewer, decision, reviewed_at, approval_record_allowed=true"
+  ],
+  "safety": {
+    "no_netbox_write": true,
+    "no_apply_plan_created": true,
+    "manual_review_required": true
+  }
+}

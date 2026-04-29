@@ -23,9 +23,13 @@ k3g-monitoring-iac project is ready for operational handoff to Network Operation
 ✅ Zero POST/PATCH/DELETE routes in Web UI
 ✅ Path traversal protected
 ✅ Sensitive downloads blocked
+✅ CSV/JSON/TXT/LOG downloads allowed only for safe artifacts
 ✅ No tokens in files or logs
 ✅ All writes require explicit approval
 ✅ Audit trail for all operations
+✅ Week 2 board can be prepared locally only after validation passes
+✅ PT-BR copy review documented for operator UX
+✅ Real Week 1 execution log and final validation artifacts available
 
 ---
 
@@ -53,6 +57,7 @@ python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 8890 --reload
 - Approval Queue (approval status)
 - Batch Results (execution history)
 - Compliance Reports (audit trail)
+- Execution log and validation gate for real Week 1
 
 ### 3. Daily Checklist
 
@@ -94,8 +99,14 @@ python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 8890 --reload
 1. Go to /service-engagement
 2. Select device (e.g., 4WNET-MNS-KTG-RX)
 3. Download engagement package
-4. Send to service teams
-5. Track responses
+4. Open the pending-item editor
+5. Save the response locally only
+6. Download the generated CSV from the UI if needed
+7. Track the generated CSV and validation report
+8. Open the validation dashboard
+9. Use the PT-BR friendly labels if the operator needs the UI in Portuguese
+9. Run local validation or finalize responses
+10. Check the real execution log and final validation report
 
 ### Controlled Write Operations (Ops + Approver)
 
@@ -180,7 +191,7 @@ python3 tools/local/manage_approval_state.py \
 
 ### Service Team Lead
 - **Read:** Service engagement materials, enrichment requirements
-- **Write:** Metadata responses (manual, not via UI)
+- **Write:** Metadata responses via the local pending-item modal
 - **Responsibilities:**
   - Collect tenant/service_type/criticality
   - Provide evidence for approval
@@ -361,3 +372,8 @@ python3 tools/local/manage_approval_state.py \
 **Approved By:** [TECH_LEAD]
 **NOC Start Date:** 2026-05-01
 
+## Atualização Semana 2
+
+- Execução real da Semana 1 registrada.
+- Semana 2 em revisão humana.
+- Registros de Aprovação seguem apenas proposed/pending.

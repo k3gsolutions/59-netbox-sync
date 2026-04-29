@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Devices{% endblock %}
+{% block title %}Dispositivos{% endblock %}
 
 {% block content %}
-<h2>Devices</h2>
+<h2>Dispositivos</h2>
 
 {% if devices %}
     <table>
         <thead>
             <tr>
-                <th>Device Name</th>
-                <th>Last Update</th>
-                <th>Actions</th>
+                <th>Nome do dispositivo</th>
+                <th>Última atualização</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -20,13 +20,13 @@
                     <td>{{ device.name }}</td>
                     <td>{{ device.mtime }}</td>
                     <td>
-                        <a href="/devices/{{ device.name }}" class="button-small">Details</a>
+                        <a href="/devices/{{ device.name }}" class="button-small">Detalhes</a>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 {% else %}
-    <p>No devices found</p>
+    <p>Nenhum dispositivo encontrado</p>
 {% endif %}
 {% endblock %}

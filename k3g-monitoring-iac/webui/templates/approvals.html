@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Approvals{% endblock %}
+{% block title %}Aprovações{% endblock %}
 
 {% block content %}
-<h2>Approval Records</h2>
+<h2>Registros de aprovação</h2>
 
 {% if approvals %}
     <table>
         <thead>
             <tr>
-                <th>Name</th>
+                <th>Nome</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -20,14 +20,14 @@
                     <td>{{ approval.name }}</td>
                     <td><span class="badge badge-{{ approval.status }}">{{ approval.status }}</span></td>
                     <td>
-                        <a href="/approvals/{{ approval.name }}" class="button-small">View</a>
-                        <a href="/reports/download?path={{ approval.path }}" class="button-small">Download</a>
+                        <a href="/approvals/{{ approval.name }}" class="button-small">Ver</a>
+                        <a href="/reports/download?path={{ approval.path }}" class="button-small">Baixar</a>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 {% else %}
-    <p>No approval records found</p>
+    <p>Nenhum registro de aprovação encontrado</p>
 {% endif %}
 {% endblock %}

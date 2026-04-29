@@ -1,0 +1,144 @@
+---
+# BGP community and community-filter policy
+
+bgp_community:
+  definition: "Extended BGP community for route tagging"
+  format: "ASN:VALUE"
+  structure:
+    asn:
+      description: "Autonomous system number"
+      type: "integer"
+      range: "1-4294967295"
+    value:
+      description: "Community value"
+      type: "integer"
+      range: "0-65535"
+
+  well_known_communities:
+    - name: "no-export (0:65281)"
+      meaning: "Do not export outside confederation"
+    - name: "no-advertise (0:65282)"
+      meaning: "Do not advertise to any peer"
+    - name: "no-export-subconfed (0:65283)"
+      meaning: "Do not export outside local confederation"
+    - name: "internet (0:0)"
+      meaning: "Valid for external advertisements"
+
+  standard_patterns:
+    - pattern: "ASN:PEER_ID"
+      example: "263934:100"
+      meaning: "Identifies peer or source"
+    - pattern: "ASN:SERVICE_TYPE"
+      example: "263934:200 (customer internet)"
+      meaning: "Identifies service type"
+    - pattern: "ASN:CRITICALITY"
+      example: "263934:300 (platinum)"
+      meaning: "Identifies service criticality"
+
+community_filter:
+  definition: "Named filter for matching communities"
+  types:
+    numeric: "filter_id format (e.g., 100)"
+    named: "alphanumeric format (e.g., CUSTOMER-A-FILTER)"
+
+  structure:
+    filter_id:
+      description: "Numeric or named identifier"
+      numeric_pattern: "^\\d{1,5}$"
+      named_pattern: "^[a-zA-Z0-9_\\-]+$"
+      examples:
+        - "100 (numeric)"
+        - "CUSTOMER-A-COMMUNITIES (named)"
+
+    filter_type:
+      description: "Community or AS-path filter type"
+      allowed_values:
+        - "permit"
+        - "deny"
+
+    action:
+      description: "Match action"
+      allowed_values:
+        - "permit"
+        - "deny"
+
+    entries:
+      description: "Community values or regex patterns"
+      type: "list"
+      examples:
+        - "263934:100"
+        - "263934:200"
+
+community_validation_rules:
+  - rule: "Community must be ASN:VALUE format"
+    severity: "error"
+    enforcement: "Web UI blocks save if invalid"
+
+  - rule: "ASN must be 1-4294967295"
+    severity: "error"
+    enforcement: "Numeric validation"
+
+  - rule: "VALUE must be 0-65535"
+    severity: "error"
+    enforcement: "Numeric validation"
+
+  - rule: "Community filter must exist if referenced"
+    severity: "error"
+    enforcement: "Policy load fails if missing"
+
+  - rule: "Each route-policy node should have max one community-filter"
+    severity: "warning"
+    enforcement: "Compliance check"
+
+  - rule: "Well-known communities should be documented"
+    severity: "info"
+    enforcement: "Best practice"
+
+community_best_practices:
+  - "Use ASN:PEER_ID to identify peers (e.g., 263934:100)"
+  - "Use ASN:SERVICE_TYPE to identify service class (e.g., 263934:200)"
+  - "Use ASN:CRITICALITY to tag service importance"
+  - "Document community meanings in policy description"
+  - "Avoid overlapping community ranges"
+  - "Use named filters for readability"
+  - "Apply communities in export policy"
+  - "Use community-filter in import policy for filtering"
+
+standard_communities:
+  customer_tagging:
+    base_asn: 263934
+    pattern: "263934:CUSTOMER_ID"
+    examples:
+      - "263934:100 (customer-a)"
+      - "263934:101 (customer-b)"
+
+  service_tagging:
+    base_asn: 263934
+    patterns:
+      - "263934:200 (customer-internet)"
+      - "263934:210 (customer-vpn)"
+      - "263934:220 (carrier-transit)"
+      - "263934:230 (ix-peering)"
+
+  criticality_tagging:
+    base_asn: 263934
+    patterns:
+      - "263934:1000 (platinum)"
+      - "263934:1001 (gold)"
+      - "263934:1002 (silver)"
+      - "263934:1003 (bronze)"
+
+community_list_examples:
+  customer_a_filter:
+    name: "CUSTOMER-A-COMMUNITIES"
+    type: "permit"
+    entries:
+      - "263934:100"
+      - "263934:1000"
+
+  transit_filter:
+    name: "TRANSIT-PEERS"
+    type: "permit"
+    entries:
+      - "263934:220"
+      - "263934:1001"

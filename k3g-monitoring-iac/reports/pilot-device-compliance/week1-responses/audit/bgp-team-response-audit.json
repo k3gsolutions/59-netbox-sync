@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": "2026-04-29T18:01:07.872202Z",
+    "updated_by": "Keslley",
+    "team": "bgp-team",
+    "object_type": "bgp_peer",
+    "object_key": "203.0.113.1",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status",
+      "criticality",
+      "owner",
+      "evidence",
+      "remote_asn",
+      "remote_bgp_group",
+      "policy_intent",
+      "notes"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  }
+]

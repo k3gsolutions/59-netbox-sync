@@ -1,0 +1,5 @@
+device,object_type,object_key,responsible_team,status,tenant,service_type,criticality,owner,evidence,interface,vrf,service_relation,remote_asn,remote_bgp_group,policy_intent,notes,updated_at,updated_by,relation_type
+4WNET-MNS-KTG-RX,subinterface,Eth-Trunk0.147,Service Team,answered,4WNET,infra-backbone,gold,4WNET,testes,,,,,,,testes,2026-04-29T17:23:44.991689Z,Keslley,
+4WNET-MNS-KTG-RX,subinterface,Eth-Trunk0.1580,Service Team,answered,4WNET,customer-transport,bronze,4WNET,Testes,,,,,,,testes,2026-04-29T17:24:11.571536Z,Keslley,
+4WNET-MNS-KTG-RX,subinterface,Eth-Trunk0.1589,Service Team,answered,4WNET,ix-public,gold,4WNET,Tstes,,,,,,,Testes,2026-04-29T17:24:47.326225Z,Keslley,
+4WNET-MNS-KTG-RX,subinterface,Eth-Trunk0.1606,Service Team,answered,4WNET,cdn-cache,gold,4WNET,Testes,,,,,,,Teste,2026-04-29T17:25:13.258736Z,Keslley,

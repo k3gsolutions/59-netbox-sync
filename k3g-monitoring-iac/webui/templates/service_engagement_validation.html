@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Painel de validação: {{ device }}{% endblock %}
+
+{% block content %}
+<h2>Painel de validação: {{ device }}</h2>
+
+<div class="card">
+    <h3>Critério de liberação da Semana 2</h3>
+    <p>{{ 'Liberado para revisão com restrições' if validation_summary.validated > 0 and (validation_summary.still_pending > 0 or validation_summary.needs_clarification > 0 or validation_summary.blocked > 0 or validation_summary.rejected > 0) else 'Liberado para revisão' if validation_summary.validated > 0 and validation_summary.still_pending == 0 and validation_summary.needs_clarification == 0 and validation_summary.blocked == 0 and validation_summary.rejected == 0 else 'Ainda não liberado' }}</p>
+    <div class="pending-validation-links">
+        <button type="button" class="btn btn-primary btn-small" onclick="runValidationNow('{{ device }}').then(() => window.location.reload())">Validar respostas agora</button>
+        <button type="button" class="btn btn-primary btn-small" onclick="finalizeResponsesAndRefresh('{{ device }}')">Finalizar respostas e preparar Semana 2</button>
+        <!-- Finalizar respostas e preparar Week 2 -->
+        {% if week2_review_file %}
+        <a href="/service-engagement/{{ device }}/week2-review" class="btn btn-primary btn-small">Abrir revisão da Semana 2</a>
+        {% endif %}
+        <a href="/service-engagement/{{ device }}/uat-audit" class="btn btn-small">Auditoria do teste controlado</a>
+    </div>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Validadas</div><div class="summary-value" id="validation-count-validated">{{ validation_summary.validated }}</div></div>
+    <div class="summary-card"><div class="summary-label">Prontas para revisão</div><div class="summary-value" id="validation-count-ready_for_review">{{ validation_summary.ready_for_review }}</div></div>
+    <div class="summary-card"><div class="summary-label">Ainda pendentes</div><div class="summary-value" id="validation-count-still_pending">{{ validation_summary.still_pending }}</div></div>
+    <div class="summary-card"><div class="summary-label">Precisa de esclarecimento</div><div class="summary-value" id="validation-count-needs_clarification">{{ validation_summary.needs_clarification }}</div></div>
+    <div class="summary-card"><div class="summary-label">Bloqueadas</div><div class="summary-value" id="validation-count-blocked">{{ validation_summary.blocked }}</div></div>
+    <div class="summary-card"><div class="summary-label">Rejeitadas</div><div class="summary-value" id="validation-count-rejected">{{ validation_summary.rejected }}</div></div>
+    <div class="summary-card"><div class="summary-label">Teste controlado detectado</div><div class="summary-value">{{ 'sim' if uat_detected else 'não' }}</div></div>
+    <div class="summary-card"><div class="summary-label">Semana 2</div><div class="summary-value">{{ 'preparada' if week2_review_file else 'não preparada' }}</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Arquivos</div>
+    <ul class="compact-list">
+        {% if validation_file %}
+        <li><a href="/reports/view?path={{ validation_file.path }}">{{ validation_file.name }}</a> | <a href="/reports/download?path={{ validation_file.path }}">Baixar</a></li>
+        {% endif %}
+        {% if snapshot_file %}
+        <li><a href="/reports/view?path={{ snapshot_file.path }}">{{ snapshot_file.name }}</a> | <a href="/reports/download?path={{ snapshot_file.path }}">Baixar</a></li>
+        {% endif %}
+        {% if gate_file %}
+        <li><a href="/reports/view?path={{ gate_file.path }}">{{ gate_file.name }}</a> | <a href="/reports/download?path={{ gate_file.path }}">Baixar</a></li>
+        {% endif %}
+        {% if intake_file %}
+        <li><a href="/reports/view?path={{ intake_file.path }}">{{ intake_file.name }}</a> | <a href="/reports/download?path={{ intake_file.path }}">Baixar</a></li>
+        {% endif %}
+        {% if week2_review_file %}
+        <li><a href="/reports/view?path={{ week2_review_file.path }}">{{ week2_review_file.name }}</a> | <a href="/reports/download?path={{ week2_review_file.path }}">Baixar</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-header">Itens de resposta</div>
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>object_type</th>
+                <th>object_key</th>
+                <th>team</th>
+                <th>status</th>
+                <th>missing_fields</th>
+                <th>updated_by</th>
+                <th>updated_at</th>
+                <th>ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in pending_items %}
+            <tr>
+                <td><code>{{ item.object_type }}</code></td>
+                <td><code>{{ item.object_key }}</code></td>
+                <td>{{ item.responsible_team }}</td>
+                <td><span class="badge {{ 'badge-success' if item.current_status == 'answered' else 'badge-warning' if item.current_status == 'needs_clarification' else 'badge-danger' if item.current_status in ['blocked', 'rejected'] else 'badge-pending' }}">{{ item.current_status | status_label }}</span></td>
+                <td>{{ item.missing_fields | join(', ') if item.missing_fields else 'none' }}</td>
+                <td>{{ item.updated_by or 'n/a' }}</td>
+                <td class="mono">{{ item.updated_at or 'n/a' }}</td>
+                <td>
+                    <button class="btn btn-primary btn-small" type="button" onclick="openPendingItemModal('{{ item.safe_item_id }}', '{{ device }}')">Editar pendência</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include "partials/pending_item_modal.html" %}
+{% endblock %}

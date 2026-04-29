@@ -1,0 +1,128 @@
+[
+  {
+    "timestamp": "2026-04-29T17:23:40.716382Z",
+    "updated_by": "Keslley",
+    "team": "service-team",
+    "object_type": "subinterface",
+    "object_key": "Eth-Trunk0.147",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status",
+      "tenant",
+      "service_type",
+      "criticality",
+      "owner",
+      "evidence",
+      "notes"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  },
+  {
+    "timestamp": "2026-04-29T17:23:43.152103Z",
+    "updated_by": "Keslley",
+    "team": "service-team",
+    "object_type": "subinterface",
+    "object_key": "Eth-Trunk0.147",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  },
+  {
+    "timestamp": "2026-04-29T17:23:44.992266Z",
+    "updated_by": "Keslley",
+    "team": "service-team",
+    "object_type": "subinterface",
+    "object_key": "Eth-Trunk0.147",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  },
+  {
+    "timestamp": "2026-04-29T17:24:11.572508Z",
+    "updated_by": "Keslley",
+    "team": "service-team",
+    "object_type": "subinterface",
+    "object_key": "Eth-Trunk0.1580",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status",
+      "tenant",
+      "service_type",
+      "criticality",
+      "owner",
+      "evidence",
+      "notes"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  },
+  {
+    "timestamp": "2026-04-29T17:24:47.327203Z",
+    "updated_by": "Keslley",
+    "team": "service-team",
+    "object_type": "subinterface",
+    "object_key": "Eth-Trunk0.1589",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status",
+      "tenant",
+      "service_type",
+      "criticality",
+      "owner",
+      "evidence",
+      "notes"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  },
+  {
+    "timestamp": "2026-04-29T17:25:13.259428Z",
+    "updated_by": "Keslley",
+    "team": "service-team",
+    "object_type": "subinterface",
+    "object_key": "Eth-Trunk0.1606",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status",
+      "tenant",
+      "service_type",
+      "criticality",
+      "owner",
+      "evidence",
+      "notes"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  }
+]

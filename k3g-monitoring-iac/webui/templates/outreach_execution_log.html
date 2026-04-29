@@ -1,29 +1,29 @@
 {% extends "base.html" %}
-{% block title %}Execution Log{% endblock %}
+{% block title %}Log de execução{% endblock %}
 {% block content %}
-<h2>Outreach Distribution Log</h2>
+<h2>Log de distribuição da comunicação</h2>
 <div class="card">
-    <h3>📋 Manual Send Registry</h3>
-    <p>Record of messages sent, responses received, reminders, escalations.</p>
+    <h3>📋 Registro de envio manual</h3>
+    <p>Registro das mensagens enviadas, respostas recebidas, lembretes e escalonamentos.</p>
 </div>
 {% if distribution_content %}
 <div class="section">
     <div class="report-content">{{ distribution_content|safe }}</div>
-    {% if distribution_log %}<p><a href="/reports/download?path={{ distribution_log.path }}" class="button">Download Log</a></p>{% endif %}
+    {% if distribution_log %}<p><a href="/reports/download?path={{ distribution_log.path }}" class="button">Baixar log</a></p>{% endif %}
 </div>
 <div class="section">
-    <h3>Send Checklist</h3>
+    <h3>Checklist de envio</h3>
     {% if checklist %}
-    <p><a href="/reports/view?path={{ checklist.path }}" class="button">View Checklist</a>
-    <a href="/reports/download?path={{ checklist.path }}" class="button">Download</a></p>
+    <p><a href="/reports/view?path={{ checklist.path }}" class="button">Ver checklist</a>
+    <a href="/reports/download?path={{ checklist.path }}" class="button">Baixar</a></p>
     {% endif %}
 </div>
 {% else %}
-<div class="alert">Log not found. Start by running: <code>python3 track_week1_outreach_execution.py ...</code></div>
+<div class="alert">Log não encontrado. Comece com: <code>python3 track_week1_outreach_execution.py ...</code></div>
 {% endif %}
-<h3>Related</h3>
+<h3>Relacionados</h3>
 <ul>
     <li><a href="/outreach/status">Status</a></li>
-    <li><a href="/outreach/reminders">Reminders</a></li>
+    <li><a href="/outreach/reminders">Lembretes</a></li>
 </ul>
 {% endblock %}

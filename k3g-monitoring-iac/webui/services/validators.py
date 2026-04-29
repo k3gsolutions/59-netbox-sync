@@ -1,9 +1,20 @@
-"""Response form validators for FASE 3.9."""
+"""Response form validators for local pending-item editing."""
 
 import re
 from typing import Dict, List, Tuple, Optional
 
-BLOCKED_KEYWORDS = {'password', 'token', 'secret', 'api_key', 'ssh_key', 'private_key'}
+BLOCKED_KEYWORDS = {
+    "password",
+    "token",
+    "secret",
+    "netbox_write_token",
+    "private key",
+    "bearer",
+    "authorization",
+    "api_key",
+    "ssh_key",
+    "private_key",
+}
 SERVICE_TYPES = {
     'customer-internet', 'customer-l2vpn', 'customer-l3vpn', 'customer-transport',
     'carrier-transit', 'carrier-peering', 'ix-public', 'cdn-cache',
@@ -11,11 +22,12 @@ SERVICE_TYPES = {
 }
 CRITICALITIES = {'platinum', 'gold', 'silver', 'bronze'}
 STATUSES = {'pending', 'answered', 'needs_clarification', 'blocked', 'rejected'}
+RELATION_TYPES = {'service', 'infrastructure', 'loopback', 'management', 'backbone', 'unknown'}
 
 def contains_blocked_keywords(text: str) -> bool:
     """Check if text contains blocked keywords."""
     text_lower = text.lower()
-    return any(f"{kw}=" in text_lower or f"{kw} " in text_lower for kw in BLOCKED_KEYWORDS)
+    return any(kw in text_lower for kw in BLOCKED_KEYWORDS)
 
 def validate_tenant(value: str, required: bool = False) -> Tuple[bool, Optional[str]]:
     """Validate tenant field."""
@@ -85,11 +97,42 @@ def validate_remote_bgp_group(value: str, required: bool = False) -> Tuple[bool,
     if not value and required:
         return False, "Remote BGP group required"
     if value:
-        # Alphanumeric, hyphen, underscore, dot
-        if not re.match(r'^[a-zA-Z0-9\-_.]+$', value):
-            return False, "BGP group must contain only alphanumeric, hyphen, underscore, dot"
+        if not re.match(r'^[a-zA-Z0-9\-_]+$', value):
+            return False, "BGP group must contain only alphanumeric, hyphen, underscore"
         if len(value) > 100:
             return False, "BGP group too long (max 100 chars)"
+    return True, None
+
+def validate_service_relation(value: str, required: bool = False) -> Tuple[bool, Optional[str]]:
+    """Validate service_relation field for Network Ops."""
+    if not value and required:
+        return False, "Service relation required"
+    if value and len(value) < 2:
+        return False, "Service relation too short (min 2 chars)"
+    if value and len(value) > 120:
+        return False, "Service relation too long (max 120 chars)"
+    if value and contains_blocked_keywords(value):
+        return False, "Service relation contains blocked keywords"
+    return True, None
+
+def validate_relation_type(value: str, required: bool = False) -> Tuple[bool, Optional[str]]:
+    """Validate relation_type field for IP mappings."""
+    if not value and required:
+        return False, "Relation type required"
+    if value and value not in RELATION_TYPES:
+        return False, f"Invalid relation type: {value}"
+    return True, None
+
+def validate_policy_intent(value: str, required: bool = False) -> Tuple[bool, Optional[str]]:
+    """Validate BGP policy_intent field."""
+    if not value and required:
+        return False, "Policy intent required"
+    if value and len(value) < 5:
+        return False, "Policy intent too short (min 5 chars)"
+    if value and len(value) > 1000:
+        return False, "Policy intent too long (max 1000 chars)"
+    if value and contains_blocked_keywords(value):
+        return False, "Policy intent contains blocked keywords"
     return True, None
 
 def validate_interface(value: str, required: bool = False) -> Tuple[bool, Optional[str]]:
@@ -196,7 +239,7 @@ def validate_bgp_response(data: Dict) -> Tuple[bool, List[str]]:
             elif field == 'remote_bgp_group':
                 valid, err = validate_remote_bgp_group(value, required=True)
             elif field == 'policy_intent':
-                valid, err = validate_evidence(value, required=True)  # Same as evidence
+                valid, err = validate_policy_intent(value, required=True)
             elif field == 'owner':
                 valid, err = validate_owner(value, required=True)
             elif field == 'criticality':
@@ -221,23 +264,53 @@ def validate_ip_response(data: Dict) -> Tuple[bool, List[str]]:
         errors.append(f"status: {err}")
         return False, errors
 
+    relation_type = (data.get('relation_type') or '').strip()
+    detected_interface = (data.get('detected_interface') or '').strip()
+    detected_vrf = (data.get('detected_vrf') or '').strip()
+
     if status == 'answered':
-        required_fields = ['interface', 'vrf', 'owner']
+        required_fields = ['owner', 'evidence', 'relation_type']
 
         for field in required_fields:
             value = data.get(field, '').strip()
-            if field == 'interface':
-                valid, err = validate_interface(value, required=True)
-            elif field == 'vrf':
-                valid, err = validate_vrf(value, required=True)
+            if field == 'relation_type':
+                valid, err = validate_relation_type(value, required=True)
             elif field == 'owner':
                 valid, err = validate_owner(value, required=True)
+            elif field == 'evidence':
+                valid, err = validate_evidence(value, required=True)
             if not valid:
                 errors.append(f"{field}: {err}")
 
+        interface_value = data.get('interface', '').strip()
+        if not interface_value and not detected_interface:
+            errors.append("interface: Interface required")
+        elif interface_value:
+            valid, err = validate_interface(interface_value, required=True)
+            if not valid:
+                errors.append(f"interface: {err}")
+
+        vrf_value = data.get('vrf', '').strip()
+        if not vrf_value and not detected_vrf:
+            errors.append("vrf: VRF required")
+        elif vrf_value:
+            valid, err = validate_vrf(vrf_value, required=True)
+            if not valid:
+                errors.append(f"vrf: {err}")
+
+        if relation_type == 'service':
+            valid, err = validate_service_relation(data.get('service_relation', '').strip(), required=True)
+            if not valid:
+                errors.append(f"service_relation: {err}")
+        if relation_type == 'unknown' and not data.get('notes', '').strip():
+            errors.append("notes: required")
+
     notes = data.get('notes', '').strip()
-    valid, err = validate_notes(notes)
-    if not valid:
-        errors.append(f"notes: {err}")
+    if status in {'blocked', 'rejected', 'needs_clarification'} and not notes:
+        errors.append("notes: required")
+    if notes:
+        valid, err = validate_notes(notes)
+        if not valid:
+            errors.append(f"notes: {err}")
 
     return len(errors) == 0, errors

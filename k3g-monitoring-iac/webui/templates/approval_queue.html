@@ -1,28 +1,62 @@
 {% extends "base.html" %}
 
-{% block title %}Approval Queue{% endblock %}
+{% block title %}Fila de aprovação{% endblock %}
 
 {% block content %}
-<h2>Approval Queue</h2>
+<h2>Fila de aprovação</h2>
 
 <div class="filters">
     <form method="get">
-        <label>Status: <input type="text" name="status" value="{{ filter_status or '' }}" placeholder="pending, approved, etc"></label>
-        <label>Device: <input type="text" name="device" value="{{ filter_device or '' }}" placeholder="device name"></label>
-        <button type="submit">Filter</button>
+        <label>Situação: <input type="text" name="status" value="{{ filter_status or '' }}" placeholder="pendente, proposto, aprovado, etc"></label>
+        <label>Dispositivo: <input type="text" name="device" value="{{ filter_device or '' }}" placeholder="nome do dispositivo"></label>
+        <button type="submit">Filtrar</button>
     </form>
 </div>
 
-<p>Total: <strong>{{ total }}</strong> approval(s)</p>
+<p>Total: <strong>{{ total }}</strong> aprovação(ões)</p>
+
+{% if proposed_approvals %}
+<div class="section">
+    <h3>Registros de Aprovação Propostos ({{ proposed_approvals | length }})</h3>
+    <table class="full-width">
+        <thead>
+            <tr>
+                <th>approval_id</th>
+                <th>object_key</th>
+                <th>categoria</th>
+                <th>status</th>
+                <th>criado em</th>
+                <th>origem</th>
+                <th>reviewer</th>
+                <th>próxima ação</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for approval in proposed_approvals %}
+            <tr>
+                <td><a href="/approval-timeline/{{ approval.approval_id }}">{{ approval.approval_id[:8] }}</a></td>
+                <td><code>{{ approval.object_key }}</code></td>
+                <td>{{ approval.category or approval.object_type }}</td>
+                <td><span class="badge badge-warning">{{ approval.status | status_label }}</span></td>
+                <td class="mono">{{ approval.reviewed_at or approval.mtime }}</td>
+                <td>{{ approval.origin }}</td>
+                <td>{{ approval.reviewer or 'Pendente' }}</td>
+                <td>{{ approval.next_action }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 
 {% if pending %}
 <div class="section">
-    <h3>Pending ({{ pending | length }})</h3>
+    <h3>Pendentes ({{ pending | length }})</h3>
     <ul>
         {% for approval in pending %}
             <li>
                 <a href="/approval-timeline/{{ approval.name.split('/')[-1] }}">{{ approval.name }}</a>
-                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">View</a>
+                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">Ver</a>
             </li>
         {% endfor %}
     </ul>
@@ -31,12 +65,12 @@
 
 {% if approved %}
 <div class="section">
-    <h3>Approved ({{ approved | length }})</h3>
+    <h3>Aprovadas ({{ approved | length }})</h3>
     <ul>
         {% for approval in approved %}
             <li>
                 <a href="/approval-timeline/{{ approval.name.split('/')[-1] }}">{{ approval.name }}</a>
-                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">View</a>
+                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">Ver</a>
             </li>
         {% endfor %}
     </ul>
@@ -45,12 +79,12 @@
 
 {% if applied %}
 <div class="section">
-    <h3>Applied ({{ applied | length }})</h3>
+    <h3>Aplicadas ({{ applied | length }})</h3>
     <ul>
         {% for approval in applied %}
             <li>
                 <a href="/approval-timeline/{{ approval.name.split('/')[-1] }}">{{ approval.name }}</a>
-                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">View</a>
+                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">Ver</a>
             </li>
         {% endfor %}
     </ul>
@@ -59,17 +93,17 @@
 
 {% if rejected %}
 <div class="section">
-    <h3>Rejected ({{ rejected | length }})</h3>
+    <h3>Rejeitados ({{ rejected | length }})</h3>
     <ul>
         {% for approval in rejected %}
             <li>
                 <a href="/approval-timeline/{{ approval.name.split('/')[-1] }}">{{ approval.name }}</a>
-                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">View</a>
+                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">Ver</a>
             </li>
         {% endfor %}
     </ul>
 </div>
 {% endif %}
 
-<a href="/" class="button">Back to Dashboard</a>
+<a href="/" class="button">Voltar ao painel</a>
 {% endblock %}

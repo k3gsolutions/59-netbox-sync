@@ -1,0 +1,2 @@
+device,object_type,object_key,responsible_team,status,tenant,service_type,criticality,owner,evidence,interface,vrf,service_relation,remote_asn,remote_bgp_group,policy_intent,notes,updated_at,updated_by,relation_type
+4WNET-MNS-KTG-RX,bgp_peer,203.0.113.1,BGP Team,answered,,,bronze,4WNET,Teste,,,,4230,OPERADORA,Teste,tetste,2026-04-29T18:01:07.870843Z,Keslley,

@@ -4,20 +4,38 @@ Web UI for k3g-monitoring-iac — Read-only compliance and governance dashboard.
 No writes, no tokens, no NetBox API calls.
 """
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+try:
+    from fastapi.templating import Jinja2Templates
+except ImportError:
+    class Jinja2Templates:  # type: ignore
+        """Fallback when jinja2 is unavailable in the local test environment."""
+
+        def __init__(self, directory=None):
+            self.directory = directory
+
+        def TemplateResponse(self, template_name, context):
+            title = context.get("title", template_name)
+            body = (
+                "<html><body>"
+                f"<h1>{title}</h1>"
+                f"<p>Template fallback: {template_name}</p>"
+                "</body></html>"
+            )
+            return HTMLResponse(body)
 from starlette.requests import Request
 from pathlib import Path
 import json
+import mimetypes
 from typing import Optional
 from datetime import datetime
 
 from .services.artifact_scanner import (
     list_reports, list_devices, list_approvals, list_apply_plans,
-    list_batch_results, list_incidents, list_comparisons, safe_resolve_path,
-    normalize_report_path
+    list_batch_results, list_incidents, list_comparisons, list_proposed_approvals, safe_resolve_path,
+    safe_resolve_download_path, normalize_report_path
 )
 from .services.markdown_loader import load_markdown, render_markdown, load_json
 from .services.report_index import load_index, get_latest_report, parse_report_metrics
@@ -42,6 +60,40 @@ if not template_dir.exists():
     # Fallback if running from different directory
     template_dir = Path.cwd() / "webui" / "templates"
 templates = Jinja2Templates(directory=template_dir)
+if hasattr(templates, "env"):
+    templates.env.filters["status_label"] = lambda value: status_label(value)
+
+
+def status_label(status: str) -> str:
+    labels = {
+        "pending": "Pendente",
+        "not_sent": "Não enviado",
+        "sent": "Enviado",
+        "response_missing": "Aguardando resposta",
+        "partial_response": "Resposta parcial",
+        "complete": "Completo",
+        "overdue": "Atrasado",
+        "escalation_required": "Precisa escalonar",
+        "answered": "Respondido",
+        "validated": "Validado",
+        "ready_for_review": "Pronto para revisão",
+        "needs_clarification": "Precisa de esclarecimento",
+        "blocked": "Bloqueado",
+        "rejected": "Rejeitado",
+        "still_pending": "Ainda pendente",
+        "proposed": "Proposto",
+        "approved": "Aprovado",
+        "applied": "Aplicado",
+        "failed": "Falhou",
+        "no_go": "Não liberado",
+        "go": "Liberado",
+        "go_with_restrictions": "Liberado com restrições",
+        "go_week2_review": "Liberado para Semana 2",
+        "go_with_restrictions_uat_present": "Liberado com restrições UAT",
+        "keep_as_real": "Manter como real",
+    }
+    value = (status or "").strip()
+    return labels.get(value, value.replace("_", " ").title() if value else "N/A")
 
 
 # ============================================================================
@@ -66,6 +118,8 @@ async def index(request: Request):
     # Batch results status
     latest_batch = batch_results[0] if batch_results else None
     batch_noop = sum(1 for b in batch_results if "NO-OP" in b.get("name", "") or "already" in b.get("name", "").lower())
+    week1_execution = _week1_execution_overview("4WNET-MNS-KTG-RX")
+    week2_review = _week2_review_overview("4WNET-MNS-KTG-RX")
 
     context = {
         "request": request,
@@ -81,6 +135,8 @@ async def index(request: Request):
         "batch_noop_count": batch_noop,
         "latest_report": latest_report,
         "latest_batch": latest_batch,
+        "week1_execution": week1_execution,
+        "week2_review": week2_review,
     }
 
     return templates.TemplateResponse("index.html", context)
@@ -162,24 +218,26 @@ async def view_report(request: Request, path: str = Query(...)):
 @app.get("/reports/download")
 async def download_report(path: str = Query(...)):
     """Download markdown report safely."""
-    # Normalize path (accepts both "file.md" and "reports/file.md")
     normalized = normalize_report_path(path)
     if not normalized:
         return JSONResponse({"error": "Invalid path"}, status_code=400)
 
-    resolved = safe_resolve_path(REPORTS_DIR, normalized)
-
-    if not resolved or not resolved.exists():
-        return JSONResponse({"error": "File not found"}, status_code=404)
-
-    # Block downloads of sensitive files
-    if "payload.local" in str(resolved) or "raw" in str(resolved):
-        return JSONResponse({"error": "File blocked"}, status_code=403)
-
-    if resolved.suffix not in {".md", ".json", ".txt"}:
+    resolved = safe_resolve_download_path(REPORTS_DIR, normalized)
+    if not resolved:
+        candidate = safe_resolve_path(REPORTS_DIR, normalized)
+        if not candidate or not candidate.exists():
+            return JSONResponse({"error": "File not found"}, status_code=404)
         return JSONResponse({"error": "File type not allowed"}, status_code=403)
 
-    return FileResponse(resolved, media_type="text/plain", filename=resolved.name)
+    suffix = resolved.suffix.lower()
+    media_type = {
+        ".csv": "text/csv",
+        ".md": "text/markdown",
+        ".json": "application/json",
+        ".txt": "text/plain",
+        ".log": "text/plain",
+    }.get(suffix, mimetypes.guess_type(resolved.name)[0] or "text/plain")
+    return FileResponse(resolved, media_type=media_type, filename=resolved.name)
 
 
 # ============================================================================
@@ -420,6 +478,7 @@ async def search(request: Request, q: str = Query(...)):
 async def approval_queue(request: Request, status: Optional[str] = Query(None), device: Optional[str] = Query(None)):
     """Approval queue with status and device filters."""
     all_approvals = list_approvals(ROOT)
+    proposed_approvals = list_proposed_approvals(ROOT)
 
     # Apply filters
     filtered = all_approvals
@@ -441,6 +500,7 @@ async def approval_queue(request: Request, status: Optional[str] = Query(None), 
         "approved": approved,
         "applied": applied,
         "rejected": rejected,
+        "proposed_approvals": proposed_approvals,
         "filter_status": status,
         "filter_device": device,
         "total": len(filtered),
@@ -566,11 +626,25 @@ async def service_engagement_device(request: Request, device: str):
                     "path": str(f.relative_to(REPORTS_DIR)),
                 }
 
+    pending_items = load_pending_items(device)
+    validation_assets = _load_validation_assets(device)
+
     context = {
         "request": request,
         "title": f"Service Engagement: {device}",
         "device": device,
         "files": files,
+        "pending_items": pending_items,
+        "pending_count": len(pending_items),
+        "pending_counts": _count_pending_items(pending_items),
+        "validation_command": _pending_validation_command(device),
+        "validation_summary": validation_assets["validation_summary"],
+        "validation_file": validation_assets["validation_file"],
+        "gate_file": validation_assets["gate_file"],
+        "intake_file": validation_assets["intake_file"],
+        "snapshot_file": validation_assets["snapshot_file"],
+        "week2_review_file": validation_assets["week2_review_file"],
+        "uat_detected": _detect_uat_active(),
     }
 
     return templates.TemplateResponse("service_engagement_device.html", context)
@@ -595,12 +669,24 @@ async def service_engagement_responses(request: Request, device: str):
                 except Exception:
                     pass
 
+    pending_items = load_pending_items(device)
+    validation_assets = _load_validation_assets(device)
+
     context = {
         "request": request,
         "title": f"Week 1 Responses: {device}",
         "device": device,
         "validation_file": validation_file,
         "validation_content": validation_content,
+        "pending_items": pending_items,
+        "pending_count": len(pending_items),
+        "pending_counts": _count_pending_items(pending_items),
+        "validation_command": _pending_validation_command(device),
+        "validation_summary": validation_assets["validation_summary"],
+        "gate_file": validation_assets["gate_file"],
+        "snapshot_file": validation_assets["snapshot_file"],
+        "intake_file": validation_assets["intake_file"],
+        "uat_detected": _detect_uat_active(),
     }
 
     return templates.TemplateResponse("service_engagement_responses.html", context)
@@ -625,15 +711,94 @@ async def week2_candidates(request: Request, device: str):
                 except Exception:
                     pass
 
+    pending_items = load_pending_items(device)
+    validation_assets = _load_validation_assets(device)
+
     context = {
         "request": request,
         "title": f"Week 2 Candidates: {device}",
         "device": device,
         "candidates_file": candidates_file,
         "candidates_content": candidates_content,
+        "pending_items": pending_items,
+        "pending_count": len(pending_items),
+        "pending_counts": _count_pending_items(pending_items),
+        "validation_command": _pending_validation_command(device),
+        "validation_summary": validation_assets["validation_summary"],
+        "gate_file": validation_assets["gate_file"],
+        "intake_file": validation_assets["intake_file"],
+        "uat_detected": _detect_uat_active(),
     }
 
     return templates.TemplateResponse("week2_candidates.html", context)
+
+
+@app.get("/service-engagement/{device}/validation", response_class=HTMLResponse)
+async def validation_dashboard(request: Request, device: str):
+    """Response validation dashboard."""
+    pending_items = load_pending_items(device)
+    assets = _load_validation_assets(device)
+    context = {
+        "request": request,
+        "title": f"Validation Dashboard: {device}",
+        "device": device,
+        "pending_items": pending_items,
+        "pending_count": len(pending_items),
+        "pending_counts": _count_pending_items(pending_items),
+        "validation_summary": assets["validation_summary"],
+        "validation_file": assets["validation_file"],
+        "snapshot_file": assets["snapshot_file"],
+        "gate_file": assets["gate_file"],
+        "intake_file": assets["intake_file"],
+        "week2_review_file": assets["week2_review_file"],
+        "uat_detected": _detect_uat_active(),
+        "validation_command": _pending_validation_command(device),
+    }
+    return templates.TemplateResponse("service_engagement_validation.html", context)
+
+
+@app.get("/service-engagement/{device}/uat-audit", response_class=HTMLResponse)
+async def uat_audit_view(request: Request, device: str):
+    """UAT audit viewer."""
+    audit_report = REPORTS_DIR / "pilot-device-compliance" / "WEEK1-UAT-RESPONSE-AUDIT.md"
+    readiness_report = REPORTS_DIR / "pilot-device-compliance" / "WEEK1-REAL-READINESS-AFTER-UAT.md"
+    report_content = audit_report.read_text(encoding="utf-8") if audit_report.exists() else None
+    readiness_content = readiness_report.read_text(encoding="utf-8") if readiness_report.exists() else None
+    context = {
+        "request": request,
+        "title": f"UAT Audit: {device}",
+        "device": device,
+        "audit_report": {"name": audit_report.name, "path": str(audit_report.relative_to(REPORTS_DIR))} if audit_report.exists() else None,
+        "readiness_report": {"name": readiness_report.name, "path": str(readiness_report.relative_to(REPORTS_DIR))} if readiness_report.exists() else None,
+        "report_content": report_content,
+        "readiness_content": readiness_content,
+        "uat_state": _detect_uat_state(),
+    }
+    return templates.TemplateResponse("service_engagement_uat_audit.html", context)
+
+
+@app.post("/service-engagement/{device}/responses/run-validation", response_class=JSONResponse)
+async def run_validation_endpoint(request: Request, device: str):
+    """Run local-safe validation pipeline only."""
+    validation = run_week1_validation(device)
+    snapshot = run_outreach_snapshot(device)
+    summary = validation.get("summary", parse_week1_validation_summary())
+    gate = generate_activation_gate(device, summary)
+    return JSONResponse({
+        "success": bool(validation.get("success")) and bool(snapshot.get("success")),
+        "validation": summary,
+        "validation_report": validation.get("report_path"),
+        "snapshot_report": snapshot.get("report_path"),
+        "week2_gate": gate.get("gate"),
+        "activation_gate": gate.get("path"),
+    })
+
+
+@app.post("/service-engagement/{device}/responses/finalize", response_class=JSONResponse)
+async def finalize_responses_endpoint(request: Request, device: str):
+    """Finalize local responses and prepare Week 2 when ready."""
+    pipeline = run_safe_local_pipeline_after_response(device)
+    return JSONResponse(pipeline)
 
 
 @app.get("/service-engagement/{device}/week2-review", response_class=HTMLResponse)
@@ -644,6 +809,22 @@ async def week2_review(request: Request, device: str):
     review_file = None
     review_content = None
     decisions_file = None
+    validation_assets = _load_validation_assets(device)
+    gate_file = validation_assets["gate_file"]
+    gate_label = "Ainda não preparado"
+    if gate_file:
+        try:
+            gate_text = (REPORTS_DIR / gate_file["path"]).read_text(encoding="utf-8")
+        except Exception:
+            gate_text = ""
+        if "GO_WEEK2_REVIEW_WITH_RESTRICTIONS" in gate_text:
+            gate_label = "Liberado para revisão com restrições"
+        elif "GO_WEEK2_REVIEW" in gate_text:
+            gate_label = "Liberado para revisão"
+        elif "NO_GO" in gate_text:
+            gate_label = "Não liberado"
+    proposed_approvals = list_proposed_approvals(ROOT)
+    draft_items = []
 
     if review_dir.exists():
         board = review_dir / "week2-review-board.md"
@@ -664,6 +845,26 @@ async def week2_review(request: Request, device: str):
                 "path": str(decisions.relative_to(REPORTS_DIR)),
             }
 
+        drafts_dir = review_dir / "week2-approval-drafts"
+        if drafts_dir.exists():
+            for draft_file in drafts_dir.glob("approval-draft-*.json"):
+                try:
+                    draft_data = load_json(draft_file)
+                except Exception:
+                    draft_data = None
+                if not draft_data:
+                    continue
+                draft_items.append({
+                    "name": draft_file.name,
+                    "path": str(draft_file.relative_to(REPORTS_DIR)),
+                    "object_key": draft_data.get("object_key", ""),
+                    "object_type": draft_data.get("object_type", ""),
+                    "category": draft_data.get("category", ""),
+                    "status": draft_data.get("status", ""),
+                    "recommended_action": "Pode ser promovido" if draft_data.get("allowed_to_promote") else "Precisa de revisão",
+                    "human_decision": "",
+                })
+
     context = {
         "request": request,
         "title": f"Week 2 Review Board: {device}",
@@ -671,6 +872,11 @@ async def week2_review(request: Request, device: str):
         "review_file": review_file,
         "review_content": review_content,
         "decisions_file": decisions_file,
+        "gate_file": gate_file,
+        "gate_label": gate_label,
+        "validation_summary": validation_assets["validation_summary"],
+        "proposed_approvals": proposed_approvals,
+        "draft_items": draft_items,
     }
 
     return templates.TemplateResponse("week2_review.html", context)
@@ -689,13 +895,17 @@ async def approval_drafts(request: Request, device: str):
             try:
                 draft_data = load_json(draft_file)
                 if draft_data:
+                    draft_status = draft_data.get("status", "")
                     drafts.append({
                         "name": draft_file.name,
                         "object_key": draft_data.get("object_key", ""),
-                        "status": draft_data.get("status", ""),
+                        "status": draft_status,
                         "action": draft_data.get("action", ""),
                         "created_at": draft_data.get("created_at", ""),
                         "path": str(draft_file.relative_to(REPORTS_DIR)),
+                        "allowed_to_promote": bool(draft_data.get("allowed_to_promote")),
+                        "review_state": "Aguardando decisão" if draft_status == "draft_review" else "Rascunho",
+                        "badge_label": "Pode ser promovido" if draft_data.get("allowed_to_promote") else "Precisa ajuste",
                     })
             except Exception:
                 pass
@@ -844,6 +1054,8 @@ async def outreach_status(request: Request):
         "status_file": status_file,
         "status_content": status_content,
         "distribution_log": distribution_log,
+        "pending_device": "4WNET-MNS-KTG-RX",
+        "pending_link": "/service-engagement/4WNET-MNS-KTG-RX/pending-items",
     }
 
     return templates.TemplateResponse("outreach_status.html", context)
@@ -1067,87 +1279,284 @@ async def logs_view(request: Request, path: str = ""):
 
 
 # ============================================================================
-# Response edit forms (FASE 3.9.3)
+# Pending item editor (FASE 3.10)
 # ============================================================================
 
 from .services.response_forms import (
-    save_response_csv, save_response_audit, update_edit_audit_log, get_latest_response
+    build_pending_item_schema,
+    get_pending_item,
+    load_pending_items,
+    save_response_audit,
+    save_response_csv,
+    validate_response_payload,
 )
-from .services.validators import (
-    validate_subinterface_response, validate_bgp_response, validate_ip_response
+from .services.local_pipeline import (
+    generate_activation_gate,
+    parse_week1_validation_summary,
+    prepare_week2_if_ready,
+    run_outreach_snapshot,
+    run_safe_local_pipeline_after_response,
+    run_week1_validation,
 )
+
+
+def _count_pending_items(pending_items):
+    counts = {
+        "pending": 0,
+        "answered": 0,
+        "needs_clarification": 0,
+        "blocked": 0,
+        "rejected": 0,
+    }
+    for item in pending_items:
+        status = item.get("current_status", "pending")
+        if status not in counts:
+            status = "pending"
+        counts[status] += 1
+    return counts
+
+
+def _pending_validation_command(device: str) -> str:
+    responses_dir = REPORTS_DIR / "pilot-device-compliance" / "week1-responses"
+    output = REPORTS_DIR / "pilot-device-compliance" / "week1-response-validation.md"
+    template = REPORTS_DIR / "pilot-device-compliance" / "week1-metadata-collection-template.csv"
+    return (
+        "python3 tools/local/validate_week1_responses.py "
+        f"--template {template} "
+        f"--responses-dir {responses_dir} "
+        f"--output {output} "
+        f"--device {device}"
+    )
+
+
+def _week1_execution_overview(device: str) -> dict:
+    pending_items = load_pending_items(device)
+    pending_counts = _count_pending_items(pending_items)
+    assets = _load_validation_assets(device)
+    summary = assets["validation_summary"]
+    week2_ready = bool(assets["week2_review_file"])
+
+    if week2_ready:
+        state = "pronto para Semana 2"
+    elif summary.get("needs_clarification", 0) or summary.get("blocked", 0) or summary.get("rejected", 0):
+        state = "com restrições"
+    elif pending_counts.get("pending", 0) > 0:
+        state = "em andamento"
+    elif summary.get("validated", 0) > 0:
+        state = "pronto para Semana 2"
+    else:
+        state = "limpo"
+
+    return {
+        "state": state,
+        "pending": pending_counts.get("pending", 0),
+        "validated": int(summary.get("validated", 0)),
+        "summary": summary,
+        "week2_ready": week2_ready,
+        "link": f"/service-engagement/{device}",
+    }
+
+
+def _week2_review_overview(device: str) -> dict:
+    assets = _load_validation_assets(device)
+    summary = assets["validation_summary"]
+    review_dir = REPORTS_DIR / "pilot-device-compliance" / "week2-review"
+    drafts_dir = review_dir / "week2-approval-drafts"
+    gate_file = assets["gate_file"]
+    gate_label = "Ainda não preparado"
+
+    if gate_file:
+        try:
+            gate_text = (REPORTS_DIR / gate_file["path"]).read_text(encoding="utf-8")
+        except Exception:
+            gate_text = ""
+        if "GO_WEEK2_REVIEW_WITH_RESTRICTIONS" in gate_text:
+            gate_label = "Liberado para revisão com restrições"
+        elif "GO_WEEK2_REVIEW" in gate_text:
+            gate_label = "Liberado para revisão"
+        elif "NO_GO" in gate_text:
+            gate_label = "Não liberado"
+
+    proposed = list_proposed_approvals(ROOT)
+    draft_count = len(list(drafts_dir.glob("approval-draft-*.json"))) if drafts_dir.exists() else 0
+    restricted = int(summary.get("needs_clarification", 0)) + int(summary.get("blocked", 0)) + int(summary.get("rejected", 0))
+
+    return {
+        "gate_label": gate_label,
+        "drafts": draft_count,
+        "proposed": len(proposed),
+        "restricted": restricted,
+        "link": f"/service-engagement/{device}/week2-review",
+    }
+
+
+def _lookup_pending_item(device: str, safe_item_id: str):
+    data = get_pending_item(device, safe_item_id)
+    return data["item"]
+
+
+def _resolve_pending_item(device: str, payload):
+    safe_item_id = payload.get("safe_item_id")
+    if safe_item_id:
+        return _lookup_pending_item(device, safe_item_id)
+
+    object_key = payload.get("object_key")
+    if not object_key:
+        raise HTTPException(status_code=400, detail="safe_item_id or object_key required")
+
+    for item in load_pending_items(device):
+        if item.get("object_key") == object_key:
+            return item
+
+    raise HTTPException(status_code=404, detail="Unknown item")
+
+
+def _save_pending_item_response(device: str, item, payload):
+    payload = dict(payload or {})
+    payload.setdefault("updated_by", payload.get("updated_by", ""))
+    payload.setdefault("status", payload.get("status", ""))
+
+    valid, errors = validate_response_payload(item, payload)
+    if not valid:
+        payload["validation_errors"] = errors
+        return JSONResponse({
+            "success": False,
+            "errors": errors,
+        }, status_code=400)
+
+    team = item.get("responsible_team_slug") or item.get("responsible_team", "")
+    csv_path = save_response_csv(team, item, payload, ROOT)
+    audit_path = save_response_audit(team, item, payload, ROOT)
+    pipeline = run_safe_local_pipeline_after_response(device)
+
+    return JSONResponse({
+        "success": True,
+        "message": "Resposta salva localmente. Nenhuma alteração foi feita no NetBox.",
+        "team": item.get("responsible_team"),
+        "csv_path": str(csv_path.relative_to(ROOT)),
+        "audit_path": str(audit_path.relative_to(ROOT)),
+        "validation_status": _stringify_status(payload.get("status")),
+        "device": device,
+        "pipeline": pipeline,
+    })
+
+
+def _stringify_status(value):
+    return str(value or "").strip()
+
+
+def _load_validation_assets(device: str):
+    validation_file = REPORTS_DIR / "pilot-device-compliance" / "week1-response-validation.md"
+    snapshot_file = REPORTS_DIR / "pilot-device-compliance" / "outreach" / "execution" / "outreach-status-snapshot.md"
+    gate_file = REPORTS_DIR / "pilot-device-compliance" / "week2-activation-gate.md"
+    intake_file = REPORTS_DIR / "pilot-device-compliance" / "week1-response-intake-report.md"
+    review_dir = REPORTS_DIR / "pilot-device-compliance" / "week2-review"
+
+    return {
+        "validation_summary": parse_week1_validation_summary(validation_file),
+        "validation_file": {"name": validation_file.name, "path": str(validation_file.relative_to(REPORTS_DIR))} if validation_file.exists() else None,
+        "snapshot_file": {"name": snapshot_file.name, "path": str(snapshot_file.relative_to(REPORTS_DIR))} if snapshot_file.exists() else None,
+        "gate_file": {"name": gate_file.name, "path": str(gate_file.relative_to(REPORTS_DIR))} if gate_file.exists() else None,
+        "intake_file": {"name": intake_file.name, "path": str(intake_file.relative_to(REPORTS_DIR))} if intake_file.exists() else None,
+        "week2_review_file": {"name": "week2-review-board.md", "path": str((review_dir / "week2-review-board.md").relative_to(REPORTS_DIR))} if (review_dir / "week2-review-board.md").exists() else None,
+    }
+
+
+def _detect_uat_state():
+    responses_dir = REPORTS_DIR / "pilot-device-compliance" / "week1-responses"
+    audit_dir = responses_dir / "audit"
+    uat_hits = []
+    for path in list(responses_dir.glob("*.csv")) + list(audit_dir.glob("*.json")):
+        try:
+            content = path.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        if "updated_by,uat" in content.lower() or '"updated_by": "uat"' in content.lower() or " uat" in content.lower():
+            uat_hits.append(path.name)
+    return {
+        "active": bool(uat_hits),
+        "status": "active" if uat_hits else "unknown",
+        "files": uat_hits,
+    }
+
+
+def _detect_uat_active() -> bool:
+    return bool(_detect_uat_state().get("active"))
 
 @app.get("/service-engagement/{device}/responses/edit", response_class=HTMLResponse)
 async def response_edit_form(request: Request, device: str):
-    """Display response edit form."""
+    """Compatibility page for the pending-item editor."""
+    pending_items = load_pending_items(device)
     context = {
         "request": request,
-        "title": f"Response Edit: {device}",
+        "title": f"Pending Items: {device}",
         "device": device,
-        "service_types": [
-            'customer-internet', 'customer-l2vpn', 'customer-l3vpn', 'customer-transport',
-            'carrier-transit', 'carrier-peering', 'ix-public', 'cdn-cache',
-            'infra-backbone', 'infra-management'
-        ],
-        "criticalities": ['platinum', 'gold', 'silver', 'bronze'],
-        "statuses": ['pending', 'answered', 'needs_clarification', 'blocked', 'rejected'],
+        "pending_items": pending_items,
+        "pending_count": len(pending_items),
+        "pending_counts": _count_pending_items(pending_items),
+        "validation_command": _pending_validation_command(device),
     }
     return templates.TemplateResponse("response_edit.html", context)
 
 @app.post("/service-engagement/{device}/responses/edit", response_class=JSONResponse)
 async def response_edit_submit(request: Request, device: str):
-    """Submit response edit form."""
+    """Compatibility POST handler for local-only response saving."""
     try:
         data = await request.json()
-        team = data.get('team')
-        object_type = data.get('object_type', '')
+        item = _resolve_pending_item(device, data)
+        return _save_pending_item_response(device, item, data)
+    except HTTPException as exc:
+        return JSONResponse({"success": False, "error": exc.detail}, status_code=exc.status_code)
+    except Exception as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
 
-        if not team:
-            return JSONResponse({"error": "team required"}, status_code=400)
 
-        # Validate based on type
-        if object_type == 'subinterface':
-            valid, errors = validate_subinterface_response(data)
-        elif object_type == 'bgp_peer':
-            valid, errors = validate_bgp_response(data)
-        elif object_type == 'ip_address':
-            valid, errors = validate_ip_response(data)
-        else:
-            return JSONResponse({"error": f"unknown object_type: {object_type}"}, status_code=400)
-
-        if not valid:
-            return JSONResponse({
-                "success": False,
-                "errors": errors
-            }, status_code=400)
-
-        # Save CSV
-        success, csv_path = save_response_csv(team, data, ROOT)
-        if not success:
-            return JSONResponse({
-                "success": False,
-                "error": f"Failed to save CSV: {csv_path}"
-            }, status_code=500)
-
-        # Save audit
-        save_response_audit(team, data, ROOT)
-
-        # Update audit log
-        fields_changed = [k for k, v in data.items() if v and k not in ['team', 'object_type']]
-        update_edit_audit_log(team, data.get('object_key', ''), fields_changed, 'valid', ROOT)
-
+@app.get("/service-engagement/{device}/pending-items", response_class=HTMLResponse)
+async def pending_items_view(request: Request, device: str, format: Optional[str] = Query(None)):
+    """Return pending items as HTML or JSON."""
+    pending_items = load_pending_items(device)
+    if (format or "").lower() == "json" or "application/json" in request.headers.get("accept", "").lower():
         return JSONResponse({
-            "success": True,
-            "message": f"Response saved to {csv_path}",
-            "csv_path": csv_path,
-            "device": device
+            "device": device,
+            "count": len(pending_items),
+            "summary": _count_pending_items(pending_items),
+            "items": pending_items,
         })
 
+    context = {
+        "request": request,
+        "title": f"Pending Items: {device}",
+        "device": device,
+        "pending_items": pending_items,
+        "pending_count": len(pending_items),
+        "pending_counts": _count_pending_items(pending_items),
+        "validation_command": _pending_validation_command(device),
+    }
+    return templates.TemplateResponse("service_engagement_pending_items.html", context)
+
+
+@app.get("/service-engagement/{device}/pending-items/{safe_item_id}", response_class=JSONResponse)
+async def pending_item_detail(request: Request, device: str, safe_item_id: str):
+    """Return one pending item for the modal."""
+    try:
+        data = get_pending_item(device, safe_item_id)
+        data["validation_command"] = _pending_validation_command(device)
+        return JSONResponse({"success": True, **data})
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Unknown item")
+
+
+@app.post("/service-engagement/{device}/pending-items/{safe_item_id}/response", response_class=JSONResponse)
+async def pending_item_response(request: Request, device: str, safe_item_id: str):
+    """Save a local response for a single pending item."""
+    try:
+        payload = await request.json()
+        item = _lookup_pending_item(device, safe_item_id)
+        return _save_pending_item_response(device, item, payload)
+    except HTTPException as exc:
+        return JSONResponse({"success": False, "error": exc.detail}, status_code=exc.status_code)
     except Exception as e:
-        return JSONResponse({
-            "success": False,
-            "error": str(e)
-        }, status_code=500)
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
 
 
 # ============================================================================

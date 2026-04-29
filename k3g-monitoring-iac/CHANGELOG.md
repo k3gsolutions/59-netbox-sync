@@ -2,6 +2,67 @@
 
 ## [Unreleased]
 
+### Added — FASE 3.14 / 2.29 / 2.28
+
+**Operational Usability + Real Week 1 Execution + Final Validation**
+- Added a real Week 1 execution log for the active CSV/audit set
+- Added final Week 1 validation and Week 2 gate artifacts
+- Added clearer PT-BR next-step guidance on Service Engagement and Validation screens
+- Added dashboard card for real Week 1 execution status
+- Week 2 board prepared with restrictions for remaining pending items
+- No NetBox writes, no apply, no `/sync`, no approval automation
+
+### Added — FASE 3.13 / 2.26 / 2.27
+
+**PT-BR UX Copy + UAT Cleanup + Real Week 1 Activation**
+- Visible Web UI copy reviewed for PT-BR operator flow
+- Real Week 1 activation flow documented for modal save, local validation, and Week 2 prep
+- UAT artifacts archived out of active `week1-responses/`
+- Real readiness updated to `GO_REAL_WEEK1_CLEAN`
+- PT-BR copy guide added in `docs/66-webui-ptbr-ux-copy.md`
+- Real Week 1 flow documented in `docs/67-real-week1-activation-flow.md`
+- No NetBox writes, no apply, no `/sync`, no approval automation
+
+### Added — FASE 3.10.2 / 3.12 / 2.25
+
+**Auto Local Pipeline + Validation Dashboard + UAT Cleanup**
+- Modal now supports `Salvar` and `Salvar e fechar`
+- Saving a pending item can trigger the safe local pipeline automatically
+- New routes:
+  - `POST /service-engagement/{device}/responses/run-validation`
+  - `POST /service-engagement/{device}/responses/finalize`
+  - `GET /service-engagement/{device}/validation`
+  - `GET /service-engagement/{device}/uat-audit`
+- Local pipeline generates validation, outreach snapshot, activation gate, and Week 2 review board when ready
+- UAT cleanup script added for report/archive/reset/keep-as-real workflows
+- UAT audit and real-readiness reports added
+- No NetBox writes, no apply, no /sync, no approval automation
+
+### Added — FASE 3.10.1 / 3.11
+
+**CSV Download Fix + IP Address Form Intelligence + UAT**
+- Safe report download now allows `.csv`, `.json`, `.txt`, `.log`, and `.md` artifacts
+- Sensitive downloads remain blocked (`payload.local.json`, `*raw*.json`, secret-like names, traversal)
+- `ip_address` pending items can prefill detected interface/VRF and use `relation_type`
+- `service_relation` is now conditional on `relation_type=service`
+- Local UAT completed for 1 Service Team, 1 Network Ops, and 1 BGP Team item
+- Week 1 validator executed successfully against the generated CSV set
+- UAT evidence documented in `reports/pilot-device-compliance/WEBUI-PENDING-EDITOR-UAT.md`
+
+### Added — FASE 3.10
+
+**Web UI Pending Item Editor Modal + Backend CSV Generation**
+- New local-only pending item editor for Service Engagement / Outreach / Responses
+- Routes:
+  - `GET /service-engagement/{device}/pending-items`
+  - `GET /service-engagement/{device}/pending-items/{safe_item_id}`
+  - `POST /service-engagement/{device}/pending-items/{safe_item_id}/response`
+- Modal-based form with inline validation and dark BGP-Manager styling
+- Unified CSV output saved to `reports/pilot-device-compliance/week1-responses/<team>-response.csv`
+- Append-only audit trail saved to `reports/pilot-device-compliance/week1-responses/audit/<team>-response-audit.json`
+- Secret keyword blocking, path traversal blocking, and no NetBox writes enforced
+- Local safety test suite updated and passing
+
 ### Added — FASE 1.1 & 1.2
 
 **Report History & Versioning (FASE 1.1)**
@@ -533,3 +594,8 @@
 - Web UI read-only verified
 - Ready for integration and future phases (3.1+)
 
+## 2026-04-29
+
+- Semana 2 review experience polish.
+- Validation and promotion helpers for human review.
+- Proposed ApprovalRecords only, no NetBox writes.

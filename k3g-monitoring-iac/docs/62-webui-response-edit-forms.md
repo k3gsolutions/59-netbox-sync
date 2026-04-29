@@ -1,5 +1,7 @@
 # FASE 3.9.3 — Web UI Response Edit Forms
 
+> Superseded by `docs/62-webui-response-form.md` in FASE 3.10.
+
 **Date:** 2026-04-29
 **Status:** ✅ COMPLETE
 **Files Created:** 

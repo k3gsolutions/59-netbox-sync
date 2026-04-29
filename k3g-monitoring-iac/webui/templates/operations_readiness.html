@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Operations Readiness{% endblock %}
+{% block title %}Prontidão operacional{% endblock %}
 
 {% block content %}
-<h2>Operations Readiness Status</h2>
+<h2>Status de prontidão operacional</h2>
 
 <div class="card">
-    <h3>✓ Pre-Deployment Checklist</h3>
-    <p>Verify system readiness before executing batch applies and approvals.</p>
+    <h3>✓ Checklist pré-implantação</h3>
+    <p>Verifique a prontidão do sistema antes de executar aplicações em lote e aprovações.</p>
 </div>
 
 {% if readiness_files %}
 <div class="section">
-    <h3>📋 Readiness Reports</h3>
-    <p>Available readiness reports:</p>
+    <h3>📋 Relatórios de prontidão</h3>
+    <p>Relatórios de prontidão disponíveis:</p>
 
     <table class="full-width">
         <thead>
             <tr>
-                <th>Report</th>
-                <th>Action</th>
+                <th>Relatório</th>
+                <th>Ação</th>
             </tr>
         </thead>
         <tbody>
@@ -27,8 +27,8 @@
             <tr>
                 <td><strong>{{ file.name }}</strong></td>
                 <td>
-                    <a href="/reports/view?path={{ file.path }}" class="button small">View</a>
-                    <a href="/reports/download?path={{ file.path }}" class="button small">Download</a>
+                    <a href="/reports/view?path={{ file.path }}" class="button small">Ver</a>
+                    <a href="/reports/download?path={{ file.path }}" class="button small">Baixar</a>
                 </td>
             </tr>
         {% endfor %}
@@ -37,57 +37,57 @@
 </div>
 {% else %}
 <div class="alert">
-    <p>No readiness reports found yet.</p>
-    <p>Run operational readiness check to generate.</p>
+    <p>Nenhum relatório de prontidão encontrado ainda.</p>
+    <p>Rode a checagem de prontidão operacional para gerar.</p>
 </div>
 {% endif %}
 
 <div class="section">
-    <h3>✓ Pre-Deployment Checklist</h3>
+    <h3>✓ Checklist pré-implantação</h3>
     <ul style="font-size: 0.95em;">
-        <li>☑ NetBox API accessible</li>
-        <li>☑ Write token valid (NETBOX_WRITE_TOKEN)</li>
-        <li>☑ Approvals in approval queue</li>
-        <li>☑ ApplyPlans generated</li>
-        <li>☑ Dry-run validation passed</li>
-        <li>☑ Risk assessment complete</li>
-        <li>☑ Change window confirmed</li>
-        <li>☑ Rollback plan ready</li>
-        <li>☑ Notifications configured</li>
-        <li>☑ Monitoring alerts active</li>
+        <li>☑ API do NetBox acessível</li>
+        <li>☑ Credencial de escrita válida (fluxo legado)</li>
+        <li>☑ Aprovações na fila de aprovação</li>
+        <li>☑ Planos de aplicação gerados</li>
+        <li>☑ Validação de teste aprovada</li>
+        <li>☑ Análise de risco concluída</li>
+        <li>☑ Janela de mudança confirmada</li>
+        <li>☑ Plano de rollback pronto</li>
+        <li>☑ Notificações configuradas</li>
+        <li>☑ Alertas de monitoramento ativos</li>
     </ul>
 </div>
 
 <div class="section">
-    <h3>🟢 GO Criteria</h3>
-    <p>System is ready for deployment when:</p>
+    <h3>🟢 Critérios de liberação</h3>
+    <p>O sistema fica pronto para implantação quando:</p>
     <ul>
-        <li>All checklist items passed</li>
-        <li>No blocking incidents open</li>
-        <li>Recent dry-run validated all changes</li>
-        <li>Approval authority confirmed</li>
-        <li>Maintenance window confirmed</li>
+        <li>Todos os itens do checklist foram aprovados</li>
+        <li>Não há incidentes bloqueadores abertos</li>
+        <li>A validação de teste recente aprovou todas as mudanças</li>
+        <li>A autoridade de aprovação foi confirmada</li>
+        <li>A janela de manutenção foi confirmada</li>
     </ul>
 </div>
 
 <div class="section">
-    <h3>🔴 NO-GO Criteria</h3>
-    <p>Do NOT deploy if:</p>
+    <h3>🔴 Critérios de bloqueio</h3>
+    <p>Não implantar se:</p>
     <ul>
-        <li>Any checklist item failed</li>
-        <li>Blocking incidents exist</li>
-        <li>Dry-run validation failed</li>
-        <li>Approvals incomplete</li>
-        <li>High-risk items not reviewed</li>
+        <li>Qualquer item do checklist falhar</li>
+        <li>Existirem incidentes bloqueadores</li>
+        <li>A validação de teste falhar</li>
+        <li>As aprovações estiverem incompletas</li>
+        <li>Itens de alto risco não tiverem sido revisados</li>
     </ul>
 </div>
 
-<h3>Related</h3>
+<h3>Relacionados</h3>
 <ul>
-    <li><a href="/operations/handoff">Operational Handoff</a></li>
-    <li><a href="/outreach">Week 1 Outreach</a></li>
-    <li><a href="/approval-queue">Approval Queue</a></li>
-    <li><a href="/apply-plans">Apply Plans</a></li>
+    <li><a href="/operations/handoff">Passagem operacional</a></li>
+    <li><a href="/outreach">Comunicação da Semana 1</a></li>
+    <li><a href="/approval-queue">Fila de aprovação</a></li>
+    <li><a href="/apply-plans">Planos de aplicação</a></li>
 </ul>
 
 {% endblock %}

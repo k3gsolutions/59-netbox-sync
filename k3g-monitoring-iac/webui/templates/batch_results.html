@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Batch Results{% endblock %}
+{% block title %}Resultados em lote{% endblock %}
 
 {% block content %}
-<h2>Batch Apply Results</h2>
+<h2>Resultados de aplicação em lote</h2>
 
 {% if results %}
     <table>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Path</th>
-                <th>Actions</th>
+                <th>Nome</th>
+                <th>Caminho</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -20,14 +20,14 @@
                     <td>{{ result.name }}</td>
                     <td>{{ result.path }}</td>
                     <td>
-                        <a href="/reports/view?path={{ result.path }}" class="button-small">View</a>
-                        <a href="/reports/download?path={{ result.path }}" class="button-small">Download</a>
+                        <a href="/reports/view?path={{ result.path }}" class="button-small">Ver</a>
+                        <a href="/reports/download?path={{ result.path }}" class="button-small">Baixar</a>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 {% else %}
-    <p>No batch results found</p>
+    <p>Nenhum resultado em lote encontrado</p>
 {% endif %}
 {% endblock %}

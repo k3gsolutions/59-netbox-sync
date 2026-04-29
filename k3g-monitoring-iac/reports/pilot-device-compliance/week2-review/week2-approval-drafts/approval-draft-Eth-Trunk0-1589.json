@@ -1,0 +1,28 @@
+{
+  "draft_id": "9cd67191-a949-4df6-bfbd-5e4edba6b911",
+  "status": "draft_review",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 1890,
+  "object_type": "subinterface",
+  "object_key": "Eth-Trunk0.1589",
+  "action": "safe_create_staged",
+  "category": "service_candidate",
+  "created_at": "2026-04-29T19:49:51.995848+00:00",
+  "allowed_to_promote": false,
+  "promotion_requirements": {
+    "reviewer_required": true,
+    "decision_required": true,
+    "approval_record_allowed_required": true,
+    "reviewed_at_required": true
+  },
+  "warnings": [
+    "This is a draft. Not an official ApprovalRecord.",
+    "Can only be promoted with explicit human decision.",
+    "Must complete: reviewer, decision, reviewed_at, approval_record_allowed=true"
+  ],
+  "safety": {
+    "no_netbox_write": true,
+    "no_apply_plan_created": true,
+    "manual_review_required": true
+  }
+}

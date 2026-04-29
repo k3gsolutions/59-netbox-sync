@@ -1,84 +1,101 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Painel{% endblock %}
 
 {% block content %}
-<h2>Dashboard</h2>
+<h2>Painel</h2>
 
 <div class="cards">
     <div class="card">
         <h3>{{ total_devices }}</h3>
-        <p>Devices with History</p>
+        <p>Dispositivos com histórico</p>
     </div>
 
     <div class="card">
         <h3>{{ total_reports }}</h3>
-        <p>Compliance Reports</p>
+        <p>Relatórios de compliance</p>
     </div>
 
     <div class="card">
         <h3>{{ total_approvals }}</h3>
-        <p>Approval Records</p>
+        <p>Registros de aprovação</p>
     </div>
 
     <div class="card">
         <h3>{{ approvals_pending }}</h3>
-        <p>Pending Approvals</p>
+        <p>Aprovações pendentes</p>
     </div>
 
     <div class="card">
         <h3>{{ approvals_approved }}</h3>
-        <p>Approved</p>
+        <p>Aprovados</p>
     </div>
 
     <div class="card">
         <h3>{{ total_apply_plans }}</h3>
-        <p>Apply Plans</p>
+        <p>Planos de aplicação</p>
     </div>
 
     <div class="card">
         <h3>{{ total_batch_results }}</h3>
-        <p>Batch Results</p>
+        <p>Resultados em lote</p>
     </div>
 
     <div class="card">
         <h3>{{ batch_noop_count }}</h3>
-        <p>Batches (NO-OP)</p>
+        <p>Lotes (sem ação)</p>
     </div>
 
     <div class="card">
         <h3>{{ total_incidents }}</h3>
-        <p>Incidents</p>
+        <p>Incidentes</p>
+    </div>
+
+    <div class="card">
+        <h3>Execução real da Semana 1</h3>
+        <p>Estado: {{ week1_execution.state }}</p>
+        <p>Pendentes: {{ week1_execution.pending }}</p>
+        <p>Validadas: {{ week1_execution.validated }}</p>
+        <a href="{{ week1_execution.link }}" class="button">Pendências de Serviço</a>
+    </div>
+
+    <div class="card">
+        <h3>Semana 2 — Revisão Humana</h3>
+        <p>Critério de liberação: {{ week2_review.gate_label }}</p>
+        <p>Rascunhos: {{ week2_review.drafts }}</p>
+        <p>Registros propostos: {{ week2_review.proposed }}</p>
+        <p>Itens com restrição: {{ week2_review.restricted }}</p>
+        <a href="{{ week2_review.link }}" class="button">Abrir revisão</a>
     </div>
 </div>
 
-<h3>Latest Report</h3>
+<h3>Relatório mais recente</h3>
 {% if latest_report %}
-    <a href="/reports/view?path={{ latest_report }}" class="button">View {{ latest_report }}</a>
+    <a href="/reports/view?path={{ latest_report }}" class="button">Ver {{ latest_report }}</a>
 {% else %}
-    <p>No reports available</p>
+    <p>Nenhum relatório disponível</p>
 {% endif %}
 
-<h3>Latest Batch Result</h3>
+<h3>Resultado em lote mais recente</h3>
 {% if latest_batch %}
     <div class="card">
         <p><strong>{{ latest_batch.name }}</strong></p>
-        <a href="/batch-results/{{ latest_batch.name }}" class="button">View Detail</a>
-        <a href="/reports/view?path={{ latest_batch.path }}" class="button">View Raw</a>
+        <a href="/batch-results/{{ latest_batch.name }}" class="button">Ver detalhe</a>
+        <a href="/reports/view?path={{ latest_batch.path }}" class="button">Ver bruto</a>
     </div>
 {% else %}
-    <p>No batch results available</p>
+    <p>Nenhum resultado em lote disponível</p>
 {% endif %}
 
-<h3>Quick Links</h3>
+<h3>Atalhos</h3>
 <ul>
-    <li><a href="/devices">All Devices</a></li>
-    <li><a href="/service-engagement">Service Engagement</a></li>
-    <li><a href="/approval-queue">Approval Queue</a></li>
-    <li><a href="/approvals">Approval Records</a></li>
-    <li><a href="/apply-plans">Apply Plans</a></li>
-    <li><a href="/batch-results">Batch Results</a></li>
-    <li><a href="/incidents">Incident Reports</a></li>
-    <li><a href="/comparisons">Device Comparisons</a></li>
+    <li><a href="/devices">Todos os dispositivos</a></li>
+    <li><a href="/service-engagement">Pendências de serviço</a></li>
+    <li><a href="/approval-queue">Fila de aprovação</a></li>
+    <li><a href="/approvals">Registros de aprovação</a></li>
+    <li><a href="/apply-plans">Planos de aplicação</a></li>
+    <li><a href="/batch-results">Resultados em lote</a></li>
+    <li><a href="/incidents">Relatórios de incidente</a></li>
+    <li><a href="/comparisons">Comparações de dispositivos</a></li>
 </ul>
 {% endblock %}

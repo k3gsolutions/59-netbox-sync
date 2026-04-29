@@ -1,0 +1,21 @@
+<div id="pending-item-modal-backdrop" class="modal-backdrop" onclick="closePendingItemModal()"></div>
+<div id="pending-item-modal" class="modal-content" role="dialog" aria-modal="true" aria-labelledby="pending-item-modal-title">
+    <div class="modal-header">
+        <h2 id="pending-item-modal-title">Editar pendência</h2>
+        <button type="button" class="modal-close" aria-label="Fechar" onclick="closePendingItemModal()">×</button>
+    </div>
+    <div class="modal-body">
+        <div id="pending-item-modal-message" class="alert alert-info hidden"></div>
+        <div id="pending-item-modal-context" class="pending-modal-context"></div>
+        <form id="pending-item-form" onsubmit="return false;">
+            <input type="hidden" id="pending-item-safe-id" name="safe_item_id" value="">
+            <input type="hidden" id="pending-item-device" name="device" value="{{ device }}">
+            <div id="pending-item-form-fields"></div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" onclick="submitPendingItemResponse(false, false)">Salvar</button>
+                <button class="btn btn-primary" type="button" onclick="submitPendingItemResponse(true, false)">Salvar e fechar</button>
+                <button class="btn" type="button" onclick="closePendingItemModal()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,84 +1,136 @@
 {% extends "base.html" %}
 
-{% block title %}Service Engagement: {{ device }}{% endblock %}
+{% block title %}Pendências de serviço: {{ device }}{% endblock %}
 
 {% block content %}
-<h2>Service Engagement: {{ device }}</h2>
+<h2>Pendências de Serviço: {{ device }}</h2>
 
 <div class="card">
-    <h3>Device: {{ device }}</h3>
-    <p>Service owner engagement materials and metadata collection status.</p>
+    <h3>Dispositivo: {{ device }}</h3>
+    <p>Materiais de coleta, pendências e status da coleta de metadados.</p>
+    <div class="pending-validation-links">
+        <a href="/service-engagement/{{ device }}/pending-items" class="btn btn-primary btn-small">Abrir fila de pendências</a>
+        <a href="/service-engagement/{{ device }}/responses" class="btn btn-small">Ver respostas</a>
+        <a href="/service-engagement/{{ device }}/week2-candidates" class="btn btn-small">Candidatos da Semana 2</a>
+        <a href="/service-engagement/{{ device }}/validation" class="btn btn-small">Painel de validação</a>
+        <button type="button" class="btn btn-small" onclick="finalizeResponsesAndRefresh('{{ device }}')">Finalizar respostas e preparar Semana 2</button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Próximo passo</div>
+    {% if week2_review_file %}
+        <p>Semana 2 preparada. Próximo passo: revisão humana.</p>
+    {% elif validation_summary.needs_clarification > 0 or validation_summary.blocked > 0 or validation_summary.rejected > 0 %}
+        <p>Há itens com restrição. Revise antes de avançar.</p>
+    {% elif pending_counts.pending > 0 %}
+        <p>Ainda existem pendências. Clique em <strong>Editar pendência</strong> para completar as informações.</p>
+    {% elif validation_summary.validated > 0 %}
+        <p>Todas as pendências foram respondidas. Clique em <strong>Finalizar respostas e preparar Semana 2</strong>.</p>
+    {% else %}
+        <p>Estado limpo. Comece respondendo as pendências do time.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Fluxo de respostas</div>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">Pendentes</div>
+            <div class="summary-value">{{ pending_counts.pending }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Respondidas</div>
+            <div class="summary-value">{{ pending_counts.answered }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Validação</div>
+            <div class="summary-value">{{ validation_summary.validated }} validadas</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Critério de liberação</div>
+            <div class="summary-value">{{ 'Liberado para revisão' if validation_summary.still_pending == 0 and validation_summary.needs_clarification == 0 and validation_summary.blocked == 0 and validation_summary.rejected == 0 and validation_summary.validated > 0 else 'Liberado com restrições' if validation_summary.validated > 0 else 'Não liberado' }}</div>
+        </div>
+    </div>
+    <p class="text-muted">A última validação e o retrato do status aparecem no painel de validação.</p>
+</div>
+
+<div class="card">
+    <div class="card-header">Pendências</div>
+    {% include "partials/pending_items_table.html" %}
 </div>
 
 {% if files.engagement_package %}
 <div class="section">
-    <h3>📦 Engagement Package</h3>
+    <h3>📦 Pacote de engajamento</h3>
     <p>{{ files.engagement_package.name }}</p>
-    <a href="/reports/view?path={{ files.engagement_package.path }}" class="button">View</a>
-    <a href="/reports/download?path={{ files.engagement_package.path }}" class="button">Download</a>
+    <a href="/reports/view?path={{ files.engagement_package.path }}" class="button">Ver</a>
+    <a href="/reports/download?path={{ files.engagement_package.path }}" class="button">Baixar</a>
 </div>
 {% endif %}
 
 {% if files.week1_collection %}
 <div class="section">
-    <h3>📋 Week 1 Metadata Collection</h3>
+    <h3>📋 Coleta de metadados da Semana 1</h3>
     <p>{{ files.week1_collection.name }}</p>
-    <a href="/reports/view?path={{ files.week1_collection.path }}" class="button">View</a>
-    <a href="/reports/download?path={{ files.week1_collection.path }}" class="button">Download</a>
+    <a href="/reports/view?path={{ files.week1_collection.path }}" class="button">Ver</a>
+    <a href="/reports/download?path={{ files.week1_collection.path }}" class="button">Baixar</a>
 </div>
 {% endif %}
 
 {% if files.readiness %}
 <div class="section">
-    <h3>✓ Readiness Analysis</h3>
+    <h3>✓ Análise de prontidão</h3>
     <p>{{ files.readiness.name }}</p>
-    <a href="/reports/view?path={{ files.readiness.path }}" class="button">View</a>
-    <a href="/reports/download?path={{ files.readiness.path }}" class="button">Download</a>
+    <a href="/reports/view?path={{ files.readiness.path }}" class="button">Ver</a>
+    <a href="/reports/download?path={{ files.readiness.path }}" class="button">Baixar</a>
 </div>
 {% endif %}
 
 {% if files.enrichment_plan %}
 <div class="section">
-    <h3>📊 Enrichment Plan</h3>
+    <h3>📊 Plano de enriquecimento</h3>
     <p>{{ files.enrichment_plan.name }}</p>
-    <a href="/reports/view?path={{ files.enrichment_plan.path }}" class="button">View</a>
-    <a href="/reports/download?path={{ files.enrichment_plan.path }}" class="button">Download</a>
+    <a href="/reports/view?path={{ files.enrichment_plan.path }}" class="button">Ver</a>
+    <a href="/reports/download?path={{ files.enrichment_plan.path }}" class="button">Baixar</a>
 </div>
 {% endif %}
 
 {% if files.week1_validation %}
 <div class="section">
-    <h3>✓ Week 1 Response Validation</h3>
+    <h3>✓ Validação das respostas da Semana 1</h3>
     <p>{{ files.week1_validation.name }}</p>
-    <a href="/service-engagement/{{ device }}/responses" class="button">View Status</a>
-    <a href="/reports/view?path={{ files.week1_validation.path }}" class="button">View Full Report</a>
-    <a href="/reports/download?path={{ files.week1_validation.path }}" class="button">Download</a>
+    <a href="/service-engagement/{{ device }}/responses" class="button">Ver status</a>
+    <a href="/reports/view?path={{ files.week1_validation.path }}" class="button">Ver relatório completo</a>
+    <a href="/reports/download?path={{ files.week1_validation.path }}" class="button">Baixar</a>
 </div>
 {% endif %}
 
 {% if files.week2_candidates %}
 <div class="section">
-    <h3>📋 Week 2 Review Candidates</h3>
+    <h3>📋 Candidatos para revisão da Semana 2</h3>
     <p>{{ files.week2_candidates.name }}</p>
-    <a href="/service-engagement/{{ device }}/week2-candidates" class="button">View Candidates</a>
-    <a href="/reports/view?path={{ files.week2_candidates.path }}" class="button">View Full Document</a>
-    <a href="/reports/download?path={{ files.week2_candidates.path }}" class="button">Download</a>
+    <a href="/service-engagement/{{ device }}/week2-candidates" class="button">Ver candidatos</a>
+    <a href="/reports/view?path={{ files.week2_candidates.path }}" class="button">Ver documento completo</a>
+    <a href="/reports/download?path={{ files.week2_candidates.path }}" class="button">Baixar</a>
 </div>
 {% endif %}
 
 <div class="section">
-    <h3>🔍 Week 2 Review & Approval Drafts</h3>
-    <p>Human review process, decisions, and draft promotion.</p>
-    <a href="/service-engagement/{{ device }}/week2-review" class="button">Review Board</a>
-    <a href="/service-engagement/{{ device }}/approval-drafts" class="button">Approval Drafts</a>
-    <a href="/service-engagement/{{ device }}/promotion-report" class="button">Promotion Report</a>
+    <h3>🔍 Revisão da Semana 2 e rascunhos de aprovação</h3>
+    <p>Processo de revisão humana, decisões e promoção de rascunhos.</p>
+    <a href="/service-engagement/{{ device }}/week2-review" class="button">Painel de revisão</a>
+    <a href="/service-engagement/{{ device }}/approval-drafts" class="button">Rascunhos de aprovação</a>
+    <a href="/service-engagement/{{ device }}/promotion-report" class="button">Relatório de promoção</a>
 </div>
 
-<h3>Related</h3>
+<h3>Relacionados</h3>
 <ul>
-    <li><a href="/devices/{{ device }}">Device Details</a></li>
-    <li><a href="/service-engagement">All Engagement</a></li>
-    <li><a href="/approval-queue">Approval Queue</a></li>
+    <li><a href="/devices/{{ device }}">Detalhes do dispositivo</a></li>
+    <li><a href="/service-engagement">Todas as pendências</a></li>
+    <li><a href="/approval-queue">Fila de aprovação</a></li>
 </ul>
+
+{% include "partials/pending_item_modal.html" %}
 
 {% endblock %}
