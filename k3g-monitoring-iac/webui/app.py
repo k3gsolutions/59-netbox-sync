@@ -797,6 +797,165 @@ async def outreach_team(request: Request, team: str):
     return templates.TemplateResponse("outreach_team.html", context)
 
 
+@app.get("/outreach/status", response_class=HTMLResponse)
+async def outreach_status(request: Request):
+    """Week 1 response monitoring status."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    outreach_dir = compliance_dir / "outreach"
+    status_file = None
+    status_content = None
+    distribution_log = None
+
+    if outreach_dir.exists():
+        snapshot = outreach_dir / "execution" / "outreach-status-snapshot.md"
+        if snapshot.exists():
+            status_file = {
+                "name": snapshot.name,
+                "path": str(snapshot.relative_to(REPORTS_DIR)),
+            }
+            try:
+                status_content = load_markdown(snapshot)
+                if status_content:
+                    status_content = render_markdown(status_content)
+            except Exception:
+                pass
+
+        dist_log = outreach_dir / "execution" / "outreach-distribution-log.md"
+        if dist_log.exists():
+            distribution_log = {
+                "name": dist_log.name,
+                "path": str(dist_log.relative_to(REPORTS_DIR)),
+            }
+
+    context = {
+        "request": request,
+        "title": "Outreach Status",
+        "status_file": status_file,
+        "status_content": status_content,
+        "distribution_log": distribution_log,
+    }
+
+    return templates.TemplateResponse("outreach_status.html", context)
+
+
+@app.get("/outreach/execution-log", response_class=HTMLResponse)
+async def outreach_execution_log(request: Request):
+    """Outreach distribution log + checklist."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    outreach_dir = compliance_dir / "outreach"
+    dist_log = None
+    dist_content = None
+    checklist = None
+
+    if outreach_dir.exists():
+        log = outreach_dir / "execution" / "outreach-distribution-log.md"
+        if log.exists():
+            dist_log = {
+                "name": log.name,
+                "path": str(log.relative_to(REPORTS_DIR)),
+            }
+            try:
+                dist_content = load_markdown(log)
+                if dist_content:
+                    dist_content = render_markdown(dist_content)
+            except Exception:
+                pass
+
+        check = outreach_dir / "execution" / "manual-send-checklist.md"
+        if check.exists():
+            checklist = {
+                "name": check.name,
+                "path": str(check.relative_to(REPORTS_DIR)),
+            }
+
+    context = {
+        "request": request,
+        "title": "Outreach Execution Log",
+        "distribution_log": dist_log,
+        "distribution_content": dist_content,
+        "checklist": checklist,
+    }
+
+    return templates.TemplateResponse("outreach_execution_log.html", context)
+
+
+@app.get("/outreach/reminders", response_class=HTMLResponse)
+async def outreach_reminders(request: Request):
+    """Reminder messages index."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    outreach_dir = compliance_dir / "outreach"
+    reminder_plan = None
+    reminders = []
+
+    if outreach_dir.exists():
+        plan = outreach_dir / "execution" / "outreach-reminder-plan.md"
+        if plan.exists():
+            reminder_plan = {
+                "name": plan.name,
+                "path": str(plan.relative_to(REPORTS_DIR)),
+            }
+
+        reminders_dir = outreach_dir / "execution" / "reminder-messages"
+        if reminders_dir.exists():
+            for f in reminders_dir.glob("*.md"):
+                reminders.append({
+                    "name": f.stem.replace("reminder-", "").replace("-", " ").title(),
+                    "file": f.name,
+                    "path": str(f.relative_to(REPORTS_DIR)),
+                })
+
+    context = {
+        "request": request,
+        "title": "Reminders & Escalation",
+        "reminder_plan": reminder_plan,
+        "reminders": sorted(reminders, key=lambda x: x["name"]),
+        "teams": ["Service Team", "Network Ops", "BGP Team", "Escalation"],
+    }
+
+    return templates.TemplateResponse("outreach_reminders.html", context)
+
+
+@app.get("/outreach/reminders/{reminder_type}", response_class=HTMLResponse)
+async def outreach_reminder(request: Request, reminder_type: str):
+    """Specific reminder message."""
+    valid_types = ["service-team", "network-ops", "bgp-team", "escalation"]
+    if reminder_type not in valid_types:
+        return HTMLResponse("<h1>Invalid reminder type</h1>", status_code=404)
+
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    outreach_dir = compliance_dir / "outreach"
+    reminder_file = None
+    reminder_content = None
+
+    if outreach_dir.exists():
+        if reminder_type == "escalation":
+            file = outreach_dir / "execution" / "reminder-messages" / "escalation-template.md"
+        else:
+            file = outreach_dir / "execution" / "reminder-messages" / f"reminder-{reminder_type}.md"
+
+        if file.exists():
+            reminder_file = {
+                "name": file.name,
+                "path": str(file.relative_to(REPORTS_DIR)),
+            }
+            try:
+                reminder_content = load_markdown(file)
+                if reminder_content:
+                    reminder_content = render_markdown(reminder_content)
+            except Exception:
+                pass
+
+    context = {
+        "request": request,
+        "title": f"Reminder: {reminder_type}",
+        "reminder_type": reminder_type,
+        "reminder_file": reminder_file,
+        "reminder_content": reminder_content,
+    }
+
+    return templates.TemplateResponse("outreach_reminder_team.html", context)
+
+
 @app.get("/operations/handoff", response_class=HTMLResponse)
 async def operations_handoff(request: Request):
     """Operational handoff package."""

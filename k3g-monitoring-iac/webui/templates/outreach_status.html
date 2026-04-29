@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Outreach Status{% endblock %}
+{% block content %}
+<h2>Week 1 Response Status</h2>
+<div class="card">
+    <h3>📊 Monitoring Dashboard</h3>
+    <p>Real-time Week 1 outreach execution status.</p>
+</div>
+{% if status_content %}
+<div class="section">
+    <div class="report-content">{{ status_content|safe }}</div>
+    {% if status_file %}<p><a href="/reports/download?path={{ status_file.path }}" class="button">Download Snapshot</a></p>{% endif %}
+</div>
+{% else %}
+<div class="alert">Snapshot not generated yet. Run: <code>python3 tools/local/track_week1_outreach_execution.py ...</code></div>
+{% endif %}
+<h3>Quick Links</h3>
+<ul>
+    <li><a href="/outreach/execution-log">Execution Log</a></li>
+    <li><a href="/outreach/reminders">Reminders</a></li>
+    <li><a href="/outreach">Outreach Pack</a></li>
+</ul>
+{% endblock %}

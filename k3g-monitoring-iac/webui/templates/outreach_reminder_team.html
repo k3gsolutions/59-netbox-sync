@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Reminder: {{ reminder_type }}{% endblock %}
+{% block content %}
+<h2>Reminder Message: {{ reminder_type }}</h2>
+<div class="card">
+    <h3>📧 Ready to Send</h3>
+    <p>Copy message below. Send manually on 2026-05-06 (or 2026-05-08 EOD for escalation).</p>
+</div>
+{% if reminder_content %}
+<div class="section">
+    <div class="message-content">{{ reminder_content|safe }}</div>
+    {% if reminder_file %}
+    <p style="margin-top: 20px;">
+        <a href="/reports/download?path={{ reminder_file.path }}" class="button">Download as Markdown</a>
+    </p>
+    {% endif %}
+</div>
+{% else %}
+<div class="alert">Reminder message not found for this type.</div>
+{% endif %}
+<h3>Next Steps</h3>
+<ol>
+    <li>Copy message above (or download)</li>
+    <li>Customize contact info if needed</li>
+    <li>Send manually via email/Slack/Teams</li>
+    <li>Update outreach-distribution-log.md</li>
+    <li>Re-run status snapshot</li>
+</ol>
+<h3>Related</h3>
+<ul>
+    <li><a href="/outreach/reminders">All Reminders</a></li>
+    <li><a href="/outreach/status">Status</a></li>
+    <li><a href="/outreach/execution-log">Execution Log</a></li>
+</ul>
+{% endblock %}
