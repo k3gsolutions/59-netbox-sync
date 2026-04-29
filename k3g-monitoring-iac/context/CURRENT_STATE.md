@@ -579,3 +579,23 @@ POST /compliance/import-plan/report (FASE 1.3)
   - docs/86-dryrun-applyplan-readiness-gate.md created
   - All 18/18 tests passing (test_manual_approval_flow.py)
   - All 39/39 existing Web UI tests still passing
+
+**FASE 2.42 COMPLETE** — Generate Dry-Run ApplyPlan
+  - generate_dryrun_applyplan.py creates ApplyPlan from approved ApprovalRecords
+  - ApplyPlan mode=dry_run, status=generated
+  - safety_flags enforced: dry_run_only, no_netbox_write, no_token_required, no_apply_execution, manual_execution_gate_required, generated_from_approved_records
+  - execution_policy: can_execute_real_write=false, requires_next_gate=true
+  - Blocked if readiness gate NOT_READY or no valid records
+  - Generation report created
+  - docs/87-generate-dryrun-applyplan.md created
+  - Zero NetBox writes, no ApplyPlan execution, local artifact only
+
+**FASE 2.43 COMPLETE** — Validate Dry-Run ApplyPlan
+  - validate_dryrun_applyplan.py validates ApplyPlan structure
+  - Decisions: VALID / VALID_WITH_WARNINGS / INVALID
+  - Validates all safety_flags, execution_policy, items, no secrets
+  - BLOCKER checks: mode=dry_run, can_execute_real_write=false, item payloads
+  - Validation report created
+  - docs/88-validate-dryrun-applyplan.md created
+  - All 20/20 tests passing (test_dryrun_applyplan_flow.py)
+  - All 39/39 Web UI tests still passing (zero regressions)
