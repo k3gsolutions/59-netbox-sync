@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Batch Result: {{ batch.id }}{% endblock %}
+
+{% block content %}
+<h2>Batch Result: {{ batch.id }}</h2>
+
+<div class="card">
+    <p><strong>Name:</strong> {{ batch.name }}</p>
+    <p><strong>File:</strong> {{ batch.path }}</p>
+    <a href="/reports/download?path={{ batch.path }}" class="button">Download</a>
+</div>
+
+<h3>Content</h3>
+<div class="report-content">
+    {{ batch.content | safe }}
+</div>
+
+<a href="/batch-results" class="button">Back to Batch Results</a>
+{% endblock %}

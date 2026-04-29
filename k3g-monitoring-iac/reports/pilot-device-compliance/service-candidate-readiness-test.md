@@ -1,6 +1,6 @@
 # Service Candidate Readiness — 4WNET-MNS-KTG-RX
 
-**Generated:** 2026-04-28T17:31:21.095001+00:00
+**Generated:** 2026-04-29T13:41:39.783691+00:00
 
 ## 1. Resumo
 

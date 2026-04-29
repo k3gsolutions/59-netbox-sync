@@ -1,21 +1,98 @@
-# Next Actions — 2026-04-28 (FASE 2.7 Ready for Approval)
+# Next Actions — 2026-04-29 (FASE 2.11 + 3.3 + 3.4 Complete)
 
-## Immediate (This Week)
+## Just Completed
 
-### 1. FASE 2.7 — Real Batch POST ✅ **COMPLETE**
-- ✅ Tech lead review + code approval (completed)
-- ✅ Supervisor incident closure approval (completed)
-- ✅ Operations batch execution approval (completed)
-- ✅ Executed with --enable-real-post-implementation flag
-- ✅ NetBox objects created: Eth-Trunk1 (ID 18229), GigabitEthernet0/5/0 (ID 18230)
-- ✅ Results documented in FASE-2-7-BATCH-CLOSURE.md
-- ⏳ FREEZE ready for closure (objects verified in NetBox)
+### FASE 2.11 ✅ **COMPLETE** — Week 1 Metadata Collection
+- ✅ Collection workflow documented (timeline, criteria, format)
+- ✅ CSV template created (7 items, 3 teams)
+- ✅ Acceptance criteria defined per object type
+- ✅ Response tracking format (pending → validated → approved)
+- ✅ Week 1 target: 2026-05-02 to 2026-05-08
 
-### 2. Web UI Production ✅ **LIVE**
-- Status: http://127.0.0.1:8890 (all 7/7 tests passing)
-- Features: Dashboard, Devices, Approvals, Incidents, Batch Results, Search
-- Security: Path traversal blocked, denylist enforced, zero POST routes
-- Ready for team demo
+### FASE 3.3 ✅ **COMPLETE** — Service Engagement Viewer
+- ✅ Two new read-only routes (/service-engagement, /service-engagement/{device})
+- ✅ Templates for engagement overview + device-specific view
+- ✅ Links to engagement packages, readiness, enrichment, week1 collection
+- ✅ Dashboard integration (quick links updated)
+- ✅ 7/7 tests still passing
+
+### FASE 3.4 ✅ **COMPLETE** — Operational Handoff
+- ✅ OPERATIONAL-HANDOFF-PACKAGE.md (quick start guide)
+- ✅ docs/47-operational-handoff.md (detailed runbook)
+- ✅ Roles defined + responsibilities
+- ✅ Deployment + startup procedures
+- ✅ Emergency procedures (Web UI crash, NetBox outage, token leak)
+- ✅ Monitoring checklist (daily, weekly, monthly)
+- ✅ Runbook examples (compliance review, engagement, approvals, batch execution)
+- ✅ Ready for NOC/Ops handoff on 2026-05-01
+
+### FASE 3.1.1 ✅ **COMPLETE** — Web UI Test Closure
+- ✅ Fixed jinja2 import test (environment setup)
+- ✅ All 7/7 security tests passing
+- ✅ Zero write routes verified
+- ✅ Path traversal + denylist confirmed
+
+### FASE 3.2 ✅ **COMPLETE** — Approval Queue Timeline UI
+- ✅ Approval queue route with filters (/approval-queue)
+- ✅ Approval timeline route (/approval-timeline/{id})
+- ✅ State history visualization (timeline of transitions)
+- ✅ Grouped by status (pending, approved, applied, rejected)
+- ✅ 7/7 tests still passing
+
+### FASE 2.10 ✅ **COMPLETE** — Service Owner Engagement Preparation
+- ✅ Engagement package created (3 teams, 6 items, timeline)
+- ✅ Process documentation (46-service-owner-engagement.md)
+- ✅ Roles & responsibilities defined
+- ✅ Week 1 engagement plan ready
+- ✅ Response format standardized
+
+## Previously Completed
+
+### FASE 3.1 ✅ **COMPLETE** — Web UI UX, Filters & Drill-down
+- ✅ Enhanced dashboard (9 cards, better metrics)
+- ✅ Batch result drill-down (`/batch-results/{batch_id}`)
+- ✅ Filters: approvals (status), apply-plans (readiness), batch-results (result)
+- ✅ Improved search (line numbers, highlighting, match count)
+- ✅ 6/7 tests passing (environment-specific test)
+- Status: Web UI at http://127.0.0.1:8890 (read-only, enhanced)
+
+### FASE 2.9 ✅ **COMPLETE** — Service Candidate Enrichment Readiness
+- ✅ Analysis: 1 ready, 6 missing_metadata, 0 blocked
+- ✅ docs/45-service-candidate-enrichment-workflow.md (10 readiness categories)
+- ✅ reports/.../service-candidate-enrichment-plan.md (gap analysis & timeline)
+- ✅ Enrichment needs: tenant (5 subinterfaces), interface/VRF (1 IP), remote_asn (1 BGP)
+- ✅ Owner engagement plan (service team, network ops, BGP team)
+- ✅ Timeline: week 1 (engagement) → week 2 (approval) → week 3+ (execution)
+
+## Immediate Next Steps
+
+### FASE 2.10+ Execution (Next Week: 2026-05-02)
+- **Week 1:** Distribute engagement package to 3 teams
+  - Service Team: 5 subinterfaces (tenant, service_type, criticality)
+  - Network Ops: 1 IP address (interface, VRF mapping)
+  - BGP Team: 1 BGP peer (remote_asn, remote_bgp_group)
+  - Target: All metadata collected by EOW Thursday 2026-05-02
+
+### FASE 2.11 (Following Week: 2026-05-09)
+- Review + validate enriched metadata
+- Create ApprovalRecords with enriched data
+- Dry-run validation
+- Risk assessment (BAIXO/MÉDIO/ALTO)
+- Target: ApprovalRecords ready by EOW Friday 2026-05-15
+
+### FASE 2.12+ (Week 3+: 2026-05-16)
+- Approval decisions
+- Batch execution
+- Compliance verification
+
+### FASE 2.8 (Deferred)
+- Base inventory expansion (scheduled after service enrichment stabilizes)
+- Additional interfaces beyond pilot
+
+### FASE 3.3+ (Future)
+- Batch scheduling UI (read-only)
+- Approval metrics dashboard
+- Service compliance trends
 
 ---
 

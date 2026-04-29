@@ -56,6 +56,15 @@ async def index(request: Request):
     approvals = list_approvals(ROOT)
     batch_results = list_batch_results(ROOT)
     incidents = list_incidents(ROOT)
+    apply_plans = list_apply_plans(ROOT)
+
+    # Count by approval status
+    approvals_pending = sum(1 for a in approvals if "pending" in a.get("path", ""))
+    approvals_approved = sum(1 for a in approvals if "approved" in a.get("path", ""))
+
+    # Batch results status
+    latest_batch = batch_results[0] if batch_results else None
+    batch_noop = sum(1 for b in batch_results if "NO-OP" in b.get("name", "") or "already" in b.get("name", "").lower())
 
     context = {
         "request": request,
@@ -64,8 +73,13 @@ async def index(request: Request):
         "total_reports": len(reports),
         "total_approvals": len(approvals),
         "total_incidents": len(incidents),
+        "total_batch_results": len(batch_results),
+        "total_apply_plans": len(apply_plans),
+        "approvals_pending": approvals_pending,
+        "approvals_approved": approvals_approved,
+        "batch_noop_count": batch_noop,
         "latest_report": latest_report,
-        "latest_batch": batch_results[0] if batch_results else None,
+        "latest_batch": latest_batch,
     }
 
     return templates.TemplateResponse("index.html", context)
@@ -180,14 +194,19 @@ async def comparisons_list(request: Request):
 # ============================================================================
 
 @app.get("/approvals", response_class=HTMLResponse)
-async def approvals_list(request: Request):
-    """List all approval records."""
-    approvals = list_approvals(ROOT)
+async def approvals_list(request: Request, status: Optional[str] = Query(None)):
+    """List all approval records with optional status filter."""
+    all_approvals = list_approvals(ROOT)
+
+    # Filter by status if specified (pending, approved, rejected, etc.)
+    if status:
+        all_approvals = [a for a in all_approvals if status.lower() in a.get("path", "").lower()]
 
     context = {
         "request": request,
         "title": "Approvals",
-        "approvals": approvals,
+        "approvals": all_approvals,
+        "filter_status": status,
     }
 
     return templates.TemplateResponse("approvals.html", context)
@@ -230,14 +249,19 @@ async def approval_detail(request: Request, approval_id: str):
 # ============================================================================
 
 @app.get("/apply-plans", response_class=HTMLResponse)
-async def apply_plans_list(request: Request):
-    """List apply plans."""
-    apply_plans = list_apply_plans(ROOT)
+async def apply_plans_list(request: Request, readiness: Optional[str] = Query(None)):
+    """List apply plans with optional readiness filter."""
+    all_plans = list_apply_plans(ROOT)
+
+    # Filter by readiness if specified (ready, blocked, etc.)
+    if readiness:
+        all_plans = [p for p in all_plans if readiness.lower() in p.get("name", "").lower()]
 
     context = {
         "request": request,
         "title": "Apply Plans",
-        "apply_plans": apply_plans,
+        "apply_plans": all_plans,
+        "filter_readiness": readiness,
     }
 
     return templates.TemplateResponse("apply_plans.html", context)
@@ -248,17 +272,54 @@ async def apply_plans_list(request: Request):
 # ============================================================================
 
 @app.get("/batch-results", response_class=HTMLResponse)
-async def batch_results_list(request: Request):
-    """List batch apply results."""
-    results = list_batch_results(ROOT)
+async def batch_results_list(request: Request, result: Optional[str] = Query(None)):
+    """List batch apply results with optional filter."""
+    all_results = list_batch_results(ROOT)
+
+    # Filter by result if specified
+    if result:
+        all_results = [r for r in all_results if result.lower() in r.get("name", "").lower()]
 
     context = {
         "request": request,
         "title": "Batch Results",
-        "results": results,
+        "results": all_results,
+        "filter_result": result,
     }
 
     return templates.TemplateResponse("batch_results.html", context)
+
+
+@app.get("/batch-results/{batch_id}", response_class=HTMLResponse)
+async def batch_result_detail(request: Request, batch_id: str):
+    """View single batch result detail."""
+    all_results = list_batch_results(ROOT)
+    batch_result = None
+
+    for b in all_results:
+        if batch_id in b["name"] or batch_id in b.get("path", ""):
+            resolved = safe_resolve_path(REPORTS_DIR, b["path"])
+            if resolved and resolved.exists():
+                content = load_markdown(resolved)
+                html_content = render_markdown(content)
+                batch_result = {
+                    "id": batch_id,
+                    "name": b["name"],
+                    "path": b["path"],
+                    "content": html_content,
+                }
+                break
+
+    if not batch_result:
+        return HTMLResponse("<h1>Batch result not found</h1>", status_code=404)
+
+    context = {
+        "request": request,
+        "title": f"Batch: {batch_id}",
+        "batch": batch_result,
+    }
+
+    return templates.TemplateResponse("batch_result_detail.html", context)
 
 
 # ============================================================================
@@ -285,7 +346,7 @@ async def incidents_list(request: Request):
 
 @app.get("/search", response_class=HTMLResponse)
 async def search(request: Request, q: str = Query(...)):
-    """Simple search across markdown files."""
+    """Search across markdown files with line numbers and highlighting."""
     results = []
 
     docs_dirs = [
@@ -302,31 +363,372 @@ async def search(request: Request, q: str = Query(...)):
             try:
                 content = md_file.read_text(encoding="utf-8")
                 if q.lower() in content.lower():
-                    # Find matching lines
+                    # Find matching lines with line numbers
                     lines = content.split("\n")
                     matching_lines = [
-                        (i, line) for i, line in enumerate(lines)
+                        {
+                            "line_num": i + 1,
+                            "text": line,
+                            "highlighted": line.replace(q, f"<mark>{q}</mark>") if q.lower() in line.lower() else line
+                        }
+                        for i, line in enumerate(lines)
                         if q.lower() in line.lower()
                     ]
 
                     rel_path = md_file.relative_to(ROOT)
-                    results.append({
-                        "file": str(rel_path),
-                        "path": str(rel_path),
-                        "matches": len(matching_lines),
-                        "preview": matching_lines[0][1][:100] if matching_lines else "",
+                    if matching_lines:
+                        results.append({
+                            "file": str(rel_path),
+                            "path": str(rel_path),
+                            "matches": len(matching_lines),
+                            "lines": matching_lines[:3],  # Show first 3 matches
+                            "preview": matching_lines[0]["text"][:150] if matching_lines else "",
+                        })
+            except Exception:
+                pass
+
+    # Sort by match count descending
+    results.sort(key=lambda x: x["matches"], reverse=True)
+
+    context = {
+        "request": request,
+        "title": "Search Results",
+        "query": q,
+        "results": results[:50],
+        "total": len(results),
+    }
+
+    return templates.TemplateResponse("search.html", context)
+
+
+# ============================================================================
+# Approval Queue & Timeline
+# ============================================================================
+
+@app.get("/approval-queue", response_class=HTMLResponse)
+async def approval_queue(request: Request, status: Optional[str] = Query(None), device: Optional[str] = Query(None)):
+    """Approval queue with status and device filters."""
+    all_approvals = list_approvals(ROOT)
+
+    # Apply filters
+    filtered = all_approvals
+    if status:
+        filtered = [a for a in filtered if status.lower() in a.get("path", "").lower()]
+    if device:
+        filtered = [a for a in filtered if device.lower() in a.get("path", "").lower()]
+
+    # Group by status
+    pending = [a for a in filtered if "pending" in a.get("path", "")]
+    approved = [a for a in filtered if "approved" in a.get("path", "")]
+    applied = [a for a in filtered if "applied" in a.get("path", "")]
+    rejected = [a for a in filtered if "rejected" in a.get("path", "")]
+
+    context = {
+        "request": request,
+        "title": "Approval Queue",
+        "pending": pending,
+        "approved": approved,
+        "applied": applied,
+        "rejected": rejected,
+        "filter_status": status,
+        "filter_device": device,
+        "total": len(filtered),
+    }
+
+    return templates.TemplateResponse("approval_queue.html", context)
+
+
+@app.get("/approval-timeline/{approval_id}", response_class=HTMLResponse)
+async def approval_timeline(request: Request, approval_id: str):
+    """View approval timeline with state history."""
+    all_approvals = list_approvals(ROOT)
+    approval = None
+
+    for a in all_approvals:
+        if approval_id in a["name"] or approval_id in a.get("path", ""):
+            resolved = safe_resolve_path(REPORTS_DIR, a["path"])
+            if resolved and resolved.exists():
+                approval_data = load_json(resolved)
+                if approval_data:
+                    approval = {
+                        "id": approval_id,
+                        "data": approval_data,
+                        "path": a["path"],
+                        "status": a["status"],
+                    }
+                break
+
+    if not approval:
+        return HTMLResponse("<h1>Approval not found</h1>", status_code=404)
+
+    context = {
+        "request": request,
+        "title": f"Approval Timeline: {approval_id}",
+        "approval": approval,
+    }
+
+    return templates.TemplateResponse("approval_timeline.html", context)
+
+
+# ============================================================================
+# Service Engagement
+# ============================================================================
+
+@app.get("/service-engagement", response_class=HTMLResponse)
+async def service_engagement(request: Request):
+    """Service engagement overview."""
+    # Scan for engagement files
+    engagement_files = []
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+
+    if compliance_dir.exists():
+        for f in compliance_dir.glob("*engagement*.md"):
+            engagement_files.append({
+                "name": f.name,
+                "path": str(f.relative_to(REPORTS_DIR)),
+            })
+        for f in compliance_dir.glob("week1*.md"):
+            engagement_files.append({
+                "name": f.name,
+                "path": str(f.relative_to(REPORTS_DIR)),
+            })
+
+    context = {
+        "request": request,
+        "title": "Service Engagement",
+        "engagement_files": engagement_files[:10],
+        "total_files": len(engagement_files),
+    }
+
+    return templates.TemplateResponse("service_engagement.html", context)
+
+
+@app.get("/service-engagement/{device}", response_class=HTMLResponse)
+async def service_engagement_device(request: Request, device: str):
+    """Service engagement for specific device."""
+    # Find engagement/readiness files for device
+    files = {
+        "engagement_package": None,
+        "enrichment_plan": None,
+        "readiness": None,
+        "week1_collection": None,
+        "week1_validation": None,
+        "week2_candidates": None,
+    }
+
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    if compliance_dir.exists():
+        for f in compliance_dir.glob("*engagement*package*.md"):
+            if device.lower() in f.name.lower() or device.lower() in f.read_text().lower()[:500]:
+                files["engagement_package"] = {
+                    "name": f.name,
+                    "path": str(f.relative_to(REPORTS_DIR)),
+                }
+        for f in compliance_dir.glob("*enrichment*plan*.md"):
+            if device.lower() in f.name.lower() or device.lower() in f.read_text().lower()[:500]:
+                files["enrichment_plan"] = {
+                    "name": f.name,
+                    "path": str(f.relative_to(REPORTS_DIR)),
+                }
+        for f in compliance_dir.glob("*readiness*.md"):
+            if device.lower() in f.name.lower() or device.lower() in f.read_text().lower()[:500]:
+                files["readiness"] = {
+                    "name": f.name,
+                    "path": str(f.relative_to(REPORTS_DIR)),
+                }
+        for f in compliance_dir.glob("week1*collection*.md"):
+            if device.lower() in f.name.lower() or device.lower() in f.read_text().lower()[:500]:
+                files["week1_collection"] = {
+                    "name": f.name,
+                    "path": str(f.relative_to(REPORTS_DIR)),
+                }
+        for f in compliance_dir.glob("week1*validation*.md"):
+            if device.lower() in f.name.lower() or device.lower() in f.read_text().lower()[:500]:
+                files["week1_validation"] = {
+                    "name": f.name,
+                    "path": str(f.relative_to(REPORTS_DIR)),
+                }
+        for f in compliance_dir.glob("week2*candidates*.md"):
+            if device.lower() in f.name.lower() or device.lower() in f.read_text().lower()[:500]:
+                files["week2_candidates"] = {
+                    "name": f.name,
+                    "path": str(f.relative_to(REPORTS_DIR)),
+                }
+
+    context = {
+        "request": request,
+        "title": f"Service Engagement: {device}",
+        "device": device,
+        "files": files,
+    }
+
+    return templates.TemplateResponse("service_engagement_device.html", context)
+
+
+@app.get("/service-engagement/{device}/responses", response_class=HTMLResponse)
+async def service_engagement_responses(request: Request, device: str):
+    """Service engagement Week 1 responses status."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    validation_file = None
+    validation_content = None
+
+    if compliance_dir.exists():
+        for f in compliance_dir.glob("week1*validation*.md"):
+            if device.lower() in f.name.lower() or device.lower() in f.read_text().lower()[:500]:
+                validation_file = {
+                    "name": f.name,
+                    "path": str(f.relative_to(REPORTS_DIR)),
+                }
+                try:
+                    validation_content = f.read_text()[:2000]  # First 2000 chars
+                except Exception:
+                    pass
+
+    context = {
+        "request": request,
+        "title": f"Week 1 Responses: {device}",
+        "device": device,
+        "validation_file": validation_file,
+        "validation_content": validation_content,
+    }
+
+    return templates.TemplateResponse("service_engagement_responses.html", context)
+
+
+@app.get("/service-engagement/{device}/week2-candidates", response_class=HTMLResponse)
+async def week2_candidates(request: Request, device: str):
+    """Week 2 review candidates from Week 1 validation."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    candidates_file = None
+    candidates_content = None
+
+    if compliance_dir.exists():
+        for f in compliance_dir.glob("week2*candidates*.md"):
+            if device.lower() in f.name.lower() or device.lower() in f.read_text().lower()[:500]:
+                candidates_file = {
+                    "name": f.name,
+                    "path": str(f.relative_to(REPORTS_DIR)),
+                }
+                try:
+                    candidates_content = f.read_text()[:2000]
+                except Exception:
+                    pass
+
+    context = {
+        "request": request,
+        "title": f"Week 2 Candidates: {device}",
+        "device": device,
+        "candidates_file": candidates_file,
+        "candidates_content": candidates_content,
+    }
+
+    return templates.TemplateResponse("week2_candidates.html", context)
+
+
+@app.get("/service-engagement/{device}/week2-review", response_class=HTMLResponse)
+async def week2_review(request: Request, device: str):
+    """Week 2 review board — ready for human review."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    review_dir = compliance_dir / "week2-review"
+    review_file = None
+    review_content = None
+    decisions_file = None
+
+    if review_dir.exists():
+        board = review_dir / "week2-review-board.md"
+        if board.exists():
+            review_file = {
+                "name": board.name,
+                "path": str(board.relative_to(REPORTS_DIR)),
+            }
+            try:
+                review_content = board.read_text()
+            except Exception:
+                pass
+
+        decisions = review_dir / "week2-review-decisions.csv"
+        if decisions.exists():
+            decisions_file = {
+                "name": decisions.name,
+                "path": str(decisions.relative_to(REPORTS_DIR)),
+            }
+
+    context = {
+        "request": request,
+        "title": f"Week 2 Review Board: {device}",
+        "device": device,
+        "review_file": review_file,
+        "review_content": review_content,
+        "decisions_file": decisions_file,
+    }
+
+    return templates.TemplateResponse("week2_review.html", context)
+
+
+@app.get("/service-engagement/{device}/approval-drafts", response_class=HTMLResponse)
+async def approval_drafts(request: Request, device: str):
+    """Approval drafts (draft_review status) pending promotion."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    review_dir = compliance_dir / "week2-review"
+    drafts_dir = review_dir / "week2-approval-drafts"
+    drafts = []
+
+    if drafts_dir.exists():
+        for draft_file in drafts_dir.glob("approval-draft-*.json"):
+            try:
+                draft_data = load_json(draft_file)
+                if draft_data:
+                    drafts.append({
+                        "name": draft_file.name,
+                        "object_key": draft_data.get("object_key", ""),
+                        "status": draft_data.get("status", ""),
+                        "action": draft_data.get("action", ""),
+                        "created_at": draft_data.get("created_at", ""),
+                        "path": str(draft_file.relative_to(REPORTS_DIR)),
                     })
             except Exception:
                 pass
 
     context = {
         "request": request,
-        "title": "Search Results",
-        "query": q,
-        "results": results[:20],
+        "title": f"Approval Drafts: {device}",
+        "device": device,
+        "drafts": drafts,
+        "total_drafts": len(drafts),
     }
 
-    return templates.TemplateResponse("search.html", context)
+    return templates.TemplateResponse("approval_drafts.html", context)
+
+
+@app.get("/service-engagement/{device}/promotion-report", response_class=HTMLResponse)
+async def promotion_report(request: Request, device: str):
+    """Week 2 draft promotion report."""
+    compliance_dir = REPORTS_DIR / "pilot-device-compliance"
+    review_dir = compliance_dir / "week2-review"
+    report_file = None
+    report_content = None
+
+    if review_dir.exists():
+        report = review_dir / "week2-promotion-report.md"
+        if report.exists():
+            report_file = {
+                "name": report.name,
+                "path": str(report.relative_to(REPORTS_DIR)),
+            }
+            try:
+                report_content = report.read_text()
+            except Exception:
+                pass
+
+    context = {
+        "request": request,
+        "title": f"Promotion Report: {device}",
+        "device": device,
+        "report_file": report_file,
+        "report_content": report_content,
+    }
+
+    return templates.TemplateResponse("promotion_report.html", context)
 
 
 # ============================================================================

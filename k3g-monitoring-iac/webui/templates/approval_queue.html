@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Approval Queue{% endblock %}
+
+{% block content %}
+<h2>Approval Queue</h2>
+
+<div class="filters">
+    <form method="get">
+        <label>Status: <input type="text" name="status" value="{{ filter_status or '' }}" placeholder="pending, approved, etc"></label>
+        <label>Device: <input type="text" name="device" value="{{ filter_device or '' }}" placeholder="device name"></label>
+        <button type="submit">Filter</button>
+    </form>
+</div>
+
+<p>Total: <strong>{{ total }}</strong> approval(s)</p>
+
+{% if pending %}
+<div class="section">
+    <h3>Pending ({{ pending | length }})</h3>
+    <ul>
+        {% for approval in pending %}
+            <li>
+                <a href="/approval-timeline/{{ approval.name.split('/')[-1] }}">{{ approval.name }}</a>
+                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">View</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if approved %}
+<div class="section">
+    <h3>Approved ({{ approved | length }})</h3>
+    <ul>
+        {% for approval in approved %}
+            <li>
+                <a href="/approval-timeline/{{ approval.name.split('/')[-1] }}">{{ approval.name }}</a>
+                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">View</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if applied %}
+<div class="section">
+    <h3>Applied ({{ applied | length }})</h3>
+    <ul>
+        {% for approval in applied %}
+            <li>
+                <a href="/approval-timeline/{{ approval.name.split('/')[-1] }}">{{ approval.name }}</a>
+                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">View</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if rejected %}
+<div class="section">
+    <h3>Rejected ({{ rejected | length }})</h3>
+    <ul>
+        {% for approval in rejected %}
+            <li>
+                <a href="/approval-timeline/{{ approval.name.split('/')[-1] }}">{{ approval.name }}</a>
+                <a href="/approvals/{{ approval.name.split('/')[-1] }}" class="button">View</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<a href="/" class="button">Back to Dashboard</a>
+{% endblock %}

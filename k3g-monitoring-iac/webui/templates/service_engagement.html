@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Service Engagement{% endblock %}
+
+{% block content %}
+<h2>Service Engagement Overview</h2>
+
+<p>Service owner engagement packages and metadata collection status.</p>
+
+<div class="card">
+    <h3>Active Devices</h3>
+    <ul>
+        <li><a href="/service-engagement/4WNET-MNS-KTG-RX">4WNET-MNS-KTG-RX (ID: 1890)</a></li>
+    </ul>
+</div>
+
+{% if engagement_files %}
+<div class="card">
+    <h3>Engagement Documents ({{ total_files }})</h3>
+    <ul>
+        {% for file in engagement_files %}
+            <li>
+                <a href="/reports/view?path={{ file.path }}">{{ file.name }}</a>
+                <a href="/reports/download?path={{ file.path }}" class="button">Download</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<h3>Quick Links</h3>
+<ul>
+    <li><a href="/approval-queue">Approval Queue</a></li>
+    <li><a href="/">Dashboard</a></li>
+    <li><a href="/devices">Devices</a></li>
+</ul>
+
+{% endblock %}

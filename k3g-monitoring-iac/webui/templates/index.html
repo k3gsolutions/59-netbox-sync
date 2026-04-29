@@ -22,6 +22,31 @@
     </div>
 
     <div class="card">
+        <h3>{{ approvals_pending }}</h3>
+        <p>Pending Approvals</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ approvals_approved }}</h3>
+        <p>Approved</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ total_apply_plans }}</h3>
+        <p>Apply Plans</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ total_batch_results }}</h3>
+        <p>Batch Results</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ batch_noop_count }}</h3>
+        <p>Batches (NO-OP)</p>
+    </div>
+
+    <div class="card">
         <h3>{{ total_incidents }}</h3>
         <p>Incidents</p>
     </div>
@@ -36,7 +61,11 @@
 
 <h3>Latest Batch Result</h3>
 {% if latest_batch %}
-    <a href="/reports/view?path={{ latest_batch.path }}" class="button">View {{ latest_batch.name }}</a>
+    <div class="card">
+        <p><strong>{{ latest_batch.name }}</strong></p>
+        <a href="/batch-results/{{ latest_batch.name }}" class="button">View Detail</a>
+        <a href="/reports/view?path={{ latest_batch.path }}" class="button">View Raw</a>
+    </div>
 {% else %}
     <p>No batch results available</p>
 {% endif %}
@@ -44,6 +73,8 @@
 <h3>Quick Links</h3>
 <ul>
     <li><a href="/devices">All Devices</a></li>
+    <li><a href="/service-engagement">Service Engagement</a></li>
+    <li><a href="/approval-queue">Approval Queue</a></li>
     <li><a href="/approvals">Approval Records</a></li>
     <li><a href="/apply-plans">Apply Plans</a></li>
     <li><a href="/batch-results">Batch Results</a></li>

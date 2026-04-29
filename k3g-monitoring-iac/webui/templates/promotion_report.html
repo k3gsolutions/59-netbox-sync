@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Promotion Report: {{ device }}{% endblock %}
+
+{% block content %}
+<h2>Week 2 Draft Promotion Report: {{ device }}</h2>
+
+<div class="card">
+    <h3>Promotion Status</h3>
+    <p>Report of drafts promoted from <code>draft_review</code> to <code>proposed</code> ApprovalRecords.</p>
+</div>
+
+{% if report_file %}
+<div class="section">
+    <h3>📊 Promotion Report</h3>
+
+    <div class="report-content">
+        {{ report_content|safe }}
+    </div>
+
+    <p style="margin-top: 20px;">
+        <a href="/reports/download?path={{ report_file.path }}" class="button">Download Report</a>
+    </p>
+</div>
+{% else %}
+<div class="alert">
+    <p>No promotion report found yet.</p>
+    <p>Run the promotion script to generate a report:</p>
+    <code>python3 promote_week2_drafts_to_approvals.py ...</code>
+</div>
+{% endif %}
+
+<h3>What Happens Next</h3>
+<ol>
+    <li>Promoted ApprovalRecords have status: <code>proposed</code></li>
+    <li>ApprovalRecords are NOT auto-approved</li>
+    <li>Manual approval/rejection workflow applied</li>
+    <li>State transitions tracked with audit trail</li>
+    <li>Monitor via Approval Queue dashboard</li>
+</ol>
+
+<h3>Related</h3>
+<ul>
+    <li><a href="/service-engagement/{{ device }}/week2-review">Week 2 Review Board</a></li>
+    <li><a href="/service-engagement/{{ device }}/approval-drafts">Approval Drafts</a></li>
+    <li><a href="/service-engagement/{{ device }}">Service Engagement</a></li>
+    <li><a href="/approval-queue">Approval Queue</a></li>
+</ul>
+
+{% endblock %}

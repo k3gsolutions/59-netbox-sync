@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Week 1 Responses{% endblock %}
+
+{% block content %}
+<h2>Week 1 Response Status: {{ device }}</h2>
+
+<div class="card">
+    <h3>Week 1 Response Validation</h3>
+    <p>Status of metadata collection responses from service teams.</p>
+
+    {% if validation_file %}
+        <div>
+            <p><strong>{{ validation_file.name }}</strong></p>
+            <div style="background: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 11px; white-space: pre-wrap;">
+                {{ validation_content }}
+            </div>
+            <p style="margin-top: 10px;">
+                <a href="/reports/view?path={{ validation_file.path }}" class="button">View Full Report</a>
+                <a href="/reports/download?path={{ validation_file.path }}" class="button">Download</a>
+            </p>
+        </div>
+    {% else %}
+        <p><em>No responses received yet. Expected by 2026-05-08.</em></p>
+    {% endif %}
+</div>
+
+<h3>Timeline</h3>
+<ul>
+    <li><strong>Week 1 (2026-05-02):</strong> Teams provide responses</li>
+    <li><strong>Week 1 EOW (2026-05-08):</strong> Response deadline</li>
+    <li><strong>Week 2 (2026-05-09):</strong> Validate + classify</li>
+    <li><strong>Week 2 (2026-05-09+):</strong> Review Week 2 candidates</li>
+</ul>
+
+<h3>Quick Links</h3>
+<ul>
+    <li><a href="/service-engagement/{{ device }}">Back to Engagement</a></li>
+    <li><a href="/service-engagement/{{ device }}/week2-candidates">Week 2 Candidates</a></li>
+    <li><a href="/service-engagement">All Engagement</a></li>
+</ul>
+
+{% endblock %}

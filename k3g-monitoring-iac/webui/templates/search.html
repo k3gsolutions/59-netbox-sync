@@ -8,17 +8,27 @@
 <p>Query: <strong>{{ query }}</strong></p>
 
 {% if results %}
-    <p>Found {{ results | length }} result(s)</p>
-    <ul>
-        {% for result in results %}
-            <li>
-                <a href="/reports/view?path={{ result.path }}">{{ result.file }}</a>
-                <p>{{ result.preview }}</p>
-            </li>
-        {% endfor %}
-    </ul>
+    <p>Found <strong>{{ total }}</strong> file(s) with {{ results | map(attribute='matches') | sum }} match(es)</p>
+    {% for result in results %}
+        <div class="card">
+            <h3><a href="/reports/view?path={{ result.path }}">{{ result.file }}</a></h3>
+            <p><strong>Matches:</strong> {{ result.matches }}</p>
+            {% if result.lines %}
+                <div class="search-matches" style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">
+                    {% for match in result.lines %}
+                        <div style="margin-bottom: 8px; border-left: 2px solid #007bff; padding-left: 8px;">
+                            <span style="color: #666;">{{ match.line_num }}:</span>
+                            <span>{{ match.highlighted | safe }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <a href="/reports/view?path={{ result.path }}" class="button">View File</a>
+            <a href="/reports/download?path={{ result.path }}" class="button">Download</a>
+        </div>
+    {% endfor %}
 {% else %}
-    <p>No results found</p>
+    <p>No results found for "<strong>{{ query }}</strong>"</p>
 {% endif %}
 
 <p><a href="/" class="button">Back to Dashboard</a></p>

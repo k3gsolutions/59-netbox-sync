@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Week 2 Review Board: {{ device }}{% endblock %}
+
+{% block content %}
+<h2>Week 2 Review Board: {{ device }}</h2>
+
+<div class="card">
+    <h3>Review Board Status</h3>
+    <p>Items ready for human review and decision.</p>
+</div>
+
+{% if review_file %}
+<div class="section">
+    <h3>📋 Review Board</h3>
+    <p><strong>{{ review_file.name }}</strong></p>
+
+    <div class="review-board">
+        {{ review_content|safe }}
+    </div>
+
+    <p style="margin-top: 20px;">
+        <a href="/reports/download?path={{ review_file.path }}" class="button">Download Board</a>
+    </p>
+</div>
+{% else %}
+<div class="alert">No review board generated yet.</div>
+{% endif %}
+
+{% if decisions_file %}
+<div class="section">
+    <h3>✏️ Decisions Template</h3>
+    <p><strong>{{ decisions_file.name }}</strong></p>
+    <p>Fill this CSV with your decisions (approve_for_approval_record, request_changes, reject, defer, block)</p>
+
+    <p>
+        <a href="/reports/view?path={{ decisions_file.path }}" class="button">View</a>
+        <a href="/reports/download?path={{ decisions_file.path }}" class="button">Download</a>
+    </p>
+</div>
+{% endif %}
+
+<h3>Next Steps</h3>
+<ol>
+    <li>Review each item in the Review Board</li>
+    <li>Fill decisions in the CSV (approve_for_approval_record, request_changes, reject, defer, block)</li>
+    <li>Fill reviewer name and reviewed_at timestamp</li>
+    <li>Set approval_record_allowed=true for items to promote</li>
+    <li>Run: python3 promote_week2_drafts_to_approvals.py</li>
+    <li>Verify promoted ApprovalRecords in approval-drafts section</li>
+</ol>
+
+<h3>Related</h3>
+<ul>
+    <li><a href="/service-engagement/{{ device }}/responses">Week 1 Responses</a></li>
+    <li><a href="/service-engagement/{{ device }}/week2-candidates">Week 2 Candidates</a></li>
+    <li><a href="/service-engagement/{{ device }}/approval-drafts">Approval Drafts</a></li>
+    <li><a href="/service-engagement/{{ device }}/promotion-report">Promotion Report</a></li>
+    <li><a href="/service-engagement/{{ device }}">Service Engagement</a></li>
+</ul>
+
+{% endblock %}

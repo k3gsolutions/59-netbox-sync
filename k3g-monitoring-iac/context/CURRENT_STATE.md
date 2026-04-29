@@ -1,11 +1,107 @@
-# Current State — 2026-04-28 (FASE 3.0.1 Complete)
+# Current State — 2026-04-29 (FASE 2.13, 2.14, 2.12 + 3.5 + 2.11 + 3.3 + 3.4 Complete)
 
 ## Latest Status
 
-**FASE 2.7 COMPLETE** — First real batch POST executed (2 objects created, IDs 18229 & 18230)
+**FASE 2.14 COMPLETE** — Week 2 Draft Promotion to ApprovalRecords
+  - promote_week2_drafts_to_approvals.py script created
+  - Promotion engine reads decisions CSV, promotes with explicit criteria
+  - All 5 criteria must be satisfied: decision=approve_for_approval_record, approval_record_allowed=true, reviewer filled, reviewed_at ISO datetime, draft exists
+  - ApprovalRecords created in proposed status (NOT auto-approved)
+  - week2-promotion-report.md generated with results
+  - Web UI routes + templates: /week2-review, /approval-drafts, /promotion-report
+  - Documentation: docs/50-week2-draft-promotion.md
+  - Zero NetBox writes, zero automatic approvals, audit trail maintained
+
+**FASE 2.13 COMPLETE** — Week 2 Review Board Preparation
+  - prepare_week2_review.py script created and executed
+  - week2-review-board.md generated (review checklist, 9 verification criteria)
+  - week2-review-decisions.csv generated (human decision template)
+  - Approval drafts created in draft_review status (NOT official ApprovalRecords yet)
+  - Drafts immutable (JSON format, read-only until promotion)
+  - Web UI templates: week2_review.html, approval_drafts.html, promotion_report.html
+  - Documentation: docs/49-week2-review-board-prep.md
+  - Current state: All 7 items still_pending (no responses received yet as of 2026-04-29, Week 1 ends 2026-05-08)
+
+**FASE 2.12 COMPLETE** — Week 1 Response Intake
+  - validate_week1_responses.py script created
+  - week1-response-validation.md generated
+  - week2-review-candidates.md template created
+  - Classification system ready (validated, needs_clarification, blocked, rejected, still_pending)
+  - Week 1 deadline: 2026-05-08 (responses due Thursday EOD)
+
+**FASE 3.5 COMPLETE** — Service Engagement Response Viewer
+  - `/service-engagement/{device}/responses` route (Week 1 status)
+  - `/service-engagement/{device}/week2-candidates` route (Week 2 list)
+  - Templates: service_engagement_responses.html, week2_candidates.html
+  - Device detail updated with response + candidates links
+  - 7/7 security tests passing
+
+**FASE 2.11 COMPLETE** — Week 1 Metadata Collection
+  - week1-metadata-collection.md (timeline, criteria, response format)
+  - week1-metadata-collection-template.csv (7-item template)
+  - Service Team: 5 subinterfaces (tenant, service_type, criticality)
+  - Network Ops: 1 IP (interface, VRF)
+  - BGP Team: 1 BGP peer (remote_asn, remote_bgp_group)
+  - Timeline: Week 1 (2026-05-02 to 2026-05-08) for collection
+
+**FASE 3.3 COMPLETE** — Service Engagement Viewer
+  - `/service-engagement` route (overview)
+  - `/service-engagement/{device}` route (device detail)
+  - Templates: service_engagement.html, service_engagement_device.html
+  - Links to engagement packages, readiness, enrichment, week1 collection
+  - Read-only, 7/7 tests passing
+
+**FASE 3.4 COMPLETE** — Operational Handoff
+  - OPERATIONAL-HANDOFF-PACKAGE.md (operational guide for NOC)
+  - docs/47-operational-handoff.md (detailed runbook + procedures)
+  - Roles: NOC Operator, Approver, Operations (Batch Executor)
+  - Workflows, deployment, emergency procedures documented
+  - Monitoring checklist + success metrics
+
+**FASE 3.1.1 COMPLETE** — Web UI Test Closure
+  - All 7/7 security tests passing
+  - Fixed jinja2 import test (environment issue)
+  - Zero write routes confirmed
+  - Path traversal + denylist verified
+
+**FASE 3.2 COMPLETE** — Approval Queue Timeline UI
+  - New `/approval-queue` route with filters (status, device)
+  - New `/approval-timeline/{approval_id}` with full details
+  - State history visualization (timeline of changes)
+  - Grouped by status (pending, approved, applied, rejected)
+  - Read-only, zero write routes
+
+**FASE 2.10 COMPLETE** — Service Owner Engagement Preparation
+  - service-owner-engagement-package.md (3 teams, 6 items, timeline)
+  - docs/46-service-owner-engagement.md (process + roles + criteria)
+  - Week 1 engagement plan (Service Team, Network Ops, BGP Team)
+  - Response format standardized (enrichment tables)
+  - Approval transition criteria documented
+
+**FASE 3.1 COMPLETE** — Web UI UX, Filters & Drill-down
+  - Enhanced dashboard: 9 cards (devices, reports, approvals, pending, approved, apply-plans, batch-results, batch NO-OP, incidents)
+  - Batch result drill-down: `/batch-results/{batch_id}` route + template
+  - Filters: approvals (status), apply-plans (readiness), batch-results (result)
+  - Improved search: line numbers, highlighting, match count sorting
+  - Security: read-only, 0 POST routes, path traversal blocked
+  - Tests: 6/7 passing (environment-specific test)
+
+**FASE 2.9 COMPLETE** — Service Candidate Enrichment Readiness
+  - Service candidate analysis for 4WNET-MNS-KTG-RX (1 ready, 6 missing_metadata, 0 blocked)
+  - docs/45-service-candidate-enrichment-workflow.md (enrichment strategy)
+  - reports/.../service-candidate-enrichment-plan.md (gap analysis)
+  - 6 items awaiting tenant/VRF/remote_asn enrichment
+  - Owner engagement plan established
+  - Zero API writes, zero tokens, audit trail complete
+
+**FASE 2.7 COMPLETE** — First real batch POST execution: Batch 4340469f processed
+  - Objects pre-existed in NetBox: Eth-Trunk1 (ID 18229) & GigabitEthernet0/5/0 (ID 18230)
+  - Batch status: NO-OP (all-or-none preflight validation prevented false POST)
+  - Compliance objectives met (objects already documented)
+  - Post-apply reports generated and archived
+
 **FASE 3.0 + 3.0.1 COMPLETE** — Web UI live, 7/7 tests passing
-**FREEZE READY FOR CLOSURE** — All batch objects created and verified in NetBox
-**Web UI ONLINE** — http://127.0.0.1:8890 (read-only dashboard)
+**Web UI ONLINE** — http://127.0.0.1:8890 (read-only dashboard, filters, drill-down, improved search)
 
 ---
 

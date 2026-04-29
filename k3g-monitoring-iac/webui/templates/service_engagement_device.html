@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Service Engagement: {{ device }}{% endblock %}
+
+{% block content %}
+<h2>Service Engagement: {{ device }}</h2>
+
+<div class="card">
+    <h3>Device: {{ device }}</h3>
+    <p>Service owner engagement materials and metadata collection status.</p>
+</div>
+
+{% if files.engagement_package %}
+<div class="section">
+    <h3>📦 Engagement Package</h3>
+    <p>{{ files.engagement_package.name }}</p>
+    <a href="/reports/view?path={{ files.engagement_package.path }}" class="button">View</a>
+    <a href="/reports/download?path={{ files.engagement_package.path }}" class="button">Download</a>
+</div>
+{% endif %}
+
+{% if files.week1_collection %}
+<div class="section">
+    <h3>📋 Week 1 Metadata Collection</h3>
+    <p>{{ files.week1_collection.name }}</p>
+    <a href="/reports/view?path={{ files.week1_collection.path }}" class="button">View</a>
+    <a href="/reports/download?path={{ files.week1_collection.path }}" class="button">Download</a>
+</div>
+{% endif %}
+
+{% if files.readiness %}
+<div class="section">
+    <h3>✓ Readiness Analysis</h3>
+    <p>{{ files.readiness.name }}</p>
+    <a href="/reports/view?path={{ files.readiness.path }}" class="button">View</a>
+    <a href="/reports/download?path={{ files.readiness.path }}" class="button">Download</a>
+</div>
+{% endif %}
+
+{% if files.enrichment_plan %}
+<div class="section">
+    <h3>📊 Enrichment Plan</h3>
+    <p>{{ files.enrichment_plan.name }}</p>
+    <a href="/reports/view?path={{ files.enrichment_plan.path }}" class="button">View</a>
+    <a href="/reports/download?path={{ files.enrichment_plan.path }}" class="button">Download</a>
+</div>
+{% endif %}
+
+{% if files.week1_validation %}
+<div class="section">
+    <h3>✓ Week 1 Response Validation</h3>
+    <p>{{ files.week1_validation.name }}</p>
+    <a href="/service-engagement/{{ device }}/responses" class="button">View Status</a>
+    <a href="/reports/view?path={{ files.week1_validation.path }}" class="button">View Full Report</a>
+    <a href="/reports/download?path={{ files.week1_validation.path }}" class="button">Download</a>
+</div>
+{% endif %}
+
+{% if files.week2_candidates %}
+<div class="section">
+    <h3>📋 Week 2 Review Candidates</h3>
+    <p>{{ files.week2_candidates.name }}</p>
+    <a href="/service-engagement/{{ device }}/week2-candidates" class="button">View Candidates</a>
+    <a href="/reports/view?path={{ files.week2_candidates.path }}" class="button">View Full Document</a>
+    <a href="/reports/download?path={{ files.week2_candidates.path }}" class="button">Download</a>
+</div>
+{% endif %}
+
+<div class="section">
+    <h3>🔍 Week 2 Review & Approval Drafts</h3>
+    <p>Human review process, decisions, and draft promotion.</p>
+    <a href="/service-engagement/{{ device }}/week2-review" class="button">Review Board</a>
+    <a href="/service-engagement/{{ device }}/approval-drafts" class="button">Approval Drafts</a>
+    <a href="/service-engagement/{{ device }}/promotion-report" class="button">Promotion Report</a>
+</div>
+
+<h3>Related</h3>
+<ul>
+    <li><a href="/devices/{{ device }}">Device Details</a></li>
+    <li><a href="/service-engagement">All Engagement</a></li>
+    <li><a href="/approval-queue">Approval Queue</a></li>
+</ul>
+
+{% endblock %}

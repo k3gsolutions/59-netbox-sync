@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Week 2 Candidates{% endblock %}
+
+{% block content %}
+<h2>Week 2 Review Candidates: {{ device }}</h2>
+
+<div class="card">
+    <h3>Items Ready for Review</h3>
+    <p>Service candidate items validated in Week 1 and ready for Week 2 review process.</p>
+
+    {% if candidates_file %}
+        <div>
+            <p><strong>{{ candidates_file.name }}</strong></p>
+            <div style="background: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 11px; white-space: pre-wrap;">
+                {{ candidates_content }}
+            </div>
+            <p style="margin-top: 10px;">
+                <a href="/reports/view?path={{ candidates_file.path }}" class="button">View Full Document</a>
+                <a href="/reports/download?path={{ candidates_file.path }}" class="button">Download</a>
+            </p>
+        </div>
+    {% else %}
+        <p><em>No validated candidates yet. Awaiting Week 1 response intake (expected 2026-05-09).</em></p>
+    {% endif %}
+</div>
+
+<h3>Week 2 Review Process</h3>
+<ol>
+    <li><strong>Item Summary</strong> — Object type, key, enriched metadata, owner, evidence</li>
+    <li><strong>Risk Assessment</strong> — Naming, parents, consistency, secrets check</li>
+    <li><strong>Approval Recommendation</strong> — Low/medium/high risk → approval tier</li>
+    <li><strong>ApprovalRecord Creation</strong> — Manual only, no automation</li>
+</ol>
+
+<h3>Week 2 Timeline</h3>
+<ul>
+    <li><strong>Monday (2026-05-09):</strong> Validate Week 1 responses</li>
+    <li><strong>Tuesday-Thursday:</strong> Review validated items</li>
+    <li><strong>Friday:</strong> ApprovalRecord recommendations ready</li>
+</ul>
+
+<h3>Key Points</h3>
+<ul>
+    <li>✅ No automatic ApprovalRecord creation</li>
+    <li>✅ Manual review required for each item</li>
+    <li>✅ Risk assessment before approval</li>
+    <li>✅ Zero NetBox API calls</li>
+    <li>✅ All decisions audit-trailed</li>
+</ul>
+
+<h3>Quick Links</h3>
+<ul>
+    <li><a href="/service-engagement/{{ device }}/responses">Week 1 Responses</a></li>
+    <li><a href="/service-engagement/{{ device }}">Back to Engagement</a></li>
+    <li><a href="/approval-queue">Approval Queue</a></li>
+</ul>
+
+{% endblock %}
