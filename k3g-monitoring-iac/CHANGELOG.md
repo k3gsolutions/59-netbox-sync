@@ -2,6 +2,29 @@
 
 ## [Unreleased]
 
+### Added — FASES CANDIDATES-001–024: Complete Compliance Candidate Discovery
+
+**FASES CANDIDATES-001–004** — Read-only NetBox integration:
+- NetBox GET-only client with token from env vars (NETBOX_URL, NETBOX_TOKEN)
+- Device eligibility: 4 cumulative gates (active, Compliance=true, tenant present, K3G Solutions group)
+- Dashboard with HTML form + modal confirmation
+- API: `GET /compliance/candidates`, `POST /compliance/analyze` recheck gate
+
+**FASES CANDIDATES-013–018** — Performance & security optimization:
+- Selective search: id/name/q params only (no bulk fetch on page load)
+- Minimal payload: project only 13 necessary fields, strip config_context/local_context_data
+- Rejection diagnostics: why devices don't qualify
+- Safety blocks in all responses (read_only, no writes, no device connections)
+
+**FASES CANDIDATES-019–024** — Tenant group enrichment:
+- Secondary GET call to /api/tenancy/tenants/{id}/ when device lacks group
+- In-memory cache to avoid repeat calls for same tenant
+- Improved rejection reasons: tenant_missing, tenant_group_missing, wrong_tenant_group
+- Device 1890 case: now correctly enriched and passes eligibility gates
+- API response diagnostics for rejected devices (tenant_id, tenant name, group)
+
+**Test Suite: 58 compliance candidate unit tests all passing**
+
 ### Added — FASES 4.94, 4.95, 4.96, 4.97: Cycle-003 Retry-001 Preparation
 
 **FASE 4.94** — Root Cause Confirmation:
