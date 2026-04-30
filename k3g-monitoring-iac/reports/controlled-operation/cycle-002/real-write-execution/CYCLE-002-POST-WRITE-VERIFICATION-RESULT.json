@@ -1,16 +1,22 @@
 {
   "cycle_id": "cycle-002",
-  "decision": "CYCLE_POST_WRITE_VERIFICATION_FAILED",
-  "status": "CYCLE_POST_WRITE_VERIFICATION_FAILED",
-  "issues": [
-    "secret keyword found in execution result"
+  "decision": "CYCLE_POST_WRITE_VERIFICATION_PASSED_WITH_DRIFT",
+  "status": "CYCLE_POST_WRITE_VERIFICATION_PASSED_WITH_DRIFT",
+  "items": [
+    {
+      "object_type": "ip_address",
+      "object_key": "203.0.113.1",
+      "verification_status": "drift",
+      "verified_object": {
+        "id": 6324,
+        "address": "203.0.113.1/32",
+        "status": {
+          "value": "active",
+          "label": "Active"
+        },
+        "description": "Cycle-002 controlled operation - 4WNET-MNS-KTG-RX - staged IP address"
+      }
+    }
   ],
-  "items": [],
-  "safety_confirmations": {
-    "local_only": true,
-    "no_network_call": true,
-    "no_token_read": true,
-    "no_netbox_write": true,
-    "no_apply_execution": true
-  }
+  "verified_at": "2026-04-30T06:09:05.657323+00:00"
 }

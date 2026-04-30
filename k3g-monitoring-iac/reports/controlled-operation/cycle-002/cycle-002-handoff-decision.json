@@ -1,0 +1,18 @@
+{
+  "decision_id": "handoff-cycle-002-20260430060910",
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decided_at": "2026-04-30T06:09:10.404703+00:00",
+  "decision": "CYCLE_CLOSED_WITH_RESTRICTIONS",
+  "reason": "Execution completed with warnings - restrições mantidas",
+  "closure_status": "CYCLE_CLOSED_WITH_WARNINGS",
+  "archive_status": "CYCLE_ARCHIVED_SUCCESS",
+  "restrictions": [
+    "Manter max_items=3",
+    "Manter allowed_methods=[POST]",
+    "Manter 1 device por ciclo",
+    "Manter STAY_CURRENT_LEVEL de expansão",
+    "Normalizar validadores para enum/status"
+  ]
+}

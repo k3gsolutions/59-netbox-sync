@@ -1,5 +1,5 @@
 {
-  "evaluated_at": "2026-04-30T02:14:13.917524+00:00",
+  "evaluated_at": "2026-04-30T06:09:18.822487+00:00",
   "total_cycles": 2,
   "successful_cycles": 0,
   "action_required_cycles": 0,
@@ -26,23 +26,14 @@
   },
   "policy_version": "1.0",
   "metrics_snapshot": {
-    "total_cycles": 1,
-    "cycles_planned": 1,
-    "cycles_intake_ready": 1,
-    "cycles_week1_ready": 1,
+    "measured_at": "2026-04-30T06:09:18.409311+00:00",
+    "total_cycles_defined": 2,
     "cycles_completed": 0,
-    "cycles_blocked": 0,
-    "total_items": 0,
-    "items_write_executed": 0,
-    "items_verification_passed": 0,
-    "items_verification_failed": 0,
-    "cycles": {
-      "cycle-001": {
-        "status": "PLANNED_NOT_STARTED",
-        "intake_status": "CYCLE_INTAKE_READY",
-        "week1_status": "WEEK1_READY_FOR_RESPONSES"
-      }
-    },
-    "generated_at": "2026-04-30T00:51:40.980586+00:00"
+    "cycles_closed_success": 0,
+    "cycles_closed_with_warnings": 0,
+    "cycles_action_required": 0,
+    "handoff_ready": 0,
+    "handoff_with_restrictions": 0,
+    "handoff_action_required": 0
   }
 }

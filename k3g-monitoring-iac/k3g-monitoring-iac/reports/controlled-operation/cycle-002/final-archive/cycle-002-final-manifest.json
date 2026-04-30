@@ -1,0 +1,77 @@
+{
+  "archive_id": "archive-cycle-002-20260430060750",
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "archived_at": "2026-04-30T06:07:50.745028+00:00",
+  "status": "CYCLE_ARCHIVED_SUCCESS",
+  "closure_status": "",
+  "artifacts": {
+    "week1_intake": {
+      "path": "reports/controlled-operation/cycle-002/week1/cycle-002-week1-intake.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "week1_validation": {
+      "path": "reports/controlled-operation/cycle-002/week1/cycle-002-week1-validation.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "week2_human_review": {
+      "path": "reports/controlled-operation/cycle-002/week2/cycle-002-week2-human-review.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "approval_records": {
+      "path": "reports/controlled-operation/cycle-002/approvals/approved/approval-203-0-113-1.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "applyplan_dryrun": {
+      "path": "reports/controlled-operation/cycle-002/apply-plans/dry-run/apply-plan-cycle-002-4bb0729f.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "dryrun_simulation": {
+      "path": "reports/controlled-operation/cycle-002/apply-plans/cycle-002-dryrun-simulation-result.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "real_write_authorization": {
+      "path": "reports/controlled-operation/cycle-002/real-write-authorization/authorization_request.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "execution_package": {
+      "path": "reports/controlled-operation/cycle-002/real-write-execution/execution_package.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "execution_result": {
+      "path": "reports/controlled-operation/cycle-002/real-write-execution/CYCLE-002-REAL-WRITE-EXECUTION-RESULT.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "post_write_verification": {
+      "path": "reports/controlled-operation/cycle-002/real-write-execution/CYCLE-002-POST-WRITE-VERIFICATION-RESULT.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "compliance_rerun": {
+      "path": "reports/controlled-operation/cycle-002/real-write-execution/CYCLE-002-POST-WRITE-COMPLIANCE-RERUN.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    },
+    "closure_summary": {
+      "path": "reports/controlled-operation/cycle-002/real-write-execution/closure/cycle-002-closure-summary.json",
+      "sha256": "NOT_FOUND",
+      "exists": false
+    }
+  },
+  "security_checks": {
+    "has_forbidden_terms": false,
+    "token_logged": false,
+    "env_file": false,
+    "sync_call": false
+  }
+}

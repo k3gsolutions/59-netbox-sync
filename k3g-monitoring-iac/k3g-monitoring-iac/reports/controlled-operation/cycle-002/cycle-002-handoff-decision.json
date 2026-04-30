@@ -1,0 +1,12 @@
+{
+  "decision_id": "handoff-cycle-002-20260430060807",
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decided_at": "2026-04-30T06:08:07.624011+00:00",
+  "decision": "CYCLE_ACTION_REQUIRED",
+  "reason": "Unknown: closure=, archive=CYCLE_ARCHIVED_SUCCESS",
+  "closure_status": "",
+  "archive_status": "CYCLE_ARCHIVED_SUCCESS",
+  "restrictions": []
+}

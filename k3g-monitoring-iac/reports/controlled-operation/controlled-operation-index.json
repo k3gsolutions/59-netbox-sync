@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-04-30T02:14:33.538227+00:00",
+  "measured_at": "2026-04-30T06:09:18.616041+00:00",
   "total_cycles": 2,
   "overall_status": "WITH_RESTRICTIONS",
   "cycles": [
@@ -48,9 +48,9 @@
       "cycle_id": "cycle-002",
       "device": "4WNET-MNS-KTG-RX",
       "device_id": "1890",
-      "current_status": "planned",
-      "handoff_decision": "",
-      "closure_decision": "",
+      "current_status": "closed_with_restrictions",
+      "handoff_decision": "CYCLE_CLOSED_WITH_RESTRICTIONS",
+      "closure_decision": "CYCLE_CLOSED_WITH_WARNINGS",
       "total_items": 0,
       "max_items": 3,
       "allowed_methods": [
@@ -72,16 +72,18 @@
       "requires_applyplan_dryrun": true,
       "requires_real_write_authorization": true,
       "requires_post_write_verification": true,
-      "next_action": "Planejar Week 1",
+      "next_action": "Revisar restri\u00e7\u00f5es antes de ampliar",
       "key_artifacts": [
         "cycle-002/CYCLE-002-SCOPE.json",
-        "cycle-002/CYCLE-002-STATUS.md"
+        "cycle-002/CYCLE-002-STATUS.md",
+        "cycle-002/cycle-002-handoff-decision.json",
+        "cycle-002/real-write-execution/closure/cycle-002-closure-summary.json"
       ],
       "scope_file": "cycle-002/CYCLE-002-SCOPE.json",
       "status_file": "cycle-002/CYCLE-002-STATUS.md",
-      "handoff_file": null,
+      "handoff_file": "cycle-002/cycle-002-handoff-decision.json",
       "manifest_file": null,
-      "closure_file": null,
+      "closure_file": "cycle-002/real-write-execution/closure/cycle-002-closure-summary.json",
       "sensitive_hits": []
     }
   ]

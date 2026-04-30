@@ -3,14 +3,14 @@
 ## 1. Overall Status
 - Status: WITH_RESTRICTIONS
 - Total Cycles: 2
-- Measured at: 2026-04-30T02:14:33.538227+00:00
+- Measured at: 2026-04-30T06:09:18.616041+00:00
 
 ## 2. Cycle Summary
 
 | Cycle | Device | Status | Items | Handoff | Next Action |
 |-------|--------|--------|-------|---------|-------------|
 | cycle-001 | 4WNET-MNS-KTG-RX | closed_with_restrictions | 0/3 | READY_WITH_RESTRICTIONS | Revisar restrições antes de ampliar |
-| cycle-002 | 4WNET-MNS-KTG-RX | planned | 0/3 | N/A | Planejar Week 1 |
+| cycle-002 | 4WNET-MNS-KTG-RX | closed_with_restrictions | 0/3 | CYCLE_CLOSED_WITH_RESTRICTIONS | Revisar restrições antes de ampliar |
 
 ## 3. Detailed Status
 
@@ -31,16 +31,16 @@
 
 ### cycle-002 — 4WNET-MNS-KTG-RX
 
-- **Status:** planned
+- **Status:** closed_with_restrictions
 - **Device ID:** 1890
 - **Max Items:** 3
 - **Total Items Processed:** 0
 - **Allowed Methods:** POST
 - **Forbidden Methods:** PATCH, DELETE
-- **Handoff Decision:** N/A
-- **Closure Decision:** N/A
-- **Artifacts:** cycle-002/CYCLE-002-SCOPE.json, cycle-002/CYCLE-002-STATUS.md
-- **Next Action:** Planejar Week 1
+- **Handoff Decision:** CYCLE_CLOSED_WITH_RESTRICTIONS
+- **Closure Decision:** CYCLE_CLOSED_WITH_WARNINGS
+- **Artifacts:** cycle-002/CYCLE-002-SCOPE.json, cycle-002/CYCLE-002-STATUS.md, cycle-002/cycle-002-handoff-decision.json, cycle-002/real-write-execution/closure/cycle-002-closure-summary.json
+- **Next Action:** Revisar restrições antes de ampliar
 
 ---
 
@@ -53,4 +53,4 @@ Cycles and their essential files:
 - Closure summaries in `cycle-*/real-write-execution/closure/` or `cycle-*/final-archive/`
 
 ---
-Index built at 2026-04-30T02:14:33.538227+00:00
+Index built at 2026-04-30T06:09:18.616041+00:00
