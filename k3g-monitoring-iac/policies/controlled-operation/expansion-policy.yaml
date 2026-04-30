@@ -1,0 +1,113 @@
+version: "1.0"
+
+description: |
+  Controlled expansion policy for multi-cycle operations.
+  Limits enforced at each level. No automatic expansion.
+
+current_limits:
+  max_devices_per_cycle: 1
+  max_items_per_cycle: 3
+  allowed_methods:
+    - POST
+  forbidden_methods:
+    - PATCH
+    - DELETE
+  forbidden_targets:
+    - /sync
+    - equipment
+    - ssh
+    - netconf
+  retry_policy: none
+  rollback_policy: manual_only
+
+expansion_levels:
+  level_0_pilot:
+    name: "Pilot (Level 0)"
+    max_cycles_required: 1
+    max_devices_per_cycle: 1
+    max_items_per_cycle: 3
+    description: "Single device, 3 items, POST-only. No expansion yet."
+
+  level_1_controlled:
+    name: "Controlled Expansion (Level 1)"
+    required_successful_cycles: 2
+    max_devices_per_cycle: 1
+    max_items_per_cycle: 5
+    description: "Increase items to 5. Still single device. Requires 2 successful cycles."
+
+  level_2_limited_scale:
+    name: "Limited Scale (Level 2)"
+    required_successful_cycles: 5
+    max_devices_per_cycle: 2
+    max_items_per_cycle: 7
+    requires_manager_approval: true
+    description: "Expand to 2 devices, 7 items. Requires 5 successful cycles + manager approval."
+
+  level_3_extended:
+    name: "Extended Scale (Level 3)"
+    required_successful_cycles: 10
+    max_devices_per_cycle: 5
+    max_items_per_cycle: 10
+    requires_formal_change_control: true
+    description: "5 devices, 10 items per cycle. Requires 10 successful cycles + change control."
+
+promotion_rules:
+  require_no_action_required_cycles: true
+  require_zero_token_exposure: true
+  require_zero_unverified_writes: true
+  require_post_write_verification_passed: true
+  require_compliance_rerun_passed: true
+  require_closure_success_or_restrictions: true
+
+guardrails:
+  - must_complete_week1_week2_review
+  - must_have_manual_approvals
+  - must_generate_dryrun_applyplan
+  - must_execute_dryrun_simulation
+  - must_get_real_write_authorization
+  - must_execute_real_write_once
+  - must_verify_post_write
+  - must_run_compliance_rerun
+  - must_create_closure_package
+  - must_archive_with_secrets_check
+
+decision_matrix:
+  - cycles_completed: 0
+    recommendation: "STAY_CURRENT_LEVEL"
+    action: "Begin with Level 0 (pilot)"
+  - cycles_completed: 1
+    successful: 1
+    recommendation: "ELIGIBLE_FOR_LEVEL_1_CONTROLLED"
+    action: "Can increase items to 5, same device"
+  - cycles_completed: 5
+    successful: 5
+    recommendation: "ELIGIBLE_FOR_LEVEL_2_LIMITED_SCALE"
+    action: "Can expand to 2 devices (requires manager approval)"
+  - cycles_completed: 10
+    successful: 10
+    recommendation: "ELIGIBLE_FOR_LEVEL_3_EXTENDED"
+    action: "Can expand to 5 devices (requires formal change control)"
+
+safety_gates:
+  - gate: "no_action_required"
+    blocks: true
+    description: "Any action-required cycle blocks all expansions"
+  - gate: "all_guardrails_enforced"
+    blocks: true
+    description: "Missing any mandatory guardrail blocks expansion"
+  - gate: "token_security"
+    blocks: true
+    description: "Token exposure in any cycle blocks expansion"
+
+approval_levels:
+  level_0_pilot: "No approval needed"
+  level_1_controlled: "No approval needed"
+  level_2_limited_scale: "Manager approval required"
+  level_3_extended: "Formal change control + risk assessment"
+
+implementation_notes:
+  - Limits never auto-increase
+  - Recommendations only; human decides expansion
+  - Each level requires explicit policy update
+  - All guardrails must pass before considering expansion
+  - Token security non-negotiable
