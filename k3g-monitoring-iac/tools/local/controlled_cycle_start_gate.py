@@ -39,13 +39,12 @@ def main() -> int:
             blockers.append("previous handoff decision missing")
         elif "ACTION_REQUIRED" in previous_decision:
             blockers.append("previous cycle action required")
-        elif "READY" in previous_decision:
-            if "WITH_RESTRICTIONS" in previous_decision:
-                decision = "CYCLE_START_READY_WITH_RESTRICTIONS"
-                reason = "previous cycle completed with restrictions"
-            else:
-                decision = "CYCLE_START_READY"
-                reason = "previous cycle ready for next operation"
+        elif "CLOSED_WITH_RESTRICTIONS" in previous_decision or "READY_WITH_RESTRICTIONS" in previous_decision:
+            decision = "CYCLE_START_READY_WITH_RESTRICTIONS"
+            reason = "previous cycle completed with restrictions"
+        elif "READY" in previous_decision or "CLOSED_SUCCESS" in previous_decision:
+            decision = "CYCLE_START_READY"
+            reason = "previous cycle ready for next operation"
         else:
             blockers.append(f"unsupported previous decision: {previous_decision}")
 

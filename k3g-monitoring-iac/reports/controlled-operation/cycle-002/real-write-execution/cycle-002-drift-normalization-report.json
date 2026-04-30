@@ -1,0 +1,18 @@
+{
+  "analysis_id": "drift-norm-cycle-002-20260430061407",
+  "cycle_id": "cycle-002",
+  "analyzed_at": "2026-04-30T06:14:07.465198+00:00",
+  "overall_decision": "DRIFT_FORMAT_ONLY_OPERATIONAL",
+  "drift_items": [
+    {
+      "object_key": "203.0.113.1",
+      "type": "verification_drift",
+      "fields": [],
+      "overall": "NON_BLOCKING"
+    }
+  ],
+  "verification_status": "CYCLE_POST_WRITE_VERIFICATION_PASSED_WITH_DRIFT",
+  "compliance_status": "CYCLE_POST_WRITE_COMPLIANCE_PASSED_WITH_WARNINGS",
+  "closure_status": "CYCLE_CLOSED_WITH_WARNINGS",
+  "recommendation": "Cycle-002 operationally successful. Format drift non-blocking."
+}
