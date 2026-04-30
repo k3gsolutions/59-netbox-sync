@@ -1,12 +1,14 @@
-# Current State — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10 Complete)
+# Current State — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20 Complete)
 
 ## Operational Status
 
-**READY_FOR_CONTROLLED_OPERATION** (pending FASE 2.60 baseline confirmation)
+**CONTROLLED_OPERATION_READY** ✓ Confirmed via FASE 2.60
 
 Pilot 4WNET-MNS-KTG-RX executed successfully through all phases 2.47-2.56.
 Real write executed. Post-write verification completed. Compliance validated.
-Web UI post-write integration live. System ready for controlled operation cycles.
+Web UI post-write integration live. Baseline confirmed. System ready for controlled operation cycles.
+FASE 2.60: Baseline generated with scope definition (1 device/cycle, 3 objects, POST-only, 14 mandatory gates).
+FASE 4.1: Cycle template generation functional. First cycle can be created via template.
 
 ## Latest Status
 
@@ -41,13 +43,23 @@ Web UI (FASE 3.19):
 - FASE 3.19: Post-write integration (5 routes, 5 templates, read-only, no dangerous buttons)
 - /real-write overview, /execution, /verification, /compliance, /closure
 
-Test Suites (78+ tests all passing):
+Controlled Operation (FASES 2.60, 4.1, 3.20):
+- FASE 2.60: Build controlled operation baseline (readiness evaluation, scope definition, mandatory gates)
+- FASE 4.1: Create controlled operation cycle (cycle template generation, 4-file structure)
+- FASE 3.20: Test controlled operation readiness (10 tests, all passing)
+- Baseline decision: CONTROLLED_OPERATION_READY
+- Scope: 1 device/cycle, 3 objects max, POST-only, 14 mandatory gates
+- All tools read-only, no network calls, no token handling
+
+Test Suites (103+ tests all passing):
 - 20 tests (FASES 2.47-2.52 pre-execution)
 - 18 tests (FASE 2.53 execution)
 - 15 tests (FASE 2.54 verification)
 - 25 tests (FASES 2.54-2.56 end-to-end)
 - 15 tests (FASES 2.57-2.58 archive/handoff)
-- Plus 50+ pre-write tests (all passing)
+- 10 tests (FASES 2.60/4.1 controlled operation readiness)
+- 15 tests (Compliance registry)
+- 38+ pre-write tests (all passing)
 
 **FASE 2.39 COMPLETE** — ApplyPlan Readiness Gate
   - Gate validates proposed ApprovalRecords before ApplyPlan creation

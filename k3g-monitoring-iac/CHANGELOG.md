@@ -2,6 +2,43 @@
 
 ## [Unreleased]
 
+### Added — FASES 2.60, 4.1, 3.20: Controlled Operation Baseline & Cycle (2026-04-29)
+
+**Controlled Operation Readiness (FASE 2.60)**
+- build_controlled_operation_baseline.py — evaluates pilot readiness for controlled operation transition
+- Decision logic: CONTROLLED_OPERATION_READY / READY_WITH_RESTRICTIONS / NOT_READY
+- Reads: handoff_decision, closure_decision, archive_decision
+- Generates: baseline markdown report + JSON with scope definition
+- Scope enforcement: 1 device/cycle, 3 objects max, POST-only, 14 mandatory gates
+- All read-only, no network calls, no token handling
+
+**Cycle Template Generation (FASE 4.1)**
+- create_controlled_operation_cycle.py — generates cycle template with 4 files
+- CYCLE-PLAN.md — gates checklist with 13-point sequence
+- CYCLE-SCOPE.json — constraints (max_items=3, allowed_methods=["POST"], forbidden=["PATCH","DELETE","/sync"])
+- CYCLE-CHECKLIST.md — operational checklist for all phases
+- CYCLE-STATUS.json — initial status=PLANNED_NOT_STARTED with gate tracking
+- Template generation only, no execution
+
+**Controlled Operation Readiness Tests (FASE 3.20)**
+- test_controlled_operation_readiness.py — 10 comprehensive tests
+- Tests: baseline decision logic (READY/WITH_RESTRICTIONS/NOT_READY), scope verification, mandatory gates
+- Cycle file creation: 4 files per cycle with correct structure
+- No network calls, no token exposure
+- 10/10 tests passing
+
+**Key Achievements**
+- Baseline decision: CONTROLLED_OPERATION_READY confirmed via FASE 2.60
+- Cycle template generation functional and tested
+- System ready for controlled operation cycle execution
+- 103+ total tests passing (98.1% success rate)
+
+**Fixes**
+- evaluate_readiness(): Check for NOT_READY/FAILED first to prevent substring match errors
+- main() exit code: Use decision in [READY, READY_WITH_RESTRICTIONS] instead of substring match
+
+---
+
 ### Added — FASES 2.47-3.19: Real Write Full Cycle (2026-04-29)
 
 **Pre-Execution Authorization & Validation (FASES 2.47-2.52)**

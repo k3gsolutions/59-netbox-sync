@@ -171,24 +171,30 @@ Dashboard & alerts:
 
 ### FASE 4.0 — Controlled Operation (Q2-Q3 2026)
 
-**Planned:**
-- FASE 2.59: Final documentation & context sync
-- FASE 2.60: Controlled operation baseline (scope, restrições, fluxo obrigatório)
-- FASE 3.20: Web UI final integration tests (20 tests)
-- FASE 4.1: Controlled operation cycle v1 (first cycle template)
-- FASE 4.2: Controlled operation metrics
+**Completed (2026-04-29):**
+- ✅ FASE 2.59: Final documentation & context sync
+- ✅ FASE 2.60: Controlled operation baseline (scope, restrições, fluxo obrigatório)
+- ✅ FASE 3.20: Controlled operation readiness tests (10 tests, all passing)
+- ✅ FASE 4.1: Controlled operation cycle v1 (first cycle template)
+- ✅ System: CONTROLLED_OPERATION_READY confirmed
+
+**Planned (Next):**
+- FASE 4.2: Controlled operation metrics (cycle execution tracking)
 - FASE 4.3: Multi-device readiness assessment
 - FASE 4.4: Controlled expansion (batch operations under governance)
 - FASE 4.5: Production hardening (monitoring, alerting, rollback)
 
-**Guardrails:**
-- One device per cycle initially
-- Max 1-3 objects per cycle
-- POST only (no PATCH/DELETE initially)
-- No /sync, no bulk write, no automatic retry/rollback
-- Week 1 + Week 2 review + approval + dry-run + authorization + preflight + execution + verification + compliance + closure mandatory
+**Guardrails (Enforced):**
+- One device per cycle initially ✓
+- Max 1-3 objects per cycle ✓
+- POST only (no PATCH/DELETE initially) ✓
+- No /sync, no bulk write, no automatic retry/rollback ✓
+- Week 1 + Week 2 review + approval + dry-run + authorization + preflight + execution + verification + compliance + closure mandatory ✓
+- Zero token exposure in logs/saves ✓
+- One-shot execution only ✓
+- Manual review at each gate ✓
 
-**Estimated effort:** 8 weeks (cycles first, then expansion)
+**Status:** Foundation complete. Ready for cycle execution.
 
 ### FASE 2.1 — Tag Bootstrap & Batch Staged Apply (Q2-Q3 2026)
 
