@@ -1,0 +1,36 @@
+{
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decision": "CYCLE_INTAKE_ACTIVATED_WITH_RESTRICTIONS",
+  "status": "INTAKE_ACTIVATED_WITH_RESTRICTIONS",
+  "reason": "start gate ready with restrictions",
+  "decided_at": "2026-04-30T02:36:05.216902+00:00",
+  "start_gate": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/controlled-operation/cycle-002/cycle-002-start-gate.json",
+  "operation_index": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/controlled-operation/controlled-operation-index.json",
+  "scope": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/controlled-operation/cycle-002/CYCLE-002-SCOPE.json",
+  "status_file": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/controlled-operation/cycle-002/CYCLE-002-STATUS.md",
+  "sensitive_hits": [],
+  "guardrails": {
+    "max_items": 3,
+    "allowed_methods": [
+      "POST"
+    ],
+    "forbidden_methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "forbidden_targets": [
+      "/sync",
+      "equipment",
+      "ssh",
+      "netconf"
+    ],
+    "requires_week1": true,
+    "requires_week2": true,
+    "requires_approval_records": true,
+    "requires_applyplan_dryrun": true,
+    "requires_real_write_authorization": true,
+    "requires_post_write_verification": true
+  }
+}

@@ -78,6 +78,12 @@ Then open: **http://127.0.0.1:8890**
 - Download local CSV/JSON/TXT/LOG artifacts with safe extension checks
 - Search across reports
 
+### Controlled Operation
+- Read-only multi-cycle index
+- Cycle detail, start gate, archive, handoff
+- Cycle-002 Week 1 and Week 2 review flow
+- Real-write execution/readiness/verification/compliance/closure pages are read-only views of local artifacts
+
 ### Approvals
 - List approval records by status (pending, approved, rejected, applied)
 - View single approval (formatted JSON)
@@ -114,6 +120,16 @@ Then open: **http://127.0.0.1:8890**
 - Real Week 1 execution status and final validation are documented locally
 - Next-step guidance is shown after save and on the device dashboard
 
+### Controlled Operation
+- Read-only multi-cycle index and cycle detail views
+- Cycle-002 start gate, handoff, archive, and Week 1 pages
+- Week 1 activation, preparation, intake, validation, and response seed pages are local-only
+- Week 2 preparation page shows review board, decisions CSV, and local drafts
+- Week 2 review, proposed approvals, and approval readiness pages are read-only
+- Week 2 test decision seed can move the flow to a single proposed approval for manual review
+- Manual approval review, approved-copy view, dry-run ApplyPlan generation, and dry-run validation pages are local-only
+- No write buttons, no apply, no sync, no rollback automation
+
 ### Search
 - Simple search across .md files
 - Search in reports/, docs/, context/
@@ -130,6 +146,7 @@ Then open: **http://127.0.0.1:8890**
   - Files with "token", "password", "secret"
 - ✅ POST only for local response saving
 - ✅ POST only for local validation/finalize pipeline
+- ✅ No POST/PATCH/DELETE on controlled-operation review/approval pages
 - ✅ Read-only only
 - ✅ No NetBox API calls
 - ✅ No write tokens needed
@@ -307,3 +324,8 @@ python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 8890 --reload
 **Last updated:** 2026-04-28
 **Owner:** Claude Haiku 4.5
 **Version:** 3.0
+
+## Multi-cycle operation
+
+- Read-only controlled-operation views live at `/controlled-operation`.
+- Cycle-002 start gate and expansion evaluation are local and advisory only.

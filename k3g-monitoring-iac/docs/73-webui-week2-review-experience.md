@@ -12,3 +12,6 @@ A Web UI mostra:
 - "Rascunhos não são aprovações"
 - "Esta etapa apenas prepara Registros de Aprovação"
 
+## Multi-cycle follow-up
+
+- The Week 2 review UX is now complemented by read-only controlled-operation pages.

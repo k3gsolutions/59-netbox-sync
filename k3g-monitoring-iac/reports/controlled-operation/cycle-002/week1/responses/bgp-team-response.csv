@@ -1,0 +1,2 @@
+device,object_type,object_key,responsible_team,status,tenant,service_type,criticality,owner,evidence,interface,vrf,service_relation,remote_asn,remote_bgp_group,policy_intent,notes,updated_at,updated_by,relation_type
+4WNET-MNS-KTG-RX,bgp_peer,203.0.113.1,BGP Team,answered,,,silver,UAT BGP Owner,UAT evidence,,,,65000,UAT-GROUP,UAT policy intent,UAT response,2026-04-30T02:53:51.068995Z,uat,

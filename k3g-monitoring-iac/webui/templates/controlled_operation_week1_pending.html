@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Pendências Week 1 {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Pendências Week 1: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Itens</div><div class="summary-value">{{ count }}</div></div>
+    <div class="summary-card"><div class="summary-label">Responses</div><div class="summary-value">{{ responses_dir or 'Ausente' }}</div></div>
+    <div class="summary-card"><div class="summary-label">Status</div><div class="summary-value">Leitura local</div></div>
+    <div class="summary-card"><div class="summary-label">Próximo passo</div><div class="summary-value">Seed local ou validar respostas</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Pendências do Cycle-002</div>
+    {% if items %}
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Object Type</th>
+                <th>Object Key</th>
+                <th>Status</th>
+                <th>Evidência local</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ item.responsible_team }}</td>
+                <td><code>{{ item.object_type }}</code></td>
+                <td><code>{{ item.object_key }}</code></td>
+                <td><span class="badge badge-info">{{ item.current_status | status_label }}</span></td>
+                <td>{{ item.response_present and 'Presente' or 'Ausente' }}</td>
+                <td>
+                    <a href="/controlled-operation/{{ cycle.cycle_id }}/week1/pending/{{ item.safe_item_id }}" class="btn btn-small">Ver item</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Nenhuma pendência localizada.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Seed local</div>
+    <p>Use estes comandos para preencher as respostas locais sem tocar no NetBox.</p>
+    <div class="code-blocks">
+        {% for command in seed_commands %}
+        <p><code>{{ command }}</code></p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Próximos links</div>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1" class="btn btn-small">Week 1</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1/intake" class="btn btn-primary btn-small">Intake</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1/validation" class="btn btn-primary btn-small">Validação</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week2" class="btn btn-primary btn-small">Week 2</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 # CYCLE-002 Post-Write Verification
 
-## Decision: NOT_APPLICABLE
+## Decision: CYCLE_POST_WRITE_VERIFICATION_FAILED
 
-- execution aborted preflight
+- secret keyword found in execution result

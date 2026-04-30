@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Real write package {{ cycle.cycle_id }}{% endblock %}
+{% block content %}
+<h2>Real-write execution package: {{ cycle.cycle_id }}</h2>
+<div class="card">
+  <div class="card-header">Execution package</div>
+  {% if chain.execution_package_file %}
+  <p><a href="/reports/download?path={{ chain.execution_package_file.path }}">Baixar JSON</a></p>
+  <pre class="pre-wrap">{{ chain.execution_package_file.content | tojson(indent=2) }}</pre>
+  {% else %}
+  <p>Sem execution package.</p>
+  {% endif %}
+</div>
+<div class="card"><div class="card-header">Navegação</div><div class="pending-validation-links">
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write-freeze" class="btn btn-small">Freeze</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/applyplan/real-write-readiness" class="btn btn-small">Readiness</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+</div></div>
+{% endblock %}

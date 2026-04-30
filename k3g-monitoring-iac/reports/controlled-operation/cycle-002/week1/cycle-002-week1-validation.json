@@ -1,0 +1,62 @@
+{
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decision": "WEEK1_VALIDATION_PASSED",
+  "generated_at": "2026-04-30T02:54:27.041764+00:00",
+  "policy_registry": "policies/compliance",
+  "summary": {
+    "total": 3,
+    "validated": 0,
+    "ready_for_week2_review": 3,
+    "needs_clarification": 0,
+    "blocked": 0,
+    "rejected": 0,
+    "still_pending": 0
+  },
+  "validated": [],
+  "ready_for_week2_review": [
+    {
+      "team": "bgp",
+      "object_key": "203.0.113.1",
+      "object_type": "bgp_peer",
+      "status": "ready_for_week2_review",
+      "updated_by": "uat",
+      "updated_at": "2026-04-30T02:53:51.068995Z",
+      "evidence": "UAT evidence",
+      "notes": "UAT response",
+      "source_file": "bgp-team-response.csv",
+      "issues": []
+    },
+    {
+      "team": "network_ops",
+      "object_key": "192.0.2.1/30",
+      "object_type": "ip_address",
+      "status": "ready_for_week2_review",
+      "updated_by": "uat",
+      "updated_at": "2026-04-30T02:53:47.572042Z",
+      "evidence": "UAT evidence",
+      "notes": "UAT response",
+      "source_file": "network-ops-response.csv",
+      "issues": []
+    },
+    {
+      "team": "service",
+      "object_key": "Eth-Trunk0.10",
+      "object_type": "subinterface",
+      "status": "ready_for_week2_review",
+      "updated_by": "uat",
+      "updated_at": "2026-04-30T02:53:41.922322Z",
+      "evidence": "UAT evidence",
+      "notes": "UAT response",
+      "source_file": "service-team-response.csv",
+      "issues": []
+    }
+  ],
+  "needs_clarification": [],
+  "blocked": [],
+  "rejected": [],
+  "still_pending": [],
+  "policy_ready": true,
+  "sensitive_hits": []
+}

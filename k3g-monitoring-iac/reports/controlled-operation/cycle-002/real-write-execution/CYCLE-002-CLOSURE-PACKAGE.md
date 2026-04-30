@@ -1,5 +1,5 @@
 # CYCLE-002 Closure Package
 
-## Decision: CYCLE_CLOSED_NOT_APPLICABLE
+## Decision: CYCLE_CLOSED_ACTION_REQUIRED
 
-- execution not applicable
+- verification/compliance failure

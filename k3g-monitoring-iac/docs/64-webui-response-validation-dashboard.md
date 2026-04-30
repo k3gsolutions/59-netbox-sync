@@ -19,6 +19,11 @@
 - `Finalizar respostas e preparar Week 2`
 - `Editar pendência`
 
+## Multi-cycle follow-up
+
+- The validation dashboard now links forward to controlled-operation overview pages.
+- Week 2 review remains human-only.
+
 ## Safety
 
 - Read-only dashboard

@@ -33,3 +33,7 @@ Ativar a coleta real de respostas da Semana 1 pela Web UI, sem CSV manual como f
 - `reports/pilot-device-compliance/REAL-WEEK1-EXECUTION-LOG.md`
 - `reports/pilot-device-compliance/REAL-WEEK1-FINAL-VALIDATION.md`
 - `reports/pilot-device-compliance/week2-activation-gate.md`
+
+## Multi-cycle follow-up
+
+- Once Week 1 is real, the controlled-operation index tracks cycle state and the Cycle-002 gate.

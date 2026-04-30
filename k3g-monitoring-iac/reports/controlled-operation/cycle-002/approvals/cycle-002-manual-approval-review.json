@@ -1,0 +1,13 @@
+{
+  "cycle_id": "cycle-002",
+  "decision": "CYCLE_APPROVAL_REVIEW_APPROVED",
+  "manual_decision": "approve",
+  "reviewer": "Keslley",
+  "reason": "Aprovado ap\u00f3s revis\u00e3o humana do Cycle-002",
+  "record_file": "approval-203-0-113-1.json",
+  "output_file": "approved/approval-203-0-113-1.json",
+  "reviewed_at": "2026-04-30T03:38:47.275486+00:00",
+  "issues": [],
+  "no_netbox_write": true,
+  "no_apply_plan_created": true
+}

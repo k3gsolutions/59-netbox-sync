@@ -15,6 +15,39 @@ Automated, read-only compliance analysis for network devices. Local report histo
 - FASE 2.28: real Week 1 execution via Web UI ✅
 - FASE 2.29: real Week 1 final validation + Week 2 gate ✅
 - FASE 3.14: operational usability polish ✅
+- FASE 4.30: multi-cycle operation index ✅
+- FASE 4.31: Cycle-002 start gate ✅
+- FASE 4.32: multi-cycle Web UI ✅
+- FASE 4.33: controlled expansion policy ✅
+- FASE 4.34: Cycle-002 intake activation ✅
+- FASE 4.35: Cycle-002 Week 1 preparation ✅
+- FASE 4.36: Cycle-002 Week 1 response intake ✅
+- FASE 4.37: Cycle-002 Week 1 validation ✅
+- FASE 4.38: Cycle-002 Week 1 response seed / form ✅
+- FASE 4.39: Cycle-002 Week 1 re-validation ✅
+- FASE 4.40: Cycle-002 Week 2 preparation ✅
+- FASE 4.41: Cycle-002 Week 2 human review ✅
+- FASE 4.42: Cycle-002 promote drafts to proposed ApprovalRecords ✅
+- FASE 4.43: Cycle-002 approval readiness gate ✅
+- FASE 4.44: Cycle-002 Week 2 decision seed ✅
+- FASE 4.45: Cycle-002 Week 2 re-review ✅
+- FASE 4.46: Cycle-002 proposed approval test ✅
+- FASE 4.47: Cycle-002 approval readiness re-gate ✅
+- FASE 4.48: Cycle-002 manual approval review ✅
+- FASE 4.49: Cycle-002 dry-run ApplyPlan generation ✅
+- FASE 4.50: Cycle-002 dry-run ApplyPlan validation ✅
+- FASE 4.51: Cycle-002 dry-run execution gate ✅
+- FASE 4.52: Cycle-002 dry-run simulation ✅
+- FASE 4.53: Cycle-002 real-write readiness gate ✅
+- FASE 4.54: Cycle-002 real-write authorization package ✅
+- FASE 4.55: Cycle-002 real-write final preflight ✅
+- FASE 4.56: Cycle-002 real-write execution package ✅
+- FASE 4.57: Cycle-002 execution package validation ✅
+- FASE 4.58: Cycle-002 final no-write freeze ✅
+- FASE 4.59: Cycle-002 real-write execution attempt blocked safely (no token, no write) ✅
+- FASE 4.60: Cycle-002 post-write verification not applicable ✅
+- FASE 4.61: Cycle-002 post-write compliance re-run not applicable ✅
+- FASE 4.62: Cycle-002 closure package built locally ✅
 - **FASE 3.16: Web UI Convention Registry Integration Reconciliation ✅**
 - **FASE 3.16.1: Registry Fallback Hardening ✅**
 - **FASE 2.33: Compliance Registry Operationalization ✅**
@@ -200,13 +233,15 @@ Dashboard & alerts:
 - ✅ FASE 4.23: Post-write verification (GET-only verification of created objects)
 - ✅ FASE 4.24: Compliance re-run after write (read-only local compliance checks)
 - ✅ FASE 4.25: Closure package (consolidate execution/verification/compliance results)
+- ✅ FASE 4.26: Final archive (SHA256 hashes, secret detection, manifest generation)
+- ✅ FASE 4.27: Operational handoff decision (READY / WITH_RESTRICTIONS / ACTION_REQUIRED)
+- ✅ FASE 4.28: Update controlled operation metrics (cycle tracking, success/warning/failure counts)
+- ✅ FASE 4.29: Create next cycle template (scope constraints, plan, checklist, status)
 - ✅ System: CONTROLLED_OPERATION_READY confirmed
 - ✅ Test suites: 202+ tests all passing
 
 **Planned (Next):**
-- FASE 4.26: Cycle archive (consolidate all artifacts, SHA256 hashes, audit trail)
-- FASE 4.27: Operational metrics update (cycle completion, success rate, timing)
-- FASE 4.28: Handoff readiness assessment (READY / WITH_RESTRICTIONS / ACTION_REQUIRED)
+- FASE 4.30: Cycle-002 readiness assessment (apply FASES 4.2-4.29 to second device)
 
 **Guardrails (Enforced):**
 - One device per cycle initially ✓
@@ -292,3 +327,9 @@ Read-write mode beyond staged apply:
 - Revisão humana em PT-BR.
 - ApprovalRecords apenas proposed/pending.
 - Nenhuma escrita NetBox.
+
+## Operação controlada multi-ciclo
+
+- Cycle-001 closed with restrictions.
+- Cycle-002 planned and gated.
+- Expansion remains recommendation-only.

@@ -26,6 +26,9 @@ except ImportError:
             )
             return HTMLResponse(body)
 from starlette.requests import Request
+import csv
+import hashlib
+import re
 from pathlib import Path
 import json
 import mimetypes
@@ -40,6 +43,18 @@ from .services.artifact_scanner import (
 from .services.markdown_loader import load_markdown, render_markdown, load_json
 from .services.report_index import load_index, get_latest_report, parse_report_metrics
 from .services.week2_decision_handler import Week2Decision, save_decision, load_decisions, get_item_decision
+from .services.controlled_operation import (
+    load_controlled_operation_index,
+    load_cycle_artifact,
+    load_cycle_approvals_artifacts,
+    load_cycle_dryrun_applyplan_artifacts,
+    load_cycle_real_write_chain_artifacts,
+    load_cycle_week2_review_artifacts,
+    load_cycle_week1_artifacts,
+    load_cycle_week2_artifacts,
+    safe_cycle_id,
+    list_controlled_cycles,
+)
 
 
 # Setup
@@ -84,6 +99,7 @@ def status_label(status: str) -> str:
         "still_pending": "Ainda pendente",
         "proposed": "Proposto",
         "approved": "Aprovado",
+        "changes-requested": "Solicitado ajuste",
         "applied": "Aplicado",
         "failed": "Falhou",
         "no_go": "Não liberado",
@@ -92,6 +108,77 @@ def status_label(status: str) -> str:
         "go_week2_review": "Liberado para Semana 2",
         "go_with_restrictions_uat_present": "Liberado com restrições UAT",
         "keep_as_real": "Manter como real",
+        "week1_response_ready": "Resposta da Semana 1 pronta",
+        "week1_response_ready_with_restrictions": "Resposta da Semana 1 pronta com restrições",
+        "week1_response_blocked": "Resposta da Semana 1 bloqueada",
+        "week2_preparation_ready": "Semana 2 preparada",
+        "week2_preparation_ready_with_restrictions": "Semana 2 preparada com restrições",
+        "week2_preparation_blocked": "Semana 2 bloqueada",
+        "week2_review_passed": "Revisão da Semana 2 aprovada",
+        "week2_review_passed_with_restrictions": "Revisão da Semana 2 com restrições",
+        "week2_review_blocked": "Revisão da Semana 2 bloqueada",
+        "pending_review": "Pendente de revisão",
+        "proposed_approvals_created": "Registros propostos criados",
+        "proposed_approvals_created_with_restrictions": "Registros propostos criados com restrições",
+        "no_proposed_approvals_created": "Nenhum registro proposto criado",
+        "ready_for_manual_approval_review": "Pronto para revisão manual de aprovação",
+        "ready_with_restrictions": "Pronto para revisão com restrições",
+        "not_ready_for_manual_approval_review": "Não pronto para revisão manual",
+        "cycle_approval_review_approved": "Revisão de aprovação aprovada",
+        "cycle_approval_review_with_restrictions": "Revisão de aprovação com restrições",
+        "cycle_approval_review_blocked": "Revisão de aprovação bloqueada",
+        "cycle_dryrun_applyplan_generated": "ApplyPlan dry-run gerado",
+        "cycle_dryrun_applyplan_valid": "ApplyPlan dry-run válido",
+        "cycle_dryrun_applyplan_valid_with_warnings": "ApplyPlan dry-run válido com avisos",
+        "cycle_dryrun_applyplan_invalid": "ApplyPlan dry-run inválido",
+        "cycle_dryrun_execution_ready": "Gate dry-run pronto",
+        "cycle_dryrun_execution_ready_with_restrictions": "Gate dry-run pronto com restrições",
+        "cycle_dryrun_execution_blocked": "Gate dry-run bloqueado",
+        "cycle_dryrun_simulation_passed": "Simulação dry-run aprovada",
+        "cycle_dryrun_simulation_passed_with_warnings": "Simulação dry-run aprovada com avisos",
+        "cycle_dryrun_simulation_failed": "Simulação dry-run falhou",
+        "cycle_ready_for_real_write_review": "Pronto para revisão de escrita real",
+        "cycle_ready_with_restrictions": "Pronto com restrições",
+        "cycle_not_ready_for_real_write": "Não pronto para escrita real",
+        "cycle_ready_for_real_write_execution_package": "Pacote de execução pronto",
+        "cycle_ready_for_real_write_phase": "Pronto para fase real",
+        "cycle_not_ready_for_real_write_phase": "Não pronto para fase real",
+        "cycle_real_write_execution_package_valid": "Pacote de execução válido",
+        "cycle_real_write_execution_package_valid_with_warnings": "Pacote de execução válido com avisos",
+        "cycle_real_write_execution_package_invalid": "Pacote de execução inválido",
+        "cycle_real_write_aborted_preflight_failed": "Execução real abortada na pré-validação",
+        "cycle_real_write_success": "Escrita real concluída",
+        "cycle_real_write_partial_failed": "Escrita real parcial com falha",
+        "cycle_real_write_failed": "Escrita real falhou",
+        "cycle_post_write_verification_passed": "Verificação pós-escrita aprovada",
+        "cycle_post_write_verification_passed_with_drift": "Verificação pós-escrita com drift",
+        "cycle_post_write_verification_failed": "Verificação pós-escrita falhou",
+        "cycle_post_write_verification_not_applicable": "Verificação pós-escrita não aplicável",
+        "cycle_post_write_compliance_passed": "Compliance pós-escrita aprovada",
+        "cycle_post_write_compliance_passed_with_warnings": "Compliance pós-escrita com avisos",
+        "cycle_post_write_compliance_failed": "Compliance pós-escrita falhou",
+        "cycle_post_write_compliance_not_applicable": "Compliance pós-escrita não aplicável",
+        "cycle_closed_success": "Ciclo encerrado com sucesso",
+        "cycle_closed_with_warnings": "Ciclo encerrado com avisos",
+        "cycle_closed_action_required": "Ciclo precisa de ação",
+        "cycle_closed_not_applicable": "Ciclo não aplicável",
+        "planned": "Planejado",
+        "intake_ready": "Pronto para intake",
+        "intake_activated": "Intake ativado",
+        "intake_activated_with_restrictions": "Intake ativado com restrições",
+        "week1_ready_for_responses": "Semana 1 pronta para respostas",
+        "week1_intake_ready": "Intake da Semana 1 pronto",
+        "week1_intake_partial": "Intake parcial da Semana 1",
+        "week1_intake_blocked": "Intake bloqueado da Semana 1",
+        "week1_validation_passed": "Validação da Semana 1 aprovada",
+        "week1_validation_passed_with_restrictions": "Validação da Semana 1 com restrições",
+        "week1_validation_blocked": "Validação da Semana 1 bloqueada",
+        "in_progress": "Em andamento",
+        "closed_success": "Encerrado com sucesso",
+        "closed_with_restrictions": "Encerrado com restrições",
+        "start_ready": "Pronto para iniciar",
+        "start_blocked": "Bloqueado para início",
+        "action_required": "Ação obrigatória",
     }
     value = (status or "").strip()
     return labels.get(value, value.replace("_", " ").title() if value else "N/A")
@@ -121,6 +208,7 @@ async def index(request: Request):
     batch_noop = sum(1 for b in batch_results if "NO-OP" in b.get("name", "") or "already" in b.get("name", "").lower())
     week1_execution = _week1_execution_overview("4WNET-MNS-KTG-RX")
     week2_review = _week2_review_overview("4WNET-MNS-KTG-RX")
+    controlled_operation = _controlled_operation_overview()
 
     context = {
         "request": request,
@@ -138,6 +226,7 @@ async def index(request: Request):
         "latest_batch": latest_batch,
         "week1_execution": week1_execution,
         "week2_review": week2_review,
+        "controlled_operation": controlled_operation,
     }
 
     return templates.TemplateResponse("index.html", context)
@@ -1391,6 +1480,150 @@ def _week2_review_overview(device: str) -> dict:
     }
 
 
+def _controlled_operation_overview() -> dict:
+    index = load_controlled_operation_index(ROOT)
+    cycles = index.get("cycles", [])
+    counts = {
+        "planned": sum(1 for cycle in cycles if cycle.get("current_status") == "planned"),
+        "closed_success": sum(1 for cycle in cycles if cycle.get("current_status") == "closed_success"),
+        "closed_with_restrictions": sum(1 for cycle in cycles if cycle.get("current_status") == "closed_with_restrictions"),
+        "action_required": sum(1 for cycle in cycles if cycle.get("current_status") == "action_required"),
+    }
+    return {
+        "index": index,
+        "cycles": cycles,
+        "counts": counts,
+        "latest_cycle": cycles[-1] if cycles else None,
+        "status_label": status_label(index.get("overall_status", "")),
+    }
+
+
+def _find_controlled_cycle(cycle_id: str):
+    safe_id = safe_cycle_id(cycle_id)
+    if not safe_id:
+        raise HTTPException(status_code=404, detail="cycle not found")
+    cycles = list_controlled_cycles(ROOT)
+    for cycle in cycles:
+        if cycle.get("cycle_id") == safe_id:
+            return cycle
+    raise HTTPException(status_code=404, detail="cycle not found")
+
+
+def _controlled_cycle_week1_context(cycle_id: str) -> dict:
+    cycle = _find_controlled_cycle(cycle_id)
+    assets = load_cycle_week1_artifacts(ROOT, cycle["cycle_id"])
+    state_source = str(assets.get("validation_decision") or assets.get("intake_decision") or cycle.get("current_status") or "").lower()
+    status_label_value = status_label(state_source)
+    next_action = cycle.get("next_action", "Revisar artefatos")
+    if assets.get("validation_decision"):
+        if "blocked" in str(assets["validation_decision"]).lower():
+            next_action = "Resolver bloqueios."
+        else:
+            next_action = "Abrir revisão da Semana 2."
+    elif assets.get("intake_decision"):
+        if assets["intake_decision"] == "WEEK1_INTAKE_READY":
+            next_action = "Rodar validação local."
+        else:
+            next_action = "Completar respostas pendentes."
+    elif assets.get("plan_file"):
+        next_action = "Responder as pendências."
+
+    return {
+        "cycle": cycle,
+        "assets": assets,
+        "status_label_value": status_label_value,
+        "next_action": next_action,
+    }
+
+
+def _controlled_team_slug(value: str) -> str:
+    lowered = (value or "").strip().lower()
+    if "service" in lowered:
+        return "service"
+    if "network" in lowered or "ops" in lowered:
+        return "network_ops"
+    if "bgp" in lowered:
+        return "bgp"
+    return lowered.replace("-", "_").replace(" ", "_")
+
+
+def _controlled_item_id(object_key: str) -> str:
+    base = re.sub(r"[^a-z0-9]+", "-", (object_key or "").lower()).strip("-")
+    digest = hashlib.sha1((object_key or "").encode("utf-8")).hexdigest()[:8]
+    return f"{base[:48] or 'item'}-{digest}"
+
+
+def _controlled_response_filename(team_slug: str) -> str:
+    return {
+        "service": "service-team-response.csv",
+        "network_ops": "network-ops-response.csv",
+        "bgp": "bgp-team-response.csv",
+    }.get(team_slug, f"{team_slug}-response.csv")
+
+
+def _controlled_cycle_week1_pending_context(cycle_id: str) -> dict:
+    cycle = _find_controlled_cycle(cycle_id)
+    cycle_dir = REPORTS_DIR / "controlled-operation" / cycle["cycle_id"]
+    template_file = REPORTS_DIR / "pilot-device-compliance" / "week1-metadata-collection-template.csv"
+    responses_dir = cycle_dir / "week1" / "responses"
+    response_rows: dict[str, dict[str, str]] = {}
+
+    if responses_dir.exists():
+        for csv_path in responses_dir.glob("*.csv"):
+            try:
+                with csv_path.open("r", encoding="utf-8", newline="") as handle:
+                    reader = csv.DictReader(handle)
+                    for row in reader:
+                        object_key = (row.get("object_key") or "").strip()
+                        if object_key:
+                            response_rows[object_key] = {k: (v or "").strip() for k, v in row.items()}
+            except Exception:
+                continue
+
+    items = []
+    if template_file.exists():
+        with template_file.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                if (row.get("device") or "").strip() not in {"", cycle["device"]}:
+                    continue
+                object_key = (row.get("object_key") or "").strip()
+                if not object_key:
+                    continue
+                team_label = (row.get("responsible_team") or "").strip()
+                team_slug = _controlled_team_slug(team_label)
+                response = response_rows.get(object_key, {})
+                current_status = (response.get("status") or row.get("status") or "pending").strip() or "pending"
+                items.append({
+                    "device": cycle["device"],
+                    "device_id": cycle["device_id"],
+                    "object_type": (row.get("object_type") or "").strip(),
+                    "object_key": object_key,
+                    "responsible_team": team_label,
+                    "responsible_team_slug": team_slug,
+                    "current_status": current_status,
+                    "missing_fields": [part.strip() for part in (row.get("missing_fields") or "").split(",") if part.strip()],
+                    "updated_by": response.get("updated_by", ""),
+                    "updated_at": response.get("updated_at", ""),
+                    "csv_path": str((responses_dir / _controlled_response_filename(team_slug)).relative_to(REPORTS_DIR)) if responses_dir.exists() else "",
+                    "safe_item_id": _controlled_item_id(object_key),
+                    "response_present": bool(response),
+                })
+
+    items.sort(key=lambda item: (item["responsible_team"], item["object_type"], item["object_key"]))
+    return {
+        "cycle": cycle,
+        "items": items,
+        "count": len(items),
+        "responses_dir": str(responses_dir.relative_to(REPORTS_DIR)) if responses_dir.exists() else None,
+        "seed_commands": [
+            f"python3 tools/local/controlled_cycle_week1_seed_response.py --cycle-id {cycle_id} --device {cycle['device']} --device-id {cycle['device_id']} --cycle-dir reports/controlled-operation/{cycle['cycle_id']} --team service --object-type subinterface --object-key Eth-Trunk0.10 --response-status answered --tenant \"Cliente Piloto\" --service-type customer-internet --criticality gold --owner \"UAT Service Owner\" --evidence \"UAT evidence\" --notes \"UAT response\" --output-dir reports/controlled-operation/{cycle['cycle_id']}/week1",
+            f"python3 tools/local/controlled_cycle_week1_seed_response.py --cycle-id {cycle_id} --device {cycle['device']} --device-id {cycle['device_id']} --cycle-dir reports/controlled-operation/{cycle['cycle_id']} --team network_ops --object-type ip_address --object-key 192.0.2.1/30 --response-status answered --interface GigabitEthernet0/5/0 --vrf _public_ --relation-type infrastructure --owner \"UAT Network Ops\" --evidence \"UAT evidence\" --notes \"UAT response\" --output-dir reports/controlled-operation/{cycle['cycle_id']}/week1",
+            f"python3 tools/local/controlled_cycle_week1_seed_response.py --cycle-id {cycle_id} --device {cycle['device']} --device-id {cycle['device_id']} --cycle-dir reports/controlled-operation/{cycle['cycle_id']} --team bgp --object-type bgp_peer --object-key 203.0.113.1 --response-status answered --remote-asn 65000 --remote-bgp-group UAT-GROUP --policy-intent \"UAT policy intent\" --criticality silver --owner \"UAT BGP Owner\" --evidence \"UAT evidence\" --notes \"UAT response\" --output-dir reports/controlled-operation/{cycle['cycle_id']}/week1",
+        ],
+    }
+
+
 def _lookup_pending_item(device: str, safe_item_id: str):
     data = get_pending_item(device, safe_item_id)
     return data["item"]
@@ -1496,6 +1729,313 @@ def _detect_uat_state():
 
 def _detect_uat_active() -> bool:
     return bool(_detect_uat_state().get("active"))
+
+
+@app.get("/controlled-operation", response_class=HTMLResponse)
+async def controlled_operation_overview(request: Request):
+    index = load_controlled_operation_index(ROOT)
+    context = {
+        "request": request,
+        "title": "Operação Controlada",
+        "index": index,
+        "cycles": index.get("cycles", []),
+        "controlled_operation": _controlled_operation_overview(),
+    }
+    return templates.TemplateResponse("controlled_operation_overview.html", context)
+
+
+@app.get("/controlled-operation/cycles", response_class=HTMLResponse)
+async def controlled_operation_cycles_view(request: Request):
+    index = load_controlled_operation_index(ROOT)
+    context = {
+        "request": request,
+        "title": "Ciclos Controlados",
+        "index": index,
+        "cycles": index.get("cycles", []),
+    }
+    return templates.TemplateResponse("controlled_operation_cycles.html", context)
+
+
+@app.get("/controlled-operation/{cycle_id}", response_class=HTMLResponse)
+async def controlled_operation_cycle_detail(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    context = {
+        "request": request,
+        "title": f"Ciclo: {cycle['cycle_id']}",
+        "cycle": cycle,
+        "week1": load_cycle_week1_artifacts(ROOT, cycle["cycle_id"]),
+        "week2": load_cycle_week2_artifacts(ROOT, cycle["cycle_id"]),
+    }
+    return templates.TemplateResponse("controlled_operation_cycle_detail.html", context)
+
+
+@app.get("/controlled-operation/{cycle_id}/start-gate", response_class=HTMLResponse)
+async def controlled_operation_start_gate(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    artifact = load_cycle_artifact(ROOT, cycle_id, "start-gate")
+    return templates.TemplateResponse(
+        "controlled_operation_start_gate.html",
+        {"request": request, "title": f"Start gate: {cycle['cycle_id']}", "cycle": cycle, "artifact": artifact},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/archive", response_class=HTMLResponse)
+async def controlled_operation_archive(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    artifact = None
+    try:
+        artifact = load_cycle_artifact(ROOT, cycle_id, "archive")
+    except Exception:
+        artifact = None
+    return templates.TemplateResponse(
+        "controlled_operation_archive.html",
+        {"request": request, "title": f"Archive: {cycle['cycle_id']}", "cycle": cycle, "artifact": artifact},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/handoff", response_class=HTMLResponse)
+async def controlled_operation_handoff(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    artifact = None
+    try:
+        artifact = load_cycle_artifact(ROOT, cycle_id, "handoff")
+    except Exception:
+        artifact = None
+    return templates.TemplateResponse(
+        "controlled_operation_handoff.html",
+        {"request": request, "title": f"Handoff: {cycle['cycle_id']}", "cycle": cycle, "artifact": artifact},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/week1", response_class=HTMLResponse)
+async def controlled_operation_week1(request: Request, cycle_id: str):
+    context = _controlled_cycle_week1_context(cycle_id)
+    return templates.TemplateResponse("controlled_operation_week1.html", {"request": request, **context})
+
+
+@app.get("/controlled-operation/{cycle_id}/week1/pending", response_class=HTMLResponse)
+async def controlled_operation_week1_pending(request: Request, cycle_id: str):
+    context = _controlled_cycle_week1_pending_context(cycle_id)
+    return templates.TemplateResponse("controlled_operation_week1_pending.html", {"request": request, **context})
+
+
+@app.get("/controlled-operation/{cycle_id}/week1/pending/{safe_item_id}", response_class=JSONResponse)
+async def controlled_operation_week1_pending_detail(request: Request, cycle_id: str, safe_item_id: str):
+    context = _controlled_cycle_week1_pending_context(cycle_id)
+    for item in context["items"]:
+        if item.get("safe_item_id") == safe_item_id:
+            return JSONResponse({"success": True, "item": item})
+    raise HTTPException(status_code=404, detail="Item not found")
+
+
+@app.get("/controlled-operation/{cycle_id}/week1/intake", response_class=HTMLResponse)
+async def controlled_operation_week1_intake(request: Request, cycle_id: str):
+    context = _controlled_cycle_week1_context(cycle_id)
+    return templates.TemplateResponse("controlled_operation_week1_intake.html", {"request": request, **context})
+
+
+@app.get("/controlled-operation/{cycle_id}/week1/validation", response_class=HTMLResponse)
+async def controlled_operation_week1_validation(request: Request, cycle_id: str):
+    context = _controlled_cycle_week1_context(cycle_id)
+    return templates.TemplateResponse("controlled_operation_week1_validation.html", {"request": request, **context})
+
+
+@app.get("/controlled-operation/{cycle_id}/week2", response_class=HTMLResponse)
+async def controlled_operation_week2(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    assets = load_cycle_week2_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_week2.html",
+        {"request": request, "title": f"Week 2: {cycle['cycle_id']}", "cycle": cycle, "assets": assets},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/week2/review", response_class=HTMLResponse)
+async def controlled_operation_week2_review(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    week2 = load_cycle_week2_artifacts(ROOT, cycle["cycle_id"])
+    review = load_cycle_week2_review_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_week2_review.html",
+        {"request": request, "title": f"Revisão Semana 2: {cycle['cycle_id']}", "cycle": cycle, "week2": week2, "review": review},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/approvals", response_class=HTMLResponse)
+async def controlled_operation_cycle_approvals(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    approvals = load_cycle_approvals_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_approvals.html",
+        {"request": request, "title": f"Aprovações: {cycle['cycle_id']}", "cycle": cycle, "approvals": approvals},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/approvals/readiness", response_class=HTMLResponse)
+async def controlled_operation_cycle_approval_readiness(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    approvals = load_cycle_approvals_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_approval_readiness.html",
+        {"request": request, "title": f"Prontidão de Aprovação: {cycle['cycle_id']}", "cycle": cycle, "approvals": approvals},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/approvals/manual-review", response_class=HTMLResponse)
+async def controlled_operation_cycle_manual_review(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    approvals = load_cycle_approvals_artifacts(ROOT, cycle["cycle_id"])
+    review = load_cycle_week2_review_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_manual_review.html",
+        {
+            "request": request,
+            "title": f"Revisão Manual: {cycle['cycle_id']}",
+            "cycle": cycle,
+            "approvals": approvals,
+            "review": review,
+        },
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/applyplan", response_class=HTMLResponse)
+async def controlled_operation_cycle_applyplan(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    applyplans = load_cycle_dryrun_applyplan_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_applyplan.html",
+        {
+            "request": request,
+            "title": f"ApplyPlan dry-run: {cycle['cycle_id']}",
+            "cycle": cycle,
+            "applyplans": applyplans,
+        },
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/applyplan/validation", response_class=HTMLResponse)
+async def controlled_operation_cycle_applyplan_validation(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    applyplans = load_cycle_dryrun_applyplan_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_applyplan_validation.html",
+        {
+            "request": request,
+            "title": f"Validação ApplyPlan: {cycle['cycle_id']}",
+            "cycle": cycle,
+            "applyplans": applyplans,
+        },
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/applyplan/dryrun-gate", response_class=HTMLResponse)
+async def controlled_operation_cycle_applyplan_dryrun_gate(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    applyplans = load_cycle_dryrun_applyplan_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_dryrun_execution_gate.html",
+        {"request": request, "title": f"Dry-run gate: {cycle['cycle_id']}", "cycle": cycle, "applyplans": applyplans},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/applyplan/simulation", response_class=HTMLResponse)
+async def controlled_operation_cycle_applyplan_simulation(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    applyplans = load_cycle_dryrun_applyplan_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_dryrun_simulation.html",
+        {"request": request, "title": f"Dry-run simulation: {cycle['cycle_id']}", "cycle": cycle, "applyplans": applyplans},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/applyplan/real-write-readiness", response_class=HTMLResponse)
+async def controlled_operation_cycle_applyplan_real_write_readiness(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    chain = load_cycle_real_write_chain_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_real_write_readiness.html",
+        {"request": request, "title": f"Real-write readiness: {cycle['cycle_id']}", "cycle": cycle, "chain": chain},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/real-write-authorization", response_class=HTMLResponse)
+async def controlled_operation_cycle_real_write_authorization(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    chain = load_cycle_real_write_chain_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_real_write_authorization.html",
+        {"request": request, "title": f"Real-write authorization: {cycle['cycle_id']}", "cycle": cycle, "chain": chain},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/real-write-preflight", response_class=HTMLResponse)
+async def controlled_operation_cycle_real_write_preflight(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    chain = load_cycle_real_write_chain_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_real_write_preflight.html",
+        {"request": request, "title": f"Real-write preflight: {cycle['cycle_id']}", "cycle": cycle, "chain": chain},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/real-write-package", response_class=HTMLResponse)
+async def controlled_operation_cycle_real_write_package(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    chain = load_cycle_real_write_chain_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_real_write_package.html",
+        {"request": request, "title": f"Real-write package: {cycle['cycle_id']}", "cycle": cycle, "chain": chain},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/real-write-freeze", response_class=HTMLResponse)
+async def controlled_operation_cycle_real_write_freeze(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    chain = load_cycle_real_write_chain_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_real_write_freeze.html",
+        {"request": request, "title": f"Real-write freeze: {cycle['cycle_id']}", "cycle": cycle, "chain": chain},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/real-write/execution", response_class=HTMLResponse)
+async def controlled_operation_cycle_real_write_execution(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    chain = load_cycle_real_write_chain_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_real_write_execution.html",
+        {"request": request, "title": f"Real-write execution: {cycle['cycle_id']}", "cycle": cycle, "chain": chain},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/real-write/verification", response_class=HTMLResponse)
+async def controlled_operation_cycle_real_write_verification(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    chain = load_cycle_real_write_chain_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_real_write_verification.html",
+        {"request": request, "title": f"Real-write verification: {cycle['cycle_id']}", "cycle": cycle, "chain": chain},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/real-write/compliance", response_class=HTMLResponse)
+async def controlled_operation_cycle_real_write_compliance(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    chain = load_cycle_real_write_chain_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_real_write_compliance.html",
+        {"request": request, "title": f"Real-write compliance: {cycle['cycle_id']}", "cycle": cycle, "chain": chain},
+    )
+
+
+@app.get("/controlled-operation/{cycle_id}/real-write/closure", response_class=HTMLResponse)
+async def controlled_operation_cycle_real_write_closure(request: Request, cycle_id: str):
+    cycle = _find_controlled_cycle(cycle_id)
+    chain = load_cycle_real_write_chain_artifacts(ROOT, cycle["cycle_id"])
+    return templates.TemplateResponse(
+        "controlled_operation_real_write_closure.html",
+        {"request": request, "title": f"Real-write closure: {cycle['cycle_id']}", "cycle": cycle, "chain": chain},
+    )
 
 @app.get("/service-engagement/{device}/responses/edit", response_class=HTMLResponse)
 async def response_edit_form(request: Request, device: str):

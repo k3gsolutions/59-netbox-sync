@@ -1,0 +1,11 @@
+{
+  "cycle_id": "cycle-002",
+  "root_dir": "reports/controlled-operation/cycle-002/approvals/approved",
+  "compat_dir": "reports/controlled-operation/cycle-002/approvals/approved/approved",
+  "copied": [
+    "approval-203-0-113-1.json"
+  ],
+  "generated_at": "2026-04-30T03:49:05.515885+00:00",
+  "no_netbox_write": true,
+  "no_apply_plan_created": true
+}

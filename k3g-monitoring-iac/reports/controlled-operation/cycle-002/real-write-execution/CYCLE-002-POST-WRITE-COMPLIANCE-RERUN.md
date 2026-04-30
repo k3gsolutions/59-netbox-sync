@@ -1,5 +1,5 @@
 # CYCLE-002 Post-Write Compliance Re-Run
 
-## Decision: NOT_APPLICABLE
+## Decision: CYCLE_POST_WRITE_COMPLIANCE_FAILED
 
-- execution aborted preflight
+- secret keyword found

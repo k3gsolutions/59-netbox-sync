@@ -1,0 +1,15 @@
+{
+  "cycle_id": "cycle-001",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decision": "READY_WITH_RESTRICTIONS",
+  "decided_at": "2026-04-29T00:00:00+00:00",
+  "restrictions": [
+    "Cycle completed in controlled mode",
+    "Expansion remains manual-review only",
+    "No NetBox write in this handoff package"
+  ],
+  "next_action": "Start cycle-002 with controlled limits",
+  "manual_review_required": true,
+  "no_netbox_write": true
+}

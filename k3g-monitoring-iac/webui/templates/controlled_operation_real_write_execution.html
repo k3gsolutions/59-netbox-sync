@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Real write execution {{ cycle.cycle_id }}{% endblock %}
+{% block content %}
+<h2>Real-write execution: {{ cycle.cycle_id }}</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="summary-label">Status</div><div class="summary-value">{{ chain.execution_result_json_file.content.status | status_label if chain.execution_result_json_file else 'N/A' }}</div></div>
+  <div class="summary-card"><div class="summary-label">Package</div><div class="summary-value">{{ chain.execution_package_file.content.execution_package_id if chain.execution_package_file else 'N/A' }}</div></div>
+  <div class="summary-card"><div class="summary-label">Itens</div><div class="summary-value">{{ chain.execution_result_json_file.content.items | length if chain.execution_result_json_file and chain.execution_result_json_file.content.items else 0 }}</div></div>
+  <div class="summary-card"><div class="summary-label">Freeze</div><div class="summary-value">{{ chain.freeze_json_file.content.decision | status_label if chain.freeze_json_file else 'N/A' }}</div></div>
+</div>
+<div class="card">
+  <div class="card-header">Arquivos</div>
+  <ul class="compact-list">
+    {% if chain.execution_result_json_file %}<li><a href="/reports/download?path={{ chain.execution_result_json_file.path }}">Resultado JSON</a></li>{% endif %}
+    {% if chain.execution_result_file %}<li><a href="/reports/download?path={{ chain.execution_result_file.path }}">Resultado MD</a></li>{% endif %}
+    {% if chain.execution_package_file %}<li><a href="/reports/download?path={{ chain.execution_package_file.path }}">Execution package</a></li>{% endif %}
+  </ul>
+</div>
+<div class="card"><div class="card-header">Navegação</div><div class="pending-validation-links">
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write/verification" class="btn btn-small">Verificação</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write/compliance" class="btn btn-small">Compliance</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write/closure" class="btn btn-small">Closure</a>
+</div></div>
+{% endblock %}

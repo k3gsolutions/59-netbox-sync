@@ -1,0 +1,13 @@
+{
+  "cycle_id": "cycle-002",
+  "decision": "CYCLE_DRYRUN_APPLYPLAN_GENERATED",
+  "apply_plan_id": "apply-plan-cycle-002-4bb0729f",
+  "apply_plan_file": "apply-plan-cycle-002-4bb0729f.json",
+  "generated_at": "2026-04-30T03:38:51.523820+00:00",
+  "items": 1,
+  "source_approval_records": [
+    "approval-203-0-113-1.json"
+  ],
+  "no_netbox_write": true,
+  "no_apply_execution": true
+}

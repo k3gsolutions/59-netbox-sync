@@ -1,0 +1,4 @@
+item_id,device,device_id,object_type,object_key,responsible_team,decision,reviewer,reviewed_at,approval_record_allowed,reason,notes,restriction
+203-0-113-1,4WNET-MNS-KTG-RX,1890,bgp_peer,203.0.113.1,bgp,approve_for_approval_record,Keslley,2026-04-30T03:24:43.861790+00:00,true,Aprovado para teste operacional controlado do Cycle-002,Aprovado para teste operacional controlado do Cycle-002,none
+192-0-2-1-30,4WNET-MNS-KTG-RX,1890,ip_address,192.0.2.1/30,network_ops,pending,,,false,,,none
+Eth-Trunk0-10,4WNET-MNS-KTG-RX,1890,subinterface,Eth-Trunk0.10,service,pending,,,false,,,none

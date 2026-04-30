@@ -1,0 +1,23 @@
+{
+  "authorization_id": "auth-cycle-002-cd91ff5a",
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "apply_plan_id": "apply-plan-cycle-002-4bb0729f",
+  "simulation_result_id": "simulation-cycle-002-dryrun",
+  "real_write_readiness_gate": "cycle-002-real-write-readiness-gate.json",
+  "required_phrase": "AUTORIZO_PRE_FLIGHT_ESCRITA_REAL_CYCLE-002_4WNET-MNS-KTG-RX_apply-plan-cycle-002-4bb0729f",
+  "status": "prepared",
+  "generated_at": "2026-04-30T03:53:08.065925+00:00",
+  "source_approval_records": [
+    "approval-203-0-113-1.json",
+    "approval-203-0-113-1.json"
+  ],
+  "safety_confirmations": {
+    "no_write_executed": true,
+    "no_token_read": true,
+    "no_network_call": true,
+    "final_preflight_required": true,
+    "explicit_operator_authorization_required": true
+  }
+}

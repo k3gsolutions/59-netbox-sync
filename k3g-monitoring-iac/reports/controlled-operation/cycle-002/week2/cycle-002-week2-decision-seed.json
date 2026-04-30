@@ -1,0 +1,15 @@
+{
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "seeded_item_id": "203-0-113-1",
+  "seeded_draft": "approval-draft-203-0-113-1.json",
+  "decision": "approve_for_approval_record",
+  "reviewer": "Keslley",
+  "reviewed_at": "2026-04-30T03:24:43.861790+00:00",
+  "reason": "Aprovado para teste operacional controlado do Cycle-002",
+  "approval_record_allowed": true,
+  "backup_path": "CYCLE-002-WEEK2-DECISIONS.csv.bak.20260430T032443Z",
+  "no_netbox_write": true,
+  "no_apply_plan_created": true
+}

@@ -1,0 +1,63 @@
+{
+  "apply_plan_id": "apply-plan-cycle-002-4bb0729f",
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "mode": "dry_run",
+  "status": "generated",
+  "generated_at": "2026-04-30T03:38:51.523820+00:00",
+  "source_approval_records": [
+    "approval-203-0-113-1.json"
+  ],
+  "items": [
+    {
+      "item_id": "203-0-113-1",
+      "approval_id": "cycle-002-203-0-113-1-57a92698",
+      "object_type": "bgp_peer",
+      "object_key": "203.0.113.1",
+      "action": "safe_create_staged",
+      "method": "POST",
+      "target_endpoint": "/",
+      "proposed_payload": {
+        "cycle_id": "cycle-002",
+        "device": "4WNET-MNS-KTG-RX",
+        "device_id": "1890",
+        "team": "bgp",
+        "object_type": "bgp_peer",
+        "object_key": "203.0.113.1",
+        "action": "safe_create_staged",
+        "category": "bgp"
+      },
+      "expected_result": "dry-run only",
+      "rollback_hint": "manual only",
+      "evidence_hash": "sha256:4d4e19dada48b90c417ba2db9ae0d6c3ac60da2680032a1ae305737c99e8cfca"
+    }
+  ],
+  "safety_flags": {
+    "dry_run_only": true,
+    "no_netbox_write": true,
+    "no_token_required": true,
+    "no_apply_execution": true,
+    "manual_execution_gate_required": true,
+    "generated_from_approved_records": true
+  },
+  "execution_policy": {
+    "can_execute_real_write": false,
+    "requires_next_gate": true,
+    "next_gate": "FASE_4_51_CYCLE002_DRYRUN_EXECUTION_GATE",
+    "max_items": 3,
+    "allowed_methods": [
+      "POST"
+    ],
+    "forbidden_methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "forbidden_targets": [
+      "/sync",
+      "equipment",
+      "ssh",
+      "netconf"
+    ]
+  }
+}

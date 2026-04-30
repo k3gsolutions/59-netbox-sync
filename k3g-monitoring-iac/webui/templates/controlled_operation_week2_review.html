@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Revisão Semana 2 {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Revisão Semana 2: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Decisão</div><div class="summary-value">{{ review.decision or 'N/A' | status_label }}</div></div>
+    <div class="summary-card"><div class="summary-label">Itens</div><div class="summary-value">{{ review.summary.total if review.summary else 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Aprovados</div><div class="summary-value">{{ review.summary.approved_for_approval_record if review.summary else 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Restrições</div><div class="summary-value">{{ 'Sim' if review.has_restrictions else 'Não' }}</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Critério de liberação da Semana 2</div>
+    <p>Esta etapa apenas prepara Registros de Aprovação. Nenhuma alteração será feita no NetBox.</p>
+    <p><strong>Comando:</strong> <code>ver relatório local</code></p>
+</div>
+
+<div class="card">
+    <div class="card-header">Decisões Week 2</div>
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>Object Type</th>
+                <th>Object Key</th>
+                <th>Time</th>
+                <th>Decisão</th>
+                <th>Revisor</th>
+                <th>Data</th>
+                <th>Notas</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in (review.review_json_file.content.get('items', []) if review.review_json_file else []) %}
+            <tr>
+                <td>{{ item.object_type }}</td>
+                <td><code>{{ item.object_key }}</code></td>
+                <td>{{ item.responsible_team }}</td>
+                <td>{{ item.classification | status_label }}</td>
+                <td>{{ item.reviewer or 'Pendente' }}</td>
+                <td class="mono">{{ item.reviewed_at or '-' }}</td>
+                <td>{{ item.notes or item.reason or '-' }}</td>
+            </tr>
+        {% endfor %}
+        {% if not review.review_json_file or not review.review_json_file.content.get('items') %}
+            <tr><td colspan="7">Nenhuma decisão localizada.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">Arquivos</div>
+    <ul class="compact-list">
+        {% if week2.board_file %}<li><a href="/reports/view?path={{ week2.board_file.path }}">Ver review board</a></li>{% endif %}
+        {% if week2.decisions_file %}<li><a href="/reports/view?path={{ week2.decisions_file.path }}">Ver CSV de decisões</a></li>{% endif %}
+        {% if review.review_file %}<li><a href="/reports/view?path={{ review.review_file.path }}">Ver relatório</a></li>{% endif %}
+        {% if review.review_json_file %}<li><a href="/reports/download?path={{ review.review_json_file.path }}">Baixar JSON</a></li>{% endif %}
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-header">Navegação</div>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week2" class="btn btn-small">Week 2</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals" class="btn btn-small">Aprovações</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals/readiness" class="btn btn-small">Prontidão</a>
+    </div>
+</div>
+{% endblock %}

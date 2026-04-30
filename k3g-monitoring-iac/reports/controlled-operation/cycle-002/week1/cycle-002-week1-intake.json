@@ -1,0 +1,58 @@
+{
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decision": "WEEK1_INTAKE_READY",
+  "evaluated_at": "2026-04-30T02:54:23.881132+00:00",
+  "expected_max_items": 3,
+  "summary": {
+    "responded": 3,
+    "still_pending": 0,
+    "invalid_format": 0,
+    "missing_required_fields": 0,
+    "total_teams": 3
+  },
+  "teams": {
+    "service": {
+      "status": "responded",
+      "file_count": 1,
+      "issues": [],
+      "records": [
+        {
+          "object_key": "Eth-Trunk0.10",
+          "object_type": "subinterface",
+          "status": "ready_for_week2_review",
+          "source_file": "service-team-response.csv"
+        }
+      ]
+    },
+    "network_ops": {
+      "status": "responded",
+      "file_count": 1,
+      "issues": [],
+      "records": [
+        {
+          "object_key": "192.0.2.1/30",
+          "object_type": "ip_address",
+          "status": "ready_for_week2_review",
+          "source_file": "network-ops-response.csv"
+        }
+      ]
+    },
+    "bgp": {
+      "status": "responded",
+      "file_count": 1,
+      "issues": [],
+      "records": [
+        {
+          "object_key": "203.0.113.1",
+          "object_type": "bgp_peer",
+          "status": "ready_for_week2_review",
+          "source_file": "bgp-team-response.csv"
+        }
+      ]
+    }
+  },
+  "responses_dir": "reports/controlled-operation/cycle-002/week1/responses",
+  "sensitive_hits": []
+}

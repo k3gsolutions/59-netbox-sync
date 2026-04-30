@@ -122,10 +122,10 @@ Gerado em: 2026-04-28 14:41:21 UTC
 ## Índice detalhado (auto)
 | Arquivo | Título | Seções (H2) | Linhas |
 | --- | --- | --- | --- |
-| context/CURRENT_STATE.md | Current State — 2026-04-29 (FASE 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10 Complete) | Latest Status; Completed; In Progress; Blocked; Known Limitations | 515 |
+| context/CURRENT_STATE.md | Current State — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.58 Complete) | Operational Status; Latest Status; Completed; In Progress; Blocked | 971 |
 | context/FASE-2-7-READY-FOR-APPROVAL.md | FASE 2.7 — First Real Batch POST (Ready for Approval) | Current Situation; FASE 2.7 Readiness Checklist; Approval Requirements; Execution Command (Once Approved); Expected Outcome | 156 |
 | context/GLOSSARY.md | GLOSSARY | - | 12 |
-| context/NEXT_ACTIONS.md | Next Actions — 2026-04-29 (FASE 3.14 + 2.29 + 2.28 + 3.13 + 2.26 + 2.27 + 3.12 + 3.10.2 + 3.10.1 + 3.10 Complete) | Current State; Earlier Completed; Just Completed; Previously Completed; Immediate Next Steps | 423 |
+| context/NEXT_ACTIONS.md | Next Actions — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2-4.58 Complete) | Current Focus (FASES 4.51-4.58); Current Focus (FASE 4.59); Just Completed (FASES 4.22-4.29); Status; Current State | 559 |
 | context/OPEN_QUESTIONS.md | OPEN_QUESTIONS | - | 20 |
 | context/PHASE_1_ROADMAP.md | FASE 1 Roadmap — Report Tooling | FASE 1.0 ✅ Core Analysis; FASE 1.1 ✅ Report History; FASE 1.2 ✅ Report Comparison & Cleanup; FASE 1.3 ✅ ImportPlan Read-Only; After FASE 1 | 110 |
 | context/SYSTEM_MAP.md | SYSTEM_MAP | - | 29 |
@@ -140,12 +140,46 @@ Gerado em: 2026-04-28 14:41:21 UTC
 | docs/08-grafana-strategy.md | 08 — Estratégia Grafana | Objetivo; Diretrizes iniciais; Próximos passos | 14 |
 | docs/09-n8n-workflows-strategy.md | 09 — Estratégia de Workflows N8N | Objetivo; Diretrizes; Próximos passos | 14 |
 | docs/10-brownfield-migration.md | 10 — Brownfield Migration | Contexto; Estratégia; Riscos | 19 |
+| docs/105-controlled-operation-overview.md | Controlled Operation Overview | Goal; Rules; Cycle-002; Safety | 25 |
+| docs/106-controlled-operation-cycle.md | Controlled Operation Cycle | Goal; Rules; Cycle flow; Cycle-002 | 34 |
 | docs/11-operational-runbooks.md | 11 — Operational Runbooks | Objetivo; Estrutura sugerida; Status | 14 |
 | docs/12-observability-of-observability.md | 12 — Observability of Observability | Objetivo; Diretrizes; Próximos passos | 13 |
 | docs/13-ai-operating-model.md | 13 — AI Operating Model | 1. Propósito; 2. Ordem recomendada de leitura; 3. Uso de prompts reutilizáveis; 4. Uso de skills locais; 5. Uso de ferramentas locais (`tools/local/`) | 84 |
+| docs/135-multi-cycle-operation-index.md | FASE 4.30 — Multi-Cycle Operation Index | Objetivo; Comando; Saída; Leitura | 21 |
+| docs/136-cycle-start-gate.md | FASE 4.31 — Cycle Start Gate | Objetivo; Comando; Decisões; Segurança | 25 |
+| docs/137-multi-cycle-webui.md | FASE 4.32 — Multi-Cycle Web UI | Objetivo; Rotas; Regras | 18 |
+| docs/138-controlled-expansion-policy.md | FASE 4.33 — Controlled Expansion Policy | Objetivo; Arquivo; Ferramenta; Regra | 21 |
+| docs/139-cycle002-intake-activation.md | FASE 4.34 - Cycle-002 Intake Activation | Objetivo; Comando; Resultado atual; Saidas; Segurança | 33 |
 | docs/14-device-config-discovery-standard.md | 14 — Device Config Discovery Standard | 1. Objetivo; 2. Escopo inicial; 3. Fonte da verdade; 4. Relação com netops_netbox_sync; 5. Naming convention oficial | 214 |
+| docs/140-cycle002-week1-preparation.md | FASE 4.35 - Cycle-002 Week 1 Preparation | Objetivo; Comando; Estrutura criada; Resultado atual; Segurança | 31 |
+| docs/141-cycle002-week1-response-intake.md | FASE 4.36 - Cycle-002 Week 1 Response Intake | Objetivo; Comando; Resultado atual; Saidas; Segurança | 31 |
+| docs/142-cycle002-week1-validation.md | FASE 4.37 - Cycle-002 Week 1 Validation | Objetivo; Comando; Resultado atual; Saidas; Segurança | 32 |
+| docs/143-cycle002-week1-response-form-or-seed.md | Cycle-002 Week 1 Response Form / Response Seed | Goal; Supported flow; Security; Validation | 23 |
+| docs/144-cycle002-week1-revalidation.md | Cycle-002 Week 1 Re-Validation | Goal; Expected result; Security | 17 |
+| docs/145-cycle002-week2-preparation.md | Cycle-002 Week 2 Preparation | Goal; Outputs; Security; Follow-up | 24 |
+| docs/146-cycle002-week2-human-review.md | Cycle-002 Week 2 Human Review | Purpose; Inputs; Decision Rules; Safety; Current State | 29 |
+| docs/147-cycle002-proposed-approvalrecords.md | Cycle-002 Proposed ApprovalRecords | Purpose; Inputs; Promotion Rules; Safety; Current State | 27 |
+| docs/148-cycle002-approval-readiness-gate.md | Cycle-002 Approval Readiness Gate | Purpose; Inputs; Gate Checks; Decisions; Safety | 34 |
+| docs/149-cycle002-week2-decision-seed.md | Cycle-002 Week 2 Decision Seed | Purpose; Rules; Safety; Current State | 21 |
 | docs/15-service-type-dependency-matrix.md | 15 — Service Type Dependency Matrix | customer-internet; customer-l2vpn; customer-l3vpn; customer-transport; carrier-transit | 240 |
+| docs/150-cycle002-week2-re-review.md | Cycle-002 Week 2 Re-Review | Purpose; Result; Safety; Current State | 17 |
+| docs/151-cycle002-proposed-approval-test.md | Cycle-002 Proposed Approval Test | Purpose; Result; Safety; Current State | 17 |
+| docs/152-cycle002-approval-readiness-regate.md | Cycle-002 Approval Readiness Re-Gate | Purpose; Result; Safety; Current State | 15 |
+| docs/153-cycle002-manual-approval-review.md | Cycle-002 Manual Approval Review | Goal; Rules; Decisions; Result | 22 |
+| docs/154-cycle002-dryrun-applyplan-generation.md | Cycle-002 Dry-Run ApplyPlan Generation | Goal; Rules; Output; Safety | 19 |
+| docs/155-cycle002-dryrun-applyplan-validation.md | Cycle-002 Dry-Run ApplyPlan Validation | Goal; Rules; Checks; Result | 22 |
+| docs/156-cycle002-dryrun-execution-gate.md | Cycle-002 Dry-Run Execution Gate | Goal; Rules; Result | 13 |
+| docs/157-cycle002-dryrun-simulation.md | Cycle-002 Dry-Run Simulation | Goal; Rules; Result | 13 |
+| docs/158-cycle002-real-write-readiness-gate.md | Cycle-002 Real Write Readiness Gate | Goal; Rules; Result | 13 |
+| docs/159-cycle002-real-write-authorization-package.md | Cycle-002 Real Write Authorization Package | Goal; Rules; Result | 12 |
 | docs/16-netbox-readiness-checklist.md | 16 — NetBox Readiness Checklist | Objetivo; Campos obrigatórios em Device; Campos obrigatórios em Interface; Campos obrigatórios em Circuit; Campos obrigatórios em VRF | 114 |
+| docs/160-cycle002-real-write-final-preflight.md | Cycle-002 Real Write Final Preflight | Goal; Rules; Result | 13 |
+| docs/161-cycle002-real-write-execution-package.md | Cycle-002 Real Write Execution Package | Goal; Rules; Result | 13 |
+| docs/162-cycle002-final-no-write-freeze.md | Cycle-002 Final No-Write Freeze | Goal; Rules; Result | 13 |
+| docs/163-cycle002-execute-real-write-once.md | Cycle-002 Execute Real Write Once | - | 10 |
+| docs/164-cycle002-post-write-verification.md | Cycle-002 Post-Write Verification | - | 11 |
+| docs/165-cycle002-post-write-compliance-rerun.md | Cycle-002 Post-Write Compliance Re-Run | - | 10 |
+| docs/166-cycle002-closure-package.md | Cycle-002 Closure Package | - | 9 |
 | docs/17-pilot-device-compliance-plan.md | 17 — Pilot Device Compliance Plan | Objetivo do piloto; Como escolher o dispositivo; Pré-requisitos; Dados necessários; Fluxo de execução | 85 |
 | docs/18-compliance-divergence-catalog.md | 18 — Compliance Divergence Catalog | Estrutura do catálogo; Códigos de divergência | 198 |
 | docs/19-first-pilot-runbook.md | Runbook — Primeiro Piloto de Compliance | 1. Objetivo; 2. Escopo inicial; 3. Pré-requisitos; 4. Dados a preencher antes da execução; 5. Checklist de segurança | 206 |
@@ -179,18 +213,27 @@ Gerado em: 2026-04-28 14:41:21 UTC
 | docs/60-week2-human-review-execution.md | FASE 2.23 — Week 2 Human Review Execution | Overview; Process; Summary; Approved for ApprovalRecord (Pending Promotion); Request Changes | 326 |
 | docs/61-webui-futuristic-redesign.md | FASE 3.9.1 — Web UI Futuristic Redesign | Objetivo; Design Principles; Mudanças Implementadas; Compatibilidade; Arquivo CSS | 127 |
 | docs/62-webui-response-edit-forms.md | FASE 3.9.3 — Web UI Response Edit Forms | Objetivo; Importante; Rotas Implementadas; Campos por Time/Object Type; Validações Implementadas | 287 |
-| docs/62-webui-response-form.md | FASE 3.10 — Web UI Pending Item Editor Modal | Goal; Routes; UX; Validation Rules; Storage | 192 |
-| docs/63-week1-uat-response-handling.md | FASE 2.25 - Week 1 UAT Response Handling | Modes; Detection; Reports; Safety | 32 |
-| docs/64-webui-response-validation-dashboard.md | FASE 3.12 - Web UI Response Validation Dashboard | Route; Shows; Actions; Safety | 27 |
-| docs/65-webui-auto-local-pipeline.md | FASE 3.10.2 - Web UI Auto Local Pipeline | Flow; UI Actions; Endpoints; Safety | 32 |
+| docs/62-webui-response-form.md | FASE 3.10 — Web UI Pending Item Editor Modal | Goal; Routes; UX; Validation Rules; Storage | 197 |
+| docs/63-week1-uat-response-handling.md | FASE 2.25 - Week 1 UAT Response Handling | Modes; Detection; Reports; Safety; Multi-cycle follow-up | 37 |
+| docs/64-webui-response-validation-dashboard.md | FASE 3.12 - Web UI Response Validation Dashboard | Route; Shows; Actions; Multi-cycle follow-up; Safety | 32 |
+| docs/65-webui-auto-local-pipeline.md | FASE 3.10.2 - Web UI Auto Local Pipeline | Flow; UI Actions; Endpoints; Safety; Multi-cycle follow-up | 37 |
 | docs/66-webui-ptbr-ux-copy.md | Web UI PT-BR UX Copy | Objetivo; Diretriz; Termos sugeridos; Mensagens padrão; Campos do modal | 47 |
-| docs/67-real-week1-activation-flow.md | Real Week 1 Activation Flow | Objetivo; Fluxo; O que não acontece; Resultado esperado; Artefatos locais | 35 |
+| docs/67-real-week1-activation-flow.md | Real Week 1 Activation Flow | Objetivo; Fluxo; O que não acontece; Resultado esperado; Artefatos locais | 39 |
 | docs/68-real-week1-execution.md | Real Week 1 Execution | Objetivo; Fonte; O que o log mostra; Segurança; Uso | 34 |
-| docs/69-real-week1-final-validation.md | Real Week 1 Final Validation | Objetivo; Decisões; Regras; Saídas; Segurança | 26 |
-| docs/70-webui-operational-usability.md | Web UI Operational Usability | Objetivo; Melhorias; Termos preferidos; Termos que viram linguagem simples; Limites | 33 |
+| docs/69-real-week1-final-validation.md | Real Week 1 Final Validation | Objetivo; Decisões; Regras; Saídas; Segurança | 30 |
+| docs/70-webui-operational-usability.md | Web UI Operational Usability | Objetivo; Melhorias; Termos preferidos; Termos que viram linguagem simples; Limites | 37 |
 | docs/71-week2-human-review-execution.md | Revisão Humana da Semana 2 | Entradas; Regras; Saídas | 19 |
 | docs/72-week2-promote-to-proposed-approvalrecords.md | Promoção para ApprovalRecords Propostos | Regras; Garantias | 17 |
-| docs/73-webui-week2-review-experience.md | Experiência de Revisão da Semana 2 | Texto para operador | 14 |
+| docs/73-webui-week2-review-experience.md | Experiência de Revisão da Semana 2 | Texto para operador; Multi-cycle follow-up | 17 |
+| docs/74-compliance-conventions.md | Compliance Conventions & Policy Registry | Overview; VRP Element Tree; Dependencies; Naming Conventions; Policies | 364 |
+| docs/75-webui-convention-registry-integration.md | FASE 3.16 — Web UI Convention Registry Integration | Objetivo; Arquitetura; Integração Implementada; Severity Levels; Rule IDs e Violations | 432 |
+| docs/76-compliance-registry-operations.md | FASE 2.33 — Compliance Registry Operationalization | 1. Visão Geral; 2. Arquitetura; 3. Quando Alterar uma Policy; 4. Processo de Alteração; Impacto da Mudança | 444 |
+| docs/83-manual-promotion-to-proposed-approvalrecords.md | FASE 2.38 — Manual Promotion of Week 2 Decisions to Proposed ApprovalRecords | Overview; Key Components; Promotion Criteria (ALL must be satisfied); Created ApprovalRecord Structure; Output | 293 |
+| docs/84-applyplan-readiness-gate.md | FASE 2.39 — ApplyPlan Readiness Gate | Overview; Key Purpose; Gate Tool; Validation Checks; Decision Logic | 400 |
+| docs/85-manual-approval-review.md | FASE 2.40.1 — Manual Approval Review Hardening | Overview; Tool: review_proposed_approval_record.py; Validation (Hardened); Decisions; Security | 76 |
+| docs/86-dryrun-applyplan-readiness-gate.md | FASE 2.41.1 — Dry-Run ApplyPlan Readiness Gate Hardening | Overview; Tool: dryrun_applyplan_readiness_gate.py; Validation (Hardened); Decisions; Security | 76 |
+| docs/87-generate-dryrun-applyplan.md | FASE 2.42 — Generate Dry-Run ApplyPlan | Overview; Tool: generate_dryrun_applyplan.py; ApplyPlan Structure; Security | 57 |
+| docs/88-validate-dryrun-applyplan.md | FASE 2.43 — Validate Dry-Run ApplyPlan | Overview; Tool: validate_dryrun_applyplan.py; Validation Checks; Security | 60 |
 | docs/FASE_0_8_1_NETBOX_DEEP_MAPPING.md | Fase 0 8 1 Netbox Deep Mapping | Objetivo; Componentes coletados; Core obrigatório; Plugin BGP; Limitações atuais | 30 |
 | docs/adr/0001-netbox-as-single-sot.md | ADR 0001 — NetBox como single source of truth técnico | Status; Contexto; Decisão; Consequências; Referências | 19 |
 | docs/adr/0002-n8n-as-orchestrator.md | ADR 0002 — N8N como orquestrador principal | Status; Contexto; Decisão; Consequências; Referências | 19 |

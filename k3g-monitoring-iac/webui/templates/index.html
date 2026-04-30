@@ -67,6 +67,15 @@
         <p>Itens com restrição: {{ week2_review.restricted }}</p>
         <a href="{{ week2_review.link }}" class="button">Abrir revisão</a>
     </div>
+
+    <div class="card">
+        <h3>Operação Controlada</h3>
+        <p>Status global: {{ controlled_operation.index.overall_status | status_label }}</p>
+        <p>Ciclos: {{ controlled_operation.index.total_cycles }}</p>
+        <p>Encerrados: {{ controlled_operation.counts.closed_success + controlled_operation.counts.closed_with_restrictions }}</p>
+        <p>Restrições: {{ controlled_operation.counts.closed_with_restrictions }}</p>
+        <a href="/controlled-operation" class="button">Abrir operação controlada</a>
+    </div>
 </div>
 
 <h3>Relatório mais recente</h3>
@@ -93,6 +102,7 @@
     <li><a href="/service-engagement">Pendências de serviço</a></li>
     <li><a href="/approval-queue">Fila de aprovação</a></li>
     <li><a href="/approvals">Registros de aprovação</a></li>
+    <li><a href="/controlled-operation">Operação controlada</a></li>
     <li><a href="/apply-plans">Planos de aplicação</a></li>
     <li><a href="/batch-results">Resultados em lote</a></li>
     <li><a href="/incidents">Relatórios de incidente</a></li>

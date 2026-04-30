@@ -1,0 +1,40 @@
+{
+  "simulation_id": "simulation-cycle-002-dryrun",
+  "cycle_id": "cycle-002",
+  "apply_plan_id": "apply-plan-cycle-002-4bb0729f",
+  "device": "4WNET-MNS-KTG-RX",
+  "status": "CYCLE_DRYRUN_SIMULATION_PASSED",
+  "generated_at": "2026-04-30T03:52:55.558987+00:00",
+  "items": [
+    {
+      "item_id": "203-0-113-1",
+      "approval_id": "cycle-002-203-0-113-1-57a92698",
+      "object_type": "bgp_peer",
+      "object_key": "203.0.113.1",
+      "method": "POST",
+      "target_endpoint": "/",
+      "expected_result": "dry-run only",
+      "rollback_hint": "manual only",
+      "sanitized_payload": {
+        "cycle_id": "cycle-002",
+        "device": "4WNET-MNS-KTG-RX",
+        "device_id": "1890",
+        "team": "bgp",
+        "object_type": "bgp_peer",
+        "object_key": "203.0.113.1",
+        "action": "safe_create_staged",
+        "category": "bgp"
+      }
+    }
+  ],
+  "warnings": [],
+  "safety_confirmations": {
+    "local_only": true,
+    "no_network_call": true,
+    "no_token_read": true,
+    "no_netbox_write": true,
+    "no_apply_execution": true
+  },
+  "next_gate_required": true,
+  "next_gate": "FASE_4_53_CYCLE002_REAL_WRITE_READINESS_GATE"
+}

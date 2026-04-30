@@ -1,0 +1,11 @@
+{
+  "cycle_id": "cycle-002",
+  "decision": "CYCLE_READY_FOR_REAL_WRITE_REVIEW",
+  "issues": [],
+  "approved_records": [
+    "approval-203-0-113-1.json",
+    "approval-203-0-113-1.json"
+  ],
+  "no_netbox_write": true,
+  "no_apply_plan_created": true
+}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Dry-run simulation {{ cycle.cycle_id }}{% endblock %}
+{% block content %}
+<h2>Dry-run simulation: {{ cycle.cycle_id }}</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="summary-label">Geração</div><div class="summary-value">{{ applyplans.generation_decision | status_label }}</div></div>
+  <div class="summary-card"><div class="summary-label">Validação</div><div class="summary-value">{{ applyplans.validation_decision | status_label }}</div></div>
+  <div class="summary-card"><div class="summary-label">Planos</div><div class="summary-value">{{ applyplans.plans | length }}</div></div>
+  <div class="summary-card"><div class="summary-label">Segurança</div><div class="summary-value">local only</div></div>
+</div>
+<div class="card">
+  <div class="card-header">Resumo</div>
+  <p>Simulação local apenas. Sem requests, sem rede, sem token, sem NetBox.</p>
+</div>
+<div class="card"><div class="card-header">Navegação</div><div class="pending-validation-links">
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/applyplan/dryrun-gate" class="btn btn-small">Dry-run gate</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/applyplan/real-write-readiness" class="btn btn-small">Real-write readiness</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+</div></div>
+{% endblock %}

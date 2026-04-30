@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Real write verification {{ cycle.cycle_id }}{% endblock %}
+{% block content %}
+<h2>Real-write verification: {{ cycle.cycle_id }}</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="summary-label">Decisão</div><div class="summary-value">{{ chain.post_write_verification_json_file.content.decision | status_label if chain.post_write_verification_json_file else 'N/A' }}</div></div>
+  <div class="summary-card"><div class="summary-label">Execução</div><div class="summary-value">{{ chain.execution_result_json_file.content.status | status_label if chain.execution_result_json_file else 'N/A' }}</div></div>
+  <div class="summary-card"><div class="summary-label">Itens</div><div class="summary-value">{{ chain.post_write_verification_json_file.content.items | length if chain.post_write_verification_json_file and chain.post_write_verification_json_file.content.items else 0 }}</div></div>
+  <div class="summary-card"><div class="summary-label">Device</div><div class="summary-value">{{ cycle.device }}</div></div>
+</div>
+<div class="card">
+  <div class="card-header">Arquivos</div>
+  <ul class="compact-list">
+    {% if chain.post_write_verification_json_file %}<li><a href="/reports/download?path={{ chain.post_write_verification_json_file.path }}">Verification JSON</a></li>{% endif %}
+    {% if chain.post_write_verification_file %}<li><a href="/reports/download?path={{ chain.post_write_verification_file.path }}">Verification MD</a></li>{% endif %}
+  </ul>
+</div>
+<div class="card"><div class="card-header">Navegação</div><div class="pending-validation-links">
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write/execution" class="btn btn-small">Execução</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write/compliance" class="btn btn-small">Compliance</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write/closure" class="btn btn-small">Closure</a>
+</div></div>
+{% endblock %}

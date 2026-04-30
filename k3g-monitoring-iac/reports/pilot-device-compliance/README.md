@@ -56,6 +56,10 @@ A partir da fase atual, o fluxo de compliance também gera um ImportPlan read-on
 - Real Week 1 execution is documented in `docs/68-real-week1-execution.md`
 - Real Week 1 final validation is documented in `docs/69-real-week1-final-validation.md`
 - Operational usability is documented in `docs/70-webui-operational-usability.md`
+- Cycle-002 Week 2 human review is documented in `docs/146-cycle002-week2-human-review.md`
+- Cycle-002 proposed approvals are documented in `docs/147-cycle002-proposed-approvalrecords.md`
+- Cycle-002 approval readiness gate is documented in `docs/148-cycle002-approval-readiness-gate.md`
+- Cycle-002 decision seed / re-review / re-gate are documented in `docs/149-cycle002-week2-decision-seed.md`, `docs/150-cycle002-week2-re-review.md`, `docs/151-cycle002-proposed-approval-test.md`, and `docs/152-cycle002-approval-readiness-regate.md`
 - Validation remains local via `tools/local/validate_week1_responses.py`
 - Finalize/pipeline behavior is documented in `docs/65-webui-auto-local-pipeline.md`
 - Real execution log: `REAL-WEEK1-EXECUTION-LOG.md`
@@ -128,3 +132,8 @@ Ver `docs/20-report-history-standard.md` para:
 - Revisão humana executada em ambiente local.
 - Validação e promoção geram apenas artefatos locais.
 - UAT continua separado de dados reais.
+
+## Operação multi-ciclo
+
+- Cycle-001 appears in the controlled-operation index as closed with restrictions.
+- Cycle-002 remains planned until the human review path advances it.

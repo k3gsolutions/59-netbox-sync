@@ -4,16 +4,14 @@
 from __future__ import annotations
 
 import csv
+import asyncio
 import json
 import tempfile
 import shutil
-import socket
 import subprocess
-import time
 import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
-from urllib import error, request as urllib_request
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -36,80 +34,65 @@ except Exception:
 
 
 class LocalHttpClient:
-    def __init__(self):
-        self.proc = None
-
     def __enter__(self):
-        if TestClient is not None:
-            self.client = TestClient(app)
-            return self.client
-
-        self.proc = subprocess.Popen(
-            [
-                sys.executable,
-                "-m",
-                "uvicorn",
-                "webui.app:app",
-                "--host",
-                "127.0.0.1",
-                "--port",
-                str(SERVER_PORT),
-                "--log-level",
-                "error",
-            ],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        deadline = time.time() + 15
-        while time.time() < deadline:
-            try:
-                with socket.create_connection(("127.0.0.1", SERVER_PORT), timeout=0.2):
-                    break
-            except OSError:
-                time.sleep(0.2)
-        else:
-            raise RuntimeError("uvicorn server did not start")
         return self
 
     def __exit__(self, exc_type, exc, tb):
-        if self.proc is not None:
-            self.proc.terminate()
-            try:
-                self.proc.wait(timeout=5)
-            except Exception:
-                self.proc.kill()
-            self.proc = None
+        return False
 
-    def _request(self, method: str, path: str, json_body: Dict[str, object] | None = None):
-        if TestClient is not None:
-            raise RuntimeError("TestClient path should not call LocalHttpClient._request")
+    async def _request(self, method: str, path: str, json_body: Dict[str, object] | None = None):
+        query_string = b""
+        raw_path = path.encode("utf-8")
+        if "?" in path:
+            raw_path, query = path.split("?", 1)
+            query_string = query.encode("utf-8")
+            raw_path = raw_path.encode("utf-8")
 
-        url = SERVER_URL + path
-        headers = {}
-        data = None
+        body = b""
+        headers = []
         if json_body is not None:
-            data = json.dumps(json_body).encode("utf-8")
-            headers["Content-Type"] = "application/json"
-            headers["Accept"] = "application/json"
+            body = json.dumps(json_body).encode("utf-8")
+            headers = [(b"content-type", b"application/json"), (b"accept", b"application/json")]
 
-        req = urllib_request.Request(url, data=data, headers=headers, method=method)
-        try:
-            with urllib_request.urlopen(req, timeout=20) as resp:
-                body = resp.read().decode("utf-8")
-                return SimpleResponse(resp.status, body)
-        except error.HTTPError as exc:
-            body = exc.read().decode("utf-8")
-            return SimpleResponse(exc.code, body)
+        scope = {
+            "type": "http",
+            "asgi": {"version": "3.0"},
+            "http_version": "1.1",
+            "method": method,
+            "scheme": "http",
+            "path": path.split("?", 1)[0],
+            "raw_path": raw_path,
+            "query_string": query_string,
+            "headers": headers,
+            "client": ("testclient", 123),
+            "server": ("testserver", 80),
+        }
+        status_code = 500
+        chunks: List[bytes] = []
+        request_seen = False
+
+        async def receive():
+            nonlocal request_seen
+            if not request_seen:
+                request_seen = True
+                return {"type": "http.request", "body": body, "more_body": False}
+            return {"type": "http.disconnect"}
+
+        async def send(message):
+            nonlocal status_code
+            if message["type"] == "http.response.start":
+                status_code = message["status"]
+            elif message["type"] == "http.response.body":
+                chunks.append(message.get("body", b""))
+
+        await app(scope, receive, send)
+        return SimpleResponse(status_code, b"".join(chunks).decode("utf-8", errors="ignore"))
 
     def get(self, path: str):
-        if TestClient is not None:
-            return self.client.get(path)
-        return self._request("GET", path)
+        return asyncio.run(self._request("GET", path))
 
     def post(self, path: str, json: Dict[str, object] | None = None):
-        if TestClient is not None:
-            return self.client.post(path, json=json)
-        return self._request("POST", path, json_body=json)
+        return asyncio.run(self._request("POST", path, json_body=json))
 
 
 class SimpleResponse:

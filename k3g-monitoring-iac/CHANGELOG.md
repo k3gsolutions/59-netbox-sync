@@ -2,6 +2,68 @@
 
 ## [Unreleased]
 
+### Added — FASES 4.59, 4.60, 4.61, 4.62: Cycle-002 Real-Write Attempt, Verification, Compliance, and Closure
+
+- Real-write execution script with one-shot preflight and env-token only handling.
+- Post-write verification GET-only script.
+- Local post-write compliance re-run.
+- Closure package generator.
+- Current repo run aborted safely: no `NETBOX_WRITE_TOKEN` present and execution package target endpoint is blocked, so no NetBox write happened.
+
+### Added — FASES 4.51, 4.52, 4.53, 4.54, 4.55, 4.56, 4.57, 4.58: Cycle-002 Dry-Run and Real-Write Preflight Chain
+
+- Dry-run execution gate for the generated ApplyPlan.
+- Local dry-run simulation with sanitized payloads and next-gate output.
+- Real-write readiness gate that accepts the approved record chain.
+- Human authorization package and exact phrase generation.
+- Final preflight gate before execution package build.
+- Locked real-write execution package with `execution_allowed=false`.
+- Execution-package validation and final no-write freeze check.
+- No NetBox writes, no token read, no /sync, no ApplyPlan execution.
+
+### Added — FASES 4.48, 4.49, 4.50: Cycle-002 Manual Approval Review, Dry-Run ApplyPlan Generation, and Dry-Run Validation
+
+- Manual approval review helper for a proposed Cycle-002 ApprovalRecord.
+- Approved copy created locally only, with human decision and audit trail.
+- Dry-run ApplyPlan generation from approved records.
+- Dry-run ApplyPlan validation with explicit real-write blocking.
+- No NetBox writes, no automatic approval, no ApplyPlan execution.
+
+### Added — FASES 4.44, 4.45, 4.46, 4.47: Cycle-002 Week 2 Decision Seed, Re-Review, Proposed Approval Test, and Readiness Re-Gate
+
+- Controlled seed helper for a single Week 2 decision row.
+- Week 2 review now handles the seeded test decision and passes with restrictions.
+- Promotion creates one proposed ApprovalRecord only.
+- Approval readiness gate re-run reaches `READY_FOR_MANUAL_APPROVAL_REVIEW`.
+- No NetBox writes, no ApplyPlan, no auto-approval.
+
+### Added — FASES 4.41, 4.42, 4.43: Cycle-002 Week 2 Human Review, Proposed Approvals, and Approval Readiness
+
+- Week 2 human review validator for Cycle-002 decisions CSV.
+- Proposed ApprovalRecord promotion helper for approved Week 2 drafts.
+- Approval readiness gate for proposed/pending records.
+- Read-only Web UI pages for Week 2 review, approvals, and readiness.
+- Cycle-002 Week 2 review remained blocked because explicit human decisions were still pending.
+- No proposed ApprovalRecords were created, no ApplyPlan created, no NetBox writes.
+
+### Added — FASES 4.38, 4.39, 4.40: Cycle-002 Week 1 Response Seed, Re-Validation, and Week 2 Preparation
+
+- Local response seed support for Cycle-002 Week 1 items.
+- Week 1 intake re-validation after responses are present.
+- Week 2 preparation from validated Week 1 responses.
+- Controlled-operation UI now exposes Week 1 pending and Week 2 read-only views.
+- No NetBox writes, no apply, no `/sync`, no ApprovalRecord official creation, no ApplyPlan creation.
+
+### Added — FASES 4.30, 4.31, 4.32, 4.33, 4.34, 4.35, 4.36, 4.37: Multi-Cycle Operations and Cycle-002 Week 1 Flow
+
+- Multi-cycle operation index generated for controlled cycles.
+- Cycle-002 start gate emitted and exposed in the read-only Web UI.
+- Controlled expansion policy and evaluation added.
+- Cycle-002 Week 1 activation and preparation scripts added.
+- Cycle-002 Week 1 response intake and validation scripts added.
+- Week 1 intake/validation currently report blocked when the responses directory is empty.
+- No NetBox writes, no apply, no `/sync`, no ApprovalRecord, no ApplyPlan.
+
 ### Added — FASES 4.22, 4.23, 4.24, 4.25: Real Write Execution, Verification, Compliance, Closure (2026-04-29)
 
 **Execute Real Write Once (FASE 4.22)**
@@ -47,6 +109,47 @@
 - Closure decision logic: SUCCESS/WITH_WARNINGS/ACTION_REQUIRED
 - No subprocess calls across all 4 phases
 - 15/15 tests passing
+
+### Added — FASES 4.26, 4.27, 4.28, 4.29: Cycle Closure, Handoff Decision & Next Cycle Readiness (2026-04-29)
+
+**Final Archive (FASE 4.26)**
+- controlled_cycle_final_archive.py — archive cycle with SHA256 hashes and security validation
+- Index all artifacts (.json, .md), calculate SHA256 hashes
+- Detect secrets: NETBOX_WRITE_TOKEN, token, password, secret, api_key, bearer, authorization, .env, payload.local
+- Status: CYCLE_ARCHIVED_SUCCESS (no secrets) / CYCLE_ARCHIVED_ACTION_REQUIRED (secrets found)
+- Generates manifest.json (artifacts, hashes, secret findings) and archive report markdown
+- Zero NetBox writes, local file operations only
+
+**Operational Handoff Decision (FASE 4.27)**
+- controlled_cycle_handoff_decision.py — emit final handoff decision based on cycle completion
+- Decision logic: ACTION_REQUIRED (failures/secrets) → WITH_RESTRICTIONS (warnings) → READY (all passed)
+- Decisions: CYCLE_CLOSED_READY_FOR_NEXT_OPERATION / CYCLE_CLOSED_WITH_RESTRICTIONS / CYCLE_ACTION_REQUIRED
+- Loads closure summary and archive manifest, determines readiness
+- Generates handoff decision markdown and JSON
+
+**Update Controlled Operation Metrics (FASE 4.28)**
+- update_controlled_operation_metrics.py — track global operational metrics after cycle completion
+- Counts: total cycles, cycles completed, success/warnings/action_required, handoff status
+- Generates metrics markdown report and JSON metrics (measured_at, total_cycles_defined, etc.)
+- Zero network calls, directory iteration only
+
+**Create Next Cycle Template (FASE 4.29)**
+- create_next_controlled_cycle_template.py — prepare next cycle if handoff permits
+- Blocked if CYCLE_ACTION_REQUIRED
+- Creates scope.json with constraints: max_items=3, allowed=[POST], forbidden=[PATCH,DELETE,/sync,equipment,ssh,netconf]
+- Creates plan.md (schedule, phases, next steps)
+- Creates checklist.md (prerequisites, intake, approval, execution, closure phases)
+- Creates status.md (PLANNED_NOT_STARTED)
+- Zero network calls, template generation only
+
+**Testing & Validation**
+- test_controlled_cycle_closure_and_next_cycle.py — 17 comprehensive tests
+- Archive: manifest generation, secret detection (token/password/secret keywords), SHA256 hashing
+- Handoff: decision logic (closure status + archive results → ready/restrictions/action_required)
+- Metrics: cycle counting (iterdir for cycle-* directories), handoff status tracking
+- Next cycle: blocked if ACTION_REQUIRED, scope constraints enforced, plan/checklist/status created
+- Security: no network imports (requests/urllib), read-only file operations
+- 17/17 tests passing
 
 **Key Achievements**
 - Complete real write execution workflow (FASES 4.22-4.25)
@@ -958,3 +1061,10 @@
 - Tests: test_manual_approval_flow.py (18 tests, all passing)
 - Compliance: All 39/39 Web UI tests still passing, zero regressions
 - Security: No NetBox writes, tokens, apply operations, or automatic progressions verified
+
+## FASE 4.30-4.33
+
+- Controlled-operation index added for multiple cycles.
+- Cycle-002 start gate added in read-only mode.
+- Multi-cycle Web UI added under `/controlled-operation`.
+- Expansion policy added as recommendation-only YAML.

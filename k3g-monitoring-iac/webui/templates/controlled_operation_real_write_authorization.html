@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Real write authorization {{ cycle.cycle_id }}{% endblock %}
+{% block content %}
+<h2>Real-write authorization: {{ cycle.cycle_id }}</h2>
+<div class="card">
+  <div class="card-header">Authorization request</div>
+  {% if chain.authorization_request_file %}
+  <p><a href="/reports/download?path={{ chain.authorization_request_file.path }}">Baixar JSON</a></p>
+  <pre class="pre-wrap">{{ chain.authorization_request_file.content | tojson(indent=2) }}</pre>
+  {% else %}
+  <p>Sem autorização gerada.</p>
+  {% endif %}
+</div>
+<div class="card"><div class="card-header">Navegação</div><div class="pending-validation-links">
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write-preflight" class="btn btn-small">Preflight</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write-package" class="btn btn-small">Package</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+</div></div>
+{% endblock %}

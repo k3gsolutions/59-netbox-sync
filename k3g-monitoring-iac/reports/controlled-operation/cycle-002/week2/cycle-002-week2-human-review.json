@@ -1,0 +1,67 @@
+{
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decision": "WEEK2_REVIEW_PASSED_WITH_RESTRICTIONS",
+  "reviewed_at": "2026-04-30T03:24:46.856895+00:00",
+  "errors": [],
+  "summary": {
+    "total": 3,
+    "approved_for_approval_record": 1,
+    "request_changes": 0,
+    "rejected": 0,
+    "deferred": 0,
+    "blocked": 0,
+    "pending_review": 2
+  },
+  "items": [
+    {
+      "item_id": "203-0-113-1",
+      "object_key": "203.0.113.1",
+      "object_type": "bgp_peer",
+      "responsible_team": "bgp",
+      "decision": "approve_for_approval_record",
+      "classification": "approved_for_approval_record",
+      "reviewer": "Keslley",
+      "reviewed_at": "2026-04-30T03:24:43.861790+00:00",
+      "approval_record_allowed": true,
+      "notes": "Aprovado para teste operacional controlado do Cycle-002",
+      "reason": "Aprovado para teste operacional controlado do Cycle-002",
+      "restriction": "none",
+      "issues": []
+    },
+    {
+      "item_id": "192-0-2-1-30",
+      "object_key": "192.0.2.1/30",
+      "object_type": "ip_address",
+      "responsible_team": "network_ops",
+      "decision": "pending",
+      "classification": "pending_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "approval_record_allowed": false,
+      "notes": "",
+      "reason": "",
+      "restriction": "none",
+      "issues": []
+    },
+    {
+      "item_id": "Eth-Trunk0-10",
+      "object_key": "Eth-Trunk0.10",
+      "object_type": "subinterface",
+      "responsible_team": "service",
+      "decision": "pending",
+      "classification": "pending_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "approval_record_allowed": false,
+      "notes": "",
+      "reason": "",
+      "restriction": "none",
+      "issues": []
+    }
+  ],
+  "has_restrictions": true,
+  "no_netbox_write": true,
+  "no_apply_plan": true
+}

@@ -24,3 +24,7 @@ Fechar a Semana 1 real com decisão clara para a Semana 2.
 - Nenhum `/sync`
 - Nenhum ApprovalRecord automático
 - Nenhum ApplyPlan automático
+
+## Multi-cycle follow-up
+
+- The final validation feeds the controlled-operation index and expansion policy, but does not increase scope automatically.

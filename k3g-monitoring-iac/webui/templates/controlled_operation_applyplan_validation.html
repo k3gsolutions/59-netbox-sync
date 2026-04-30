@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Validação ApplyPlan {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Validação ApplyPlan: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Validação</div><div class="summary-value">{{ applyplans.validation_decision | status_label }}</div></div>
+    <div class="summary-card"><div class="summary-label">Geração</div><div class="summary-value">{{ applyplans.generation_decision | status_label }}</div></div>
+    <div class="summary-card"><div class="summary-label">Planos</div><div class="summary-value">{{ applyplans.plans | length if applyplans.plans else 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Segurança</div><div class="summary-value">dry_run only</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Validação</div>
+    {% if applyplans.validation_file %}
+    <p><a href="/reports/view?path={{ applyplans.validation_file.path }}">Ver relatório</a> | <a href="/reports/download?path={{ applyplans.validation_json_file.path }}">Baixar JSON</a></p>
+    <pre class="pre-wrap">{{ applyplans.validation_file.content }}</pre>
+    {% else %}
+    <p>Nenhuma validação localizada.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Itens</div>
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>apply_plan_id</th>
+                <th>item_id</th>
+                <th>object_key</th>
+                <th>method</th>
+                <th>next gate</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for plan in applyplans.plans %}
+            {% for item in plan.items if plan.items is defined else [] %}
+            <tr>
+                <td><code>{{ plan.apply_plan_id }}</code></td>
+                <td><code>{{ item.item_id }}</code></td>
+                <td><code>{{ item.object_key }}</code></td>
+                <td>{{ item.method }}</td>
+                <td>{{ plan.execution_policy.next_gate if plan.execution_policy else '-' }}</td>
+            </tr>
+            {% endfor %}
+        {% endfor %}
+        {% if not applyplans.plans %}
+            <tr><td colspan="5">Nenhum item localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">Navegação</div>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/applyplan" class="btn btn-small">ApplyPlan</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals/manual-review" class="btn btn-small">Revisão manual</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+    </div>
+</div>
+{% endblock %}

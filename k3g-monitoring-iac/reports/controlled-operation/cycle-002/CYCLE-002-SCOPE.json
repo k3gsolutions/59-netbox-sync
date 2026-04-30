@@ -1,0 +1,27 @@
+{
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "status": "PLANNED_NOT_STARTED",
+  "created_at": "2026-04-29T00:00:00+00:00",
+  "max_items": 3,
+  "allowed_methods": [
+    "POST"
+  ],
+  "forbidden_methods": [
+    "PATCH",
+    "DELETE"
+  ],
+  "forbidden_targets": [
+    "/sync",
+    "equipment",
+    "ssh",
+    "netconf"
+  ],
+  "requires_week1": true,
+  "requires_week2": true,
+  "requires_approval_records": true,
+  "requires_applyplan_dryrun": true,
+  "requires_real_write_authorization": true,
+  "requires_post_write_verification": true
+}

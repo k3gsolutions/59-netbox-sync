@@ -30,3 +30,8 @@
 - No `/sync`
 - No ApprovalRecord auto-create
 - No ApplyPlan auto-create
+
+## Multi-cycle follow-up
+
+- Controlled-operation index and start gate are read-only companions to this pipeline.
+- Expansion evaluation is recommendation-only.

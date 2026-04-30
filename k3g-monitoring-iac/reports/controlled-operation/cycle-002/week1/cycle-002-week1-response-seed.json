@@ -1,0 +1,54 @@
+{
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "team": "bgp-team",
+  "object_type": "bgp_peer",
+  "object_key": "203.0.113.1",
+  "decision": "WEEK1_RESPONSE_READY_WITH_RESTRICTIONS",
+  "blocked": [],
+  "validated": true,
+  "issues": [],
+  "csv_path": "controlled-operation/cycle-002/week1/responses/bgp-team-response.csv",
+  "audit_path": "controlled-operation/cycle-002/week1/audit/bgp-team-response-audit.json",
+  "summary": {
+    "decision": "WEEK1_RESPONSE_READY_WITH_RESTRICTIONS",
+    "team_counts": {
+      "service": 0,
+      "network_ops": 0,
+      "bgp": 0
+    },
+    "items": [
+      {
+        "team": "bgp-team",
+        "object_key": "203.0.113.1",
+        "object_type": "bgp_peer",
+        "status": "answered",
+        "classification": "ready_for_week2_review",
+        "issues": [],
+        "source_file": "bgp-team-response.csv"
+      },
+      {
+        "team": "network-ops",
+        "object_key": "192.0.2.1/30",
+        "object_type": "ip_address",
+        "status": "answered",
+        "classification": "ready_for_week2_review",
+        "issues": [],
+        "source_file": "network-ops-response.csv"
+      },
+      {
+        "team": "service-team",
+        "object_key": "Eth-Trunk0.10",
+        "object_type": "subinterface",
+        "status": "answered",
+        "classification": "ready_for_week2_review",
+        "issues": [],
+        "source_file": "service-team-response.csv"
+      }
+    ],
+    "valid_count": 3,
+    "responses_dir": "reports/controlled-operation/cycle-002/week1/responses"
+  },
+  "sensitive_hits": []
+}

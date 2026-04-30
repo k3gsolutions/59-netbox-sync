@@ -1,0 +1,9 @@
+# Cycle-002 Closure Package
+
+Local closure artifact.
+
+Decision:
+- `CYCLE_CLOSED_SUCCESS`
+- `CYCLE_CLOSED_WITH_WARNINGS`
+- `CYCLE_CLOSED_ACTION_REQUIRED`
+- `CYCLE_CLOSED_NOT_APPLICABLE`

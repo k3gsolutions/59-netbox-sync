@@ -1,0 +1,10 @@
+{
+  "cycle_id": "cycle-002",
+  "decision": "CYCLE_DRYRUN_APPLYPLAN_VALID",
+  "apply_plan": "apply-plan-cycle-002-4bb0729f.json",
+  "issues": [],
+  "item_issues": [],
+  "validated_at": "2026-04-30T03:38:51.523820+00:00",
+  "no_netbox_write": true,
+  "no_apply_execution": true
+}

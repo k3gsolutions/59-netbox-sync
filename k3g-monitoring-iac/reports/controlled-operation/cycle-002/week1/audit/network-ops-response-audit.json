@@ -1,0 +1,30 @@
+[
+  {
+    "timestamp": "2026-04-30T02:53:47.572755+00:00",
+    "cycle_id": "cycle-002",
+    "device": "4WNET-MNS-KTG-RX",
+    "device_id": "1890",
+    "team": "network-ops",
+    "object_type": "ip_address",
+    "object_key": "192.0.2.1/30",
+    "updated_by": "uat",
+    "response_status": "answered",
+    "changed_fields": [
+      "device",
+      "object_type",
+      "responsible_team",
+      "status",
+      "owner",
+      "evidence",
+      "interface",
+      "vrf",
+      "notes",
+      "updated_by",
+      "relation_type"
+    ],
+    "validation_result": {
+      "valid": true,
+      "issues": []
+    }
+  }
+]

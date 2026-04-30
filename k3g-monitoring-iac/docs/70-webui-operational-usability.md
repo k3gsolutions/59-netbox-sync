@@ -31,3 +31,7 @@ Deixar a Web UI mais direta para operação diária.
 - Sem /sync
 - Sem aprovação automática
 - Revisão humana obrigatória
+
+## Multi-cycle follow-up
+
+- The usability polish now includes the read-only controlled-operation views and Cycle-002 gate.

@@ -20,7 +20,7 @@ k3g-monitoring-iac project is ready for operational handoff to Network Operation
 
 ### Security
 
-✅ Zero POST/PATCH/DELETE routes in Web UI
+✅ No write-capable POST/PATCH/DELETE routes to NetBox; local POST stays restricted to file saves and local validation
 ✅ Path traversal protected
 ✅ Sensitive downloads blocked
 ✅ CSV/JSON/TXT/LOG downloads allowed only for safe artifacts
@@ -30,6 +30,14 @@ k3g-monitoring-iac project is ready for operational handoff to Network Operation
 ✅ Week 2 board can be prepared locally only after validation passes
 ✅ PT-BR copy review documented for operator UX
 ✅ Real Week 1 execution log and final validation artifacts available
+✅ Cycle-002 Week 1 activation/preparation/intake/validation artifacts available
+✅ Cycle-002 Week 1 response seed/re-validation artifacts available
+✅ Cycle-002 Week 2 preparation artifacts available
+✅ Cycle-002 Week 2 human review, proposed approvals, and readiness-gate artifacts available
+✅ Cycle-002 Week 2 test decision seed and manual-approval-ready gate available
+✅ Cycle-002 manual approval review, dry-run ApplyPlan generation, and dry-run validation artifacts available
+✅ Cycle-002 dry-run execution gate, simulation, real-write readiness, authorization, preflight, execution package, and freeze artifacts available
+✅ Cycle-002 real-write execution attempt was blocked safely in preflight because no `NETBOX_WRITE_TOKEN` existed and the execution package target endpoint was not executable
 
 ---
 
@@ -107,6 +115,20 @@ python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 8890 --reload
 9. Use the PT-BR friendly labels if the operator needs the UI in Portuguese
 9. Run local validation or finalize responses
 10. Check the real execution log and final validation report
+
+#### Controlled Operation / Cycle-002
+1. Open /controlled-operation
+2. Review Cycle-002 start gate and Week 1 status
+3. Use /controlled-operation/cycle-002/week1 for local command links and response seed guidance
+4. Check intake and validation pages after responses exist
+5. Use /controlled-operation/cycle-002/week2 for review board and local drafts
+6. Use /controlled-operation/cycle-002/week2/review for human review status
+7. Use /controlled-operation/cycle-002/approvals and /controlled-operation/cycle-002/approvals/readiness for proposed approvals and gate checks
+8. Use /controlled-operation/cycle-002/approvals/manual-review for explicit human approval review
+9. Use /controlled-operation/cycle-002/applyplan and /controlled-operation/cycle-002/applyplan/validation for local dry-run artifacts only
+10. Use /controlled-operation/cycle-002/applyplan/dryrun-gate and /controlled-operation/cycle-002/applyplan/simulation for local simulation-only views
+11. Use /controlled-operation/cycle-002/applyplan/real-write-readiness, /real-write-authorization, /real-write-preflight, /real-write-package, and /real-write-freeze as read-only gates
+12. Do not write NetBox, apply, sync, or trigger automation from these pages
 
 ### Controlled Write Operations (Ops + Approver)
 
@@ -377,3 +399,8 @@ python3 tools/local/manage_approval_state.py \
 - Execução real da Semana 1 registrada.
 - Semana 2 em revisão humana.
 - Registros de Aprovação seguem apenas proposed/pending.
+
+## Multi-cycle operation
+
+- Controlled-operation index and Cycle-002 start gate are available in read-only mode.
+- Expansion stays recommendation-only.

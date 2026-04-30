@@ -1,0 +1,31 @@
+[
+  {
+    "timestamp": "2026-04-30T02:53:51.069669+00:00",
+    "cycle_id": "cycle-002",
+    "device": "4WNET-MNS-KTG-RX",
+    "device_id": "1890",
+    "team": "bgp-team",
+    "object_type": "bgp_peer",
+    "object_key": "203.0.113.1",
+    "updated_by": "uat",
+    "response_status": "answered",
+    "changed_fields": [
+      "device",
+      "object_type",
+      "responsible_team",
+      "status",
+      "criticality",
+      "owner",
+      "evidence",
+      "remote_asn",
+      "remote_bgp_group",
+      "policy_intent",
+      "notes",
+      "updated_by"
+    ],
+    "validation_result": {
+      "valid": true,
+      "issues": []
+    }
+  }
+]

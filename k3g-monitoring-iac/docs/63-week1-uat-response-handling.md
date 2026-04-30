@@ -30,3 +30,8 @@
 - No ApprovalRecord auto-create
 - No ApplyPlan auto-create
 - No silent removal
+
+## Multi-cycle follow-up
+
+- UAT cleanup remains separate from controlled multi-cycle reporting.
+- The read-only operation index still keeps Cycle-001 and Cycle-002 visible.

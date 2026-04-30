@@ -1,0 +1,24 @@
+{
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decision": "READY_FOR_MANUAL_APPROVAL_REVIEW",
+  "validated_at": "2026-04-30T03:24:58.160684+00:00",
+  "summary": {
+    "total": 1,
+    "valid": 1,
+    "invalid": 0,
+    "max_items": 3
+  },
+  "records": [
+    {
+      "file": "approval-203-0-113-1.json",
+      "approval_id": "cycle-002-203-0-113-1-57a92698",
+      "valid": true,
+      "issues": []
+    }
+  ],
+  "week2_review_exists": true,
+  "no_netbox_write": true,
+  "no_apply_plan_created": true
+}

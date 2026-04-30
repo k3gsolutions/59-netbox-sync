@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Validação {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Week 1 Validation: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Decisão</div><div class="summary-value">{{ decision or 'N/A' }}</div></div>
+    <div class="summary-card"><div class="summary-label">Validadas</div><div class="summary-value">{{ summary.validated or 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Prontas para revisão</div><div class="summary-value">{{ summary.ready_for_week2_review or 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Pendentes</div><div class="summary-value">{{ summary.still_pending or 0 }}</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Validação local</div>
+    {% if assets.validation_file %}
+    <p><a href="/reports/view?path={{ assets.validation_file.path }}">Ver validação</a> | <a href="/reports/download?path={{ assets.validation_file.path }}">Baixar validação</a></p>
+    <pre class="pre-wrap">{{ assets.validation_file.content }}</pre>
+    {% else %}
+    <p>Validação ainda não gerada.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Resumo</div>
+    {% if assets.validation_json_file and assets.validation_json_file.content.summary %}
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>Indicador</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, value in assets.validation_json_file.content.summary.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Sem resumo de validação ainda.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Próximo passo</div>
+    <p>{{ next_action }}</p>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1/intake" class="btn btn-small">Voltar ao intake</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1/pending" class="btn btn-small">Pendências</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-primary btn-small">Voltar ao ciclo</a>
+    </div>
+</div>
+{% endblock %}

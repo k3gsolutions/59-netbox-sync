@@ -1,9 +1,9 @@
 {
   "cycle_id": "cycle-002",
-  "decision": "CYCLE_POST_WRITE_VERIFICATION_NOT_APPLICABLE",
-  "status": "NOT_APPLICABLE",
+  "decision": "CYCLE_POST_WRITE_VERIFICATION_FAILED",
+  "status": "CYCLE_POST_WRITE_VERIFICATION_FAILED",
   "issues": [
-    "execution aborted preflight"
+    "secret keyword found in execution result"
   ],
   "items": [],
   "safety_confirmations": {

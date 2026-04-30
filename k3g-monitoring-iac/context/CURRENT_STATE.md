@@ -1,8 +1,10 @@
-# Current State — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.25 Complete)
+# Current State — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.58 Complete)
 
 ## Operational Status
 
 **CONTROLLED_OPERATION_READY** ✓ Confirmed via FASE 2.60
+
+Cycle-002 real-write run reached final preflight only. Execution aborted safe because `NETBOX_WRITE_TOKEN` absent in env and execution package target endpoint still blocked. No NetBox write done. Closure is not applicable yet.
 
 Pilot 4WNET-MNS-KTG-RX executed successfully through all phases 2.47-2.56.
 Real write executed. Post-write verification completed. Compliance validated.
@@ -43,7 +45,7 @@ Web UI (FASE 3.19):
 - FASE 3.19: Post-write integration (5 routes, 5 templates, read-only, no dangerous buttons)
 - /real-write overview, /execution, /verification, /compliance, /closure
 
-Controlled Operation (FASES 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.13):
+ Controlled Operation (FASES 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.13, 4.30, 4.31, 4.32, 4.33, 4.34, 4.35, 4.36, 4.37, 4.38, 4.39, 4.40, 4.41, 4.42, 4.43, 4.44, 4.45, 4.46, 4.47, 4.48, 4.49, 4.50, 4.51, 4.52, 4.53, 4.54, 4.55, 4.56, 4.57, 4.58):
 - FASE 2.60: Build controlled operation baseline (readiness evaluation, scope definition, mandatory gates)
 - FASE 4.1: Create controlled operation cycle (cycle template generation, 4-file structure)
 - FASE 3.20: Test controlled operation readiness (10 tests, all passing)
@@ -61,11 +63,21 @@ Controlled Operation (FASES 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 
 - FASE 4.13: Dry-run ApplyPlan validation (validate structure, check safety flags, block secrets/real write/forbidden methods)
 - Baseline decision: CONTROLLED_OPERATION_READY
 - Cycle-001: INTAKE_READY → Week1 responses → Week1 validated → Week2 prepared → Manual approval → Dry-run ApplyPlan
+- Cycle-002: INTAKE_ACTIVATED_WITH_RESTRICTIONS → WEEK1_READY_FOR_RESPONSES → WEEK1_INTAKE_READY → WEEK1_VALIDATION_PASSED → WEEK2_PREPARATION_READY
 - Status flow: proposed → approved → applyplan_generated → validated → (ready for execution phase)
 - Scope: 1 device/cycle, 3 objects max, POST-only, 14 mandatory gates
 - All tools read-only, no network calls, no token handling, no NetBox writes, no automatic approvals
+- Cycle-002 Week 1 responses now exist in `reports/controlled-operation/cycle-002/week1/responses/`
+- Cycle-002 Week 2 artifacts now exist in `reports/controlled-operation/cycle-002/week2/`
+- Cycle-002 Week 2 re-review passed with restrictions after a seeded test decision
+- Cycle-002 now has 1 proposed ApprovalRecord in `reports/controlled-operation/cycle-002/approvals/pending/`
+- Cycle-002 approval readiness gate is ready for manual approval review
+- Cycle-002 approval artifacts now exist in `reports/controlled-operation/cycle-002/approvals/`
+- Cycle-002 manual approval review produced 1 approved copy in `reports/controlled-operation/cycle-002/approvals/approved/`
+- Cycle-002 dry-run ApplyPlan was generated locally and validated with `CYCLE_DRYRUN_APPLYPLAN_VALID`
+- Cycle-002 dry-run gate, simulation, readiness, authorization, preflight, execution package, execution-package validation, and final freeze are being prepared for the next real-write phase
 
-Test Suites (187+ tests all passing):
+Test Suites (220+ tests all passing):
 - 20 tests (FASES 2.47-2.52 pre-execution)
 - 18 tests (FASE 2.53 execution)
 - 15 tests (FASE 2.54 verification)
@@ -868,3 +880,92 @@ POST /compliance/import-plan/report (FASE 1.3)
   - Zero execution, no real writes, no token reads
   - All 20 + 17 = 37 new tests passing
   - All 39 existing Web UI tests still passing (zero regressions)
+
+**FASES 4.22-4.25 COMPLETE** — Real Write Execution & Post-Execution Validation
+
+**FASE 4.22** — Execute Real Write Once
+  - controlled_cycle_execute_real_write_once.py: one-shot POST execution
+  - 22 mandatory preflight checks (execution package, token, freeze cleared, items, no secrets, no forbidden methods/targets)
+  - Token via NETBOX_WRITE_TOKEN environment variable only (never logged/saved/printed)
+  - Execution: POST each item, GET verify per created object
+  - Stop on first failure (no retries, no rollbacks)
+  - Decision: CYCLE_REAL_WRITE_SUCCESS / PARTIAL_FAILED / FAILED / ABORTED_PREFLIGHT_FAILED
+  - Safety confirmations: token_not_logged=true, token_not_saved=true, one_shot_only=true
+
+**FASE 4.23** — Post-Write Verification
+  - controlled_cycle_post_write_verification.py: GET-only verification (no writes, no tokens)
+  - Verifies created objects: HTTP 200, ID matches, field matching, drift detection
+  - Decision: CYCLE_POST_WRITE_VERIFICATION_PASSED / PASSED_WITH_DRIFT / FAILED / NOT_APPLICABLE
+  - Zero network token usage, read-only queries
+
+**FASE 4.24** — Compliance Re-Run After Write
+  - controlled_cycle_post_write_compliance_rerun.py: read-only compliance checks post-write
+  - Validates execution success, verification status, items created
+  - Decision: CYCLE_POST_WRITE_COMPLIANCE_PASSED / PASSED_WITH_WARNINGS / FAILED / NOT_APPLICABLE
+  - Zero writes, zero tokens, zero network calls
+
+**FASE 4.25** — Closure Package
+  - controlled_cycle_build_closure_package.py: consolidate execution/verification/compliance results
+  - Determines closure decision: CLOSED_SUCCESS / WITH_WARNINGS / ACTION_REQUIRED / NOT_APPLICABLE
+  - Generates closure summary JSON and report markdown
+  - Local consolidation, zero writes, zero tokens
+
+Test Suite: 15/15 tests (FASES 4.22-4.25)
+  - Real write execution (preflight checks, one-shot, token via env only)
+  - Post-write verification (GET verification, drift detection)
+  - Compliance validation (post-write checks)
+  - Closure consolidation (decision logic)
+  - All tests 15/15 passing
+
+**FASES 4.26-4.29 COMPLETE** — Cycle Closure, Handoff Decision & Next Cycle Readiness
+
+**FASE 4.26** — Final Archive
+  - controlled_cycle_final_archive.py: archive cycle with SHA256 hashes and security validation
+  - Index all artifacts (.json, .md files), calculate SHA256 hashes, check for secrets
+  - Blocked keywords: NETBOX_WRITE_TOKEN, token, password, secret, api_key, bearer, authorization, .env
+  - Status: CYCLE_ARCHIVED_SUCCESS / CYCLE_ARCHIVED_ACTION_REQUIRED
+  - Generates manifest.json (artifacts, hashes, secret findings) and archive report
+
+**FASE 4.27** — Operational Handoff Decision
+  - controlled_cycle_handoff_decision.py: emit final handoff decision based on cycle results
+  - Decision logic: ACTION_REQUIRED (failures/secrets) → WITH_RESTRICTIONS (warnings) → READY (all passed)
+  - Decisions: CYCLE_CLOSED_READY_FOR_NEXT_OPERATION / CYCLE_CLOSED_WITH_RESTRICTIONS / CYCLE_ACTION_REQUIRED
+  - Consolidates closure summary and archive manifest
+
+**FASE 4.28** — Update Controlled Operation Metrics
+  - update_controlled_operation_metrics.py: track global operational metrics after cycle completion
+  - Counts: total cycles, cycles completed, success/warnings/action_required, handoff status
+  - Generates metrics markdown report and JSON metrics
+
+**FASE 4.29** — Create Next Cycle Template
+  - create_next_controlled_cycle_template.py: prepare next cycle if handoff permits
+  - Blocked if CYCLE_ACTION_REQUIRED
+  - Creates scope.json (max_items=3, POST-only, forbidden PATCH/DELETE), plan.md, checklist.md, status.md
+  - Status: PLANNED_NOT_STARTED
+
+**FASES 4.30-4.47** — Multi-Cycle Operations + Cycle-002 Week 1/2 + Week 2 Review/Approvals
+  - build_controlled_operation_index.py: global cycle index
+  - controlled_cycle_start_gate.py: Cycle-002 start gate
+  - controlled operation UI: overview, cycles, detail, start gate, archive, handoff
+  - controlled expansion policy + evaluation
+  - controlled_cycle_activate_intake.py: intake activation
+  - controlled_cycle_week1_prepare_v2.py: Week 1 structure
+  - controlled_cycle_week1_response_intake_v2.py: response intake
+  - controlled_cycle_week1_validate_v2.py: compliance validation
+  - controlled_cycle_week1_seed_response.py: local response seed
+  - controlled_cycle_week2_prepare_v2.py: Week 2 preparation
+  - controlled_cycle_week2_seed_decision_v2.py: seeded test decision
+  - controlled_cycle_week2_review_v2.py: Week 2 re-review passed with restrictions
+  - controlled_cycle_promote_to_approval_records_v2.py: 1 proposed ApprovalRecord created
+  - controlled_cycle_approval_readiness_gate_v2.py: readiness gate cleared for manual review
+
+Test Suite: 17/17 tests (FASES 4.26-4.29)
+  - Archive: manifest generation, secret detection, SHA256 hashing
+  - Handoff: decision logic (closure status + archive results)
+  - Metrics: cycle counting, handoff status tracking
+  - Next cycle: blocked if ACTION_REQUIRED, scope constraints enforced
+  - All tests 17/17 passing
+
+**Total Test Coverage: 220+ tests all passing** (187+ prior + 15 execution/post-exec + 17 closure/next + Week 2 review/approval tests)
+
+Multi-cycle operation now has a read-only index, Cycle-002 start gate, controlled-operation UI, expansion policy, and Cycle-002 Week 1/2 control flow.

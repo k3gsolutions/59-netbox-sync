@@ -190,3 +190,8 @@ python3 tools/local/validate_week1_responses.py \
 - modal JS lives in `webui/static/app.js`
 - shared list template lives in `webui/templates/partials/pending_items_table.html`
 - shared modal template lives in `webui/templates/partials/pending_item_modal.html`
+
+## Multi-cycle follow-up
+
+- The pending-item flow now feeds the controlled-operation index and Cycle-002 start gate.
+- Multi-cycle read-only routes live under `/controlled-operation`.
