@@ -2,6 +2,62 @@
 
 ## [Unreleased]
 
+### Added — FASE 2.32: Compliance Policy Registry & Convention Validator
+
+- Created policies/compliance/ YAML registry (13 files):
+  - discovery-elements.yaml: VRP device element definitions and discovery methods.
+  - naming-conventions.yaml: Interface, VRF, route-policy, prefix, community naming patterns.
+  - dependency-map.yaml: Cross-element dependency relationships.
+  - snmp-policy.yaml, bgp-policy.yaml, vrf-policy.yaml, interface-policy.yaml, etc.
+- Created webui/services/convention_validator.py (521 lines):
+  - Zero dependencies beyond PyYAML (required, no fallback).
+  - Functions: load_policy_registry(), classify_interface(), validate_*_name(), validate_comment(), validate_bgp_metadata(), validate_ip_address_relation().
+  - Rule definitions: 19 rule IDs with bilingual explanations (EN + PT-BR).
+  - Registry-level blockers for unavailable/invalid policies (security-first).
+- Updated validators.py and response_forms.py to import convention_validator functions.
+- Created tools/local/validate_compliance_policies.py:
+  - Validates all 13 YAML files for structure, integrity, regex compilation.
+  - Generates reports/compliance-policy-validation.md with per-file results.
+  - All 13 files valid, zero issues detected.
+- Created docs/74-compliance-conventions.md:
+  - Comprehensive documentation of VRP element tree, discovery methods, dependencies, naming conventions.
+  - Rule catalog with violation explanations.
+  - Integration guide for Web UI validators.
+- Test suite: 15 tests covering interface naming, route-policy, prefix, community, SNMP, BGP, IP address mapping, comments.
+  - All 15 tests passing.
+
+### Added — FASES 4.90, 4.91, 4.92, 4.93: Cycle-003 Real-Write Execution & Closure
+
+**FASE 4.90** — Execute Real Write Once:
+- One-shot execution with 22 preflight checks (no retries, no rollback).
+- Token via NETBOX_WRITE_TOKEN environment variable only (never logged/saved/printed).
+- Validates execution_allowed=false, all safety flags, execution phrase match.
+- POST each item, GET verify per created object (or mark as unverified if response lacks ID).
+- Stop on first failure, no partial write continuation.
+- Cycle-003 Result: PARTIAL_FAILED (DNS resolution failed for netbox.k3g.local, no objects created).
+- Safety confirmations: no_token_logged, no_token_saved, no_sync_called, no_patch_delete, one_shot_only.
+
+**FASE 4.91** — Post-Write Verification:
+- GET-only verification of created objects (no network calls if none created).
+- Drift detection per item (field-by-field comparison vs. proposed_payload).
+- Cycle-003 Result: FAILED_NO_OBJECT_CREATED (items preserved with SKIPPED status, no verification attempted).
+
+**FASE 4.92** — Post-Write Compliance Re-Run:
+- Read-only local compliance checks on created objects.
+- Cycle-003 Result: NOT_APPLICABLE_NO_OBJECT_CREATED (items preserved, compliance summary shows 0 passed).
+
+**FASE 4.93** — Closure & Handoff Decision:
+- Consolidate execution, verification, compliance results.
+- Decision logic: ACTION_REQUIRED (due to network failure) / WITH_RESTRICTIONS / READY.
+- Cycle-003 Result: CYCLE_CLOSED_ACTION_REQUIRED (real_write_failed_no_object_created, action_required=true).
+- Generated cycle-003-real-write-failure-diagnosis.json with root cause analysis.
+
+**Cycle-003 Status:** COMPLETE (with ACTION_REQUIRED due to network error).
+- Zero object creation (network failure = safe failure mode).
+- Zero token exposure (env-only, never logged).
+- Proper aggregation of failed state through all post-write phases.
+- Full audit trail with timestamps and per-item status.
+
 ### Added — FASES 4.82, 4.83, 4.84, 4.85, 4.86, 4.87, 4.88, 4.89: Pre-Execution Chain + Test Suite
 
 - Dry-run execution gate: validates ApplyPlan ready for simulation.

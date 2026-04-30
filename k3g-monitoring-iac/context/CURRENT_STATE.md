@@ -1,4 +1,4 @@
-# Current State — 2026-04-30 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.89 Complete)
+# Current State — 2026-04-30 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.93, 2.32 Complete)
 
 ## Operational Status
 
@@ -1083,3 +1083,166 @@ Safety Confirmations:
   - All chain gates validated: decision flow, safety locks, phrase validation, execution lockout
 
 Cycle-003 pre-execution chain complete. All gates passed, all safety locks engaged. Ready for FASE 4.90 (Execute Real Write Once) - the only phase that will actually write to NetBox.
+
+---
+
+## FASES 4.90-4.93 Complete — Cycle-003 Real-Write Execution & Closure
+
+**FASE 4.90 — Execute Real Write Once**
+- One-shot execution with 22 preflight checks (no retries, no rollback on failure).
+- Token via NETBOX_WRITE_TOKEN environment variable only (never logged/saved/printed).
+- 22 preflight validations: execution_id, cycle_id, status, safety flags, execution phrase match, token present, https URL, item count/methods/endpoints, no secrets.
+- POST each item with Authorization header, GET verify per created object.
+- Stop on first failure (partial write still possible if some succeed before failure).
+- Cycle-003 Result: **CYCLE_REAL_WRITE_PARTIAL_FAILED** (created_count=0, failed_count=1)
+  - DNS resolution failed for netbox.k3g.local (fictitious hostname for testing).
+  - No objects created (safe failure mode).
+  - Network error properly captured, no token exposure.
+  - Tool: `tools/local/controlled_cycle_execute_real_write_once.py` (496 lines)
+
+**FASE 4.91 — Post-Write Verification**
+- GET-only verification of created objects (zero network calls if no objects created).
+- Field-by-field drift detection per created item.
+- Cycle-003 Result: **CYCLE_POST_WRITE_VERIFICATION_FAILED_NO_OBJECT_CREATED**
+  - Items preserved with status=CYCLE_VERIFICATION_SKIPPED_NO_OBJECT_CREATED.
+  - No verification attempted (no objects to verify).
+  - Reason properly documented for audit trail.
+  - Tool: `tools/local/controlled_cycle_post_write_verification.py`
+
+**FASE 4.92 — Post-Write Compliance Re-Run**
+- Read-only local compliance checks on created objects.
+- No network calls or external dependencies.
+- Cycle-003 Result: **CYCLE_POST_WRITE_COMPLIANCE_NOT_APPLICABLE_NO_OBJECT_CREATED**
+  - Items preserved from verification phase.
+  - Reason: no_created_object_to_validate.
+  - Compliance summary: 0 passed, 0 warnings, 0 failed.
+  - Tool: `tools/local/controlled_cycle_post_write_compliance_rerun.py`
+
+**FASE 4.93 — Closure & Handoff Decision**
+- Consolidate execution, verification, compliance results into unified closure.
+- Decision logic: ACTION_REQUIRED → WITH_RESTRICTIONS → READY.
+- Cycle-003 Result: **CYCLE_CLOSED_ACTION_REQUIRED**
+  - execution_status: CYCLE_REAL_WRITE_PARTIAL_FAILED
+  - verification_status: CYCLE_POST_WRITE_VERIFICATION_FAILED_NO_OBJECT_CREATED
+  - compliance_status: CYCLE_POST_WRITE_COMPLIANCE_NOT_APPLICABLE_NO_OBJECT_CREATED
+  - action_required: true
+  - reason: real_write_failed_no_object_created
+  - Root cause diagnosis: DNS resolution error (netbox.k3g.local is fictitious).
+  - Tool: `tools/local/controlled_cycle_build_closure_package.py`
+  - Tool: `tools/local/controlled_cycle_handoff_decision.py`
+
+**Cycle-003 Status: COMPLETE (with ACTION_REQUIRED)**
+- Zero object creation (network failure = safe failure mode).
+- Zero token exposure (env-only, never logged/saved).
+- Proper aggregation of failed state through all post-write phases.
+- Full audit trail with timestamps, per-item status, error details.
+- Evidence preserved for root cause analysis and corrective action.
+
+**Test Coverage: 27 tests covering Cycle-003 execution aggregation**
+- Execution package preflight validation.
+- Failed execution aggregation (zero-created scenario).
+- Post-write phase status propagation.
+- Items preserved with proper SKIPPED/NOT_APPLICABLE markings.
+- Decision logic for ACTION_REQUIRED closure.
+- All 27 tests passing.
+
+---
+
+## FASE 2.32 Complete — Compliance Policy Registry & Convention Validator
+
+**Objective:** Centralized registry of Huawei VRP configuration elements, naming conventions, dependencies, and compliance policies. Forms basis for validation in Web UI and local tools.
+
+**Deliverables:**
+
+1. **policies/compliance/ YAML Registry (13 files)**
+   - discovery-elements.yaml: VRP element definitions (device, interface, vrf, bgp_global, bgp_peer, route_policy, ip_prefix_list, community_filter, as_path_filter, etc.) with discovery methods and keys.
+   - naming-conventions.yaml: Regex patterns for interface, route-policy, ip_prefix, community, as_path naming.
+   - dependency-map.yaml: Cross-element relationships (bgp_peer → device/vrf, route_policy_node → filters, etc.).
+   - snmp-policy.yaml: v3 preferred, v2c legacy OK, blocked words (public/private/secret).
+   - interface-policy.yaml: Base vs. service interface requirements.
+   - vrf-policy.yaml: RD/RT format, description requirements.
+   - bgp-policy.yaml: Peer required fields, criticality for service peers.
+   - route-policy-policy.yaml: Node validation, referenced filter existence.
+   - ip-prefix-policy.yaml: Prefix validation, ge/le consistency.
+   - community-policy.yaml: ASN:VALUE format, max one filter per node.
+   - as-path-policy.yaml: Regex required, filter existence check.
+   - compliance-severity-policy.yaml: Severity levels (info/warning/error/blocker) per rule.
+   - comments-policy.yaml: Blocked keywords (token, password, secret), max lengths.
+
+2. **webui/services/convention_validator.py (521 lines)**
+   - Zero dependencies beyond PyYAML (required, no fallback).
+   - No silent fallbacks: registry is mandatory source of truth.
+   - Functions:
+     - `load_policy_registry()`: Load and cache all YAMLs.
+     - `classify_interface(name)`: base_inventory | service_interface | invalid.
+     - `validate_interface_name(name)`: Rule IFACE-001.
+     - `validate_vrf_name(name)`: Rule VRF-001.
+     - `validate_route_policy_name(name)`: Rule RTPOL-001.
+     - `validate_ip_prefix_name(name)`: Rule PREFIX-001.
+     - `validate_community(value)`: Rule COMM-001.
+     - `validate_comment(value)`: Rule COMMENT-001, COMMENT-002.
+     - `validate_bgp_metadata(data)`: Rules BGP-001 through BGP-004.
+     - `validate_ip_address_relation(data)`: Rules IPMAP-001, IPMAP-002.
+     - `explain_violation(rule_id)`: Full explanation per rule.
+   - Bilingual output: EN + PT-BR for Web UI integration.
+   - Standard return type: {valid, rule_id, message, message_pt, severity, details}.
+   - Registry blockers: REGISTRY-001/002/003 for unavailable/invalid policies.
+
+3. **validators.py & response_forms.py Updated**
+   - Import convention_validator functions (with fallback handling for missing module).
+   - Add wrappers for convention-based naming/comment validation.
+   - Advisory violations (warnings/errors) allow save; blockers prevent save.
+   - HAS_CONVENTION_VALIDATOR flag for graceful degradation.
+
+4. **tools/local/validate_compliance_policies.py**
+   - Validates all 13 YAML files for structure integrity.
+   - Checks: required keys present, regex compiles, examples valid per policy.
+   - Generates reports/compliance-policy-validation.md.
+   - Output: PASS/FAIL per file, violations list.
+   - Result: All 13 files valid, zero issues.
+
+5. **tools/local/test_compliance_policy_registry.py**
+   - 15 comprehensive test cases (no HTTP, pure Python unit tests):
+     1. Eth-Trunk0 → base_inventory valid.
+     2. Eth-Trunk0.1580 → service_interface valid.
+     3. Bad.Naming → invalid.
+     4. 10GE0/1/0 → base_inventory valid.
+     5. AS263934-INFORR-BVA-InterCDN-IPv4-Export → route-policy valid.
+     6. invalid-policy-name → route-policy invalid.
+     7. BOGONS-IPv4 → prefix valid.
+     8. CUSTOMER-CLIENTEABC-IPv4 → prefix valid.
+     9. 263934:100 → community valid.
+     10. bad_community → community invalid.
+     11. SNMP community "public" → blocked.
+     12. SNMPv3 complete → valid.
+     13. BGP metadata missing remote_asn → invalid.
+     14. IP address relation_type=service without service_relation → invalid.
+     15. Comment with "token" → blocked.
+   - All 15 tests passing.
+
+6. **docs/74-compliance-conventions.md**
+   - Comprehensive documentation: objective, VRP element tree, discovery methods, dependencies.
+   - Naming conventions with regex examples for each type.
+   - SNMP, BGP, comments, and IP address mapping policies.
+   - Rule catalog with severity levels and violations explanations.
+   - Good/bad examples for each convention.
+   - Integration guide for Web UI validators.
+
+**Integration Points:**
+- Web UI response form validators now call convention_validator for naming/comment checks.
+- Violations flagged as info/warning/error/blocker per severity policy.
+- Blockers (severity=blocker) prevent form save.
+- PT-BR messages displayed in Web UI.
+
+**Test Coverage: 15 tests all passing**
+- Interface naming validation.
+- Route-policy naming convention checks.
+- IP prefix naming.
+- Community ASN:VALUE format.
+- SNMP blocked communities.
+- BGP metadata required fields.
+- IP address relation mapping.
+- Comment keyword blocking.
+- Registry availability and error handling.
+
+**Security:** Registry is mandatory (no fallback). PyYAML required. If registry unavailable, validation returns blocker-level violation to prevent silent degradation.
