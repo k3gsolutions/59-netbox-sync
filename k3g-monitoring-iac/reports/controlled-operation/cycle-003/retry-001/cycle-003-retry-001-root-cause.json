@@ -1,0 +1,22 @@
+{
+  "diagnosed_at": "2026-04-30T16:26:08.478762+00:00",
+  "cycle_id": "cycle-003",
+  "execution_id": "EXEC-cycle-003-20260430130110",
+  "failure_class": "DNS_FAILURE",
+  "explanation": "DNS resolution failed: <urlopen error [Errno 8] nodename nor servname provided, or not known>",
+  "parent_status": "CYCLE_REAL_WRITE_PARTIAL_FAILED",
+  "items_executed": 1,
+  "items_created": 0,
+  "items_failed": 1,
+  "retry_recommendation": "SAFE_TO_RETRY",
+  "details": {
+    "http_error": {
+      "error": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+    },
+    "item_status": "CYCLE_REAL_WRITE_FAILED",
+    "response_id": null,
+    "endpoint": "/api/ipam/ip-addresses/",
+    "root_cause": "DNS resolution failed for target hostname",
+    "target_host": "unknown"
+  }
+}

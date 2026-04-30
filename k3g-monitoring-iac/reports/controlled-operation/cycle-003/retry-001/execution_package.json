@@ -1,0 +1,39 @@
+{
+  "retry_id": "cycle-003-retry-001",
+  "retry_attempt": 1,
+  "parent_cycle_id": "cycle-003",
+  "parent_execution_id": "exec-cycle-003-001",
+  "execution_id": "f3920def-cd07-4357-a9e9-ef7a15dfd987",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "plan_id": null,
+  "created_at": "2026-04-30T16:26:11.894082+00:00",
+  "status": "prepared",
+  "execution_allowed": false,
+  "execution_phrase": "EXECUTAR_ESCRITA_REAL_cycle-003-retry-001_4WNET-MNS-KTG-RX_f3920def",
+  "safety_flags": {
+    "requires_final_no_write_freeze": true,
+    "requires_execution_confirmation": true,
+    "no_automatic_retry": true,
+    "no_automatic_rollback": true
+  },
+  "items": [
+    {
+      "item_id": "item-1",
+      "approval_id": "AR-cycle-003-1-20260430123220",
+      "object_type": "ip_address",
+      "object_key": "203.0.113.2/32",
+      "method": "POST",
+      "target_endpoint": "/api/ipam/ip-addresses/",
+      "proposed_payload": {
+        "address": "203.0.113.2/32",
+        "status": "active",
+        "description": "Cycle-003 test object"
+      },
+      "rollback_hint": "Delete 203.0.113.2/32 if created",
+      "expected_result": "proposed"
+    }
+  ],
+  "required_next_phase": "FASE_4_98_CYCLE003_RETRY001_EXECUTE_REAL_WRITE_ONCE"
+}
