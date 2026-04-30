@@ -2629,7 +2629,7 @@ async def get_compliance_candidates(
 
 @app.post("/compliance/analyze", response_class=JSONResponse)
 async def analyze_compliance(request: Request):
-    """Manual compliance start guard — re-validates eligibility."""
+    """Manual compliance start guard — re-validates eligibility, creates job artifact."""
     try:
         payload = await request.json()
     except Exception as e:
@@ -2645,50 +2645,11 @@ async def analyze_compliance(request: Request):
             status_code=400,
         )
 
+    mode = payload.get("mode", "read_only")
+    triggered_by = payload.get("triggered_by", "operator")
+
     try:
         client = get_netbox_client()
-        # Re-fetch devices and re-validate eligibility
-        devices = client.get_devices(limit=len(device_ids) + 10)
-
-        eligible_ids = []
-        ineligible_ids = []
-
-        for device in devices:
-            if device.get("id") in device_ids:
-                if is_compliance_candidate(device):
-                    eligible_ids.append(device["id"])
-                else:
-                    ineligible_ids.append(device["id"])
-
-        # Check for missing devices
-        found_ids = set(eligible_ids) | set(ineligible_ids)
-        missing_ids = [did for did in device_ids if did not in found_ids]
-
-        if missing_ids or ineligible_ids:
-            return JSONResponse(
-                {
-                    "success": False,
-                    "error": "Dispositivos perderam elegibilidade ou não encontrados",
-                    "missing": missing_ids,
-                    "ineligible": ineligible_ids,
-                },
-                status_code=422,
-            )
-
-        return JSONResponse(
-            {
-                "success": True,
-                "confirmed_eligible": eligible_ids,
-                "ineligible": [],
-                "message": "Dispositivos confirmados elegíveis. Análise pode prosseguir.",
-                "safety": {
-                    "read_only": True,
-                    "netbox_write": False,
-                    "device_connection": False,
-                },
-            }
-        )
-
     except NetBoxNotConfiguredError:
         return JSONResponse(
             {"error": "NetBox não configurado. Defina NETBOX_URL e NETBOX_TOKEN."},
@@ -2699,11 +2660,71 @@ async def analyze_compliance(request: Request):
             {"error": "Falha de autenticação no NetBox (401/403)."},
             status_code=401,
         )
-    except NetBoxClientError as e:
+
+    confirmed_eligible = []
+    ineligible = []
+    candidates = []
+
+    # Per-ID validation with enrichment
+    for device_id in device_ids:
+        try:
+            device = client.get_device_by_id(device_id)
+        except (NetBoxClientError, NetBoxAuthError):
+            ineligible.append(device_id)
+            continue
+
+        if not device:
+            ineligible.append(device_id)
+            continue
+
+        # Enrich tenant group if missing
+        device, _ = enrich_tenant_group_if_missing(device, client)
+
+        if is_compliance_candidate(device):
+            confirmed_eligible.append(device_id)
+            candidates.append(normalize_compliance_candidate(device))
+        else:
+            ineligible.append(device_id)
+
+    if ineligible:
         return JSONResponse(
-            {"error": f"Erro ao conectar ao NetBox: {e}"},
+            {
+                "success": False,
+                "error": f"Dispositivos perderam elegibilidade: {ineligible}",
+                "ineligible": ineligible,
+                "confirmed_eligible": confirmed_eligible,
+            },
+            status_code=422,
+        )
+
+    # Create local job artifact
+    try:
+        from services.compliance_jobs import create_compliance_job
+
+        job = create_compliance_job(device_ids, candidates, triggered_by, mode)
+    except Exception as e:
+        return JSONResponse(
+            {"success": False, "error": f"Falha ao criar job: {e}"},
             status_code=500,
         )
+
+    return JSONResponse(
+        {
+            "success": True,
+            "status": "COMPLIANCE_JOB_PREPARED",
+            "job_id": job["job_id"],
+            "confirmed_eligible": confirmed_eligible,
+            "ineligible": [],
+            "message": "Job local de Compliance criado para revisão. Nenhuma coleta foi iniciada.",
+            "safety": {
+                "read_only": True,
+                "netbox_write": False,
+                "device_connection": False,
+                "auto_compliance_started": False,
+                "job_only": True,
+            },
+        }
+    )
 
 
 @app.get("/health")
