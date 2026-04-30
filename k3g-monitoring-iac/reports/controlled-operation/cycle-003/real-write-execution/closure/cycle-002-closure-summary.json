@@ -1,0 +1,20 @@
+{
+  "closure_id": "closure-cycle-003-c71fde6f",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "status": "CYCLE_CLOSED_ACTION_REQUIRED",
+  "decision": "CYCLE_CLOSED_ACTION_REQUIRED",
+  "generated_at": "2026-04-30T16:02:22.727516+00:00",
+  "reason": "real write execution failed",
+  "execution_result": "CYCLE-003-REAL-WRITE-EXECUTION-RESULT.json",
+  "post_write_verification": "CYCLE-003-POST-WRITE-VERIFICATION-RESULT.json",
+  "post_write_compliance": "CYCLE-003-POST-WRITE-COMPLIANCE-RERUN.json",
+  "safety_confirmations": {
+    "no_write_executed": true,
+    "no_token_read": true,
+    "no_network_call": true,
+    "closure_only": true,
+    "real_write_not_reexecuted": true
+  }
+}

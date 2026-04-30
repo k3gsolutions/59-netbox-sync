@@ -1,0 +1,24 @@
+{
+  "cycle_id": "cycle-003",
+  "closed_at": "2026-04-30T16:16:08.026447+00:00",
+  "decision": "CYCLE_CLOSED_ACTION_REQUIRED",
+  "execution_status": "CYCLE_REAL_WRITE_PARTIAL_FAILED",
+  "verification_status": "CYCLE_POST_WRITE_VERIFICATION_FAILED_NO_OBJECT_CREATED",
+  "compliance_status": "CYCLE_POST_WRITE_COMPLIANCE_NOT_APPLICABLE_NO_OBJECT_CREATED",
+  "action_required": true,
+  "reason": "real_write_failed_no_object_created",
+  "next_action": "correct cause of network/url failure and prepare new controlled attempt; do not repeat execution on same package without new gate",
+  "summary": {
+    "cycle": "cycle-003",
+    "device": "4WNET-MNS-KTG-RX",
+    "total_items": 1,
+    "created": 0,
+    "verified": 0,
+    "compliant": 0
+  },
+  "evidence_links": [
+    "CYCLE-003-REAL-WRITE-EXECUTION-RESULT.json",
+    "CYCLE-003-POST-WRITE-VERIFICATION-RESULT.json",
+    "CYCLE-003-POST-WRITE-COMPLIANCE-RERUN.json"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "cycle_id": "cycle-003",
+  "verified_at": "2026-04-30T16:16:08.024256+00:00",
+  "status": "CYCLE_POST_WRITE_VERIFICATION_FAILED_NO_OBJECT_CREATED",
+  "decision": "NOT_VERIFIED_NO_OBJECTS",
+  "reason": "execution failed: no objects created",
+  "items": [
+    {
+      "item_id": "item-1",
+      "approval_id": "AR-cycle-003-1-20260430123220",
+      "object_type": "ip_address",
+      "object_key": "203.0.113.2/32",
+      "endpoint": "/api/ipam/ip-addresses/",
+      "status": "CYCLE_VERIFICATION_SKIPPED_NO_OBJECT_CREATED",
+      "reason": "response_id_missing"
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "verified": 0,
+    "skipped": 1,
+    "failed": 0
+  },
+  "safety_confirmations": {
+    "local_only": true,
+    "no_network_call": true,
+    "no_token_read": true,
+    "no_netbox_write": true
+  }
+}

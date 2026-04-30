@@ -82,7 +82,8 @@ def build_closure_package(
             "real_write_not_reexecuted": True,
         },
     }
-    write_json(output_dir / "cycle-002-closure-summary.json", payload)
+    filename = f"{cycle_id}-closure-summary.json"
+    write_json(output_dir / filename, payload)
     write_md(report, f"# {cycle_id.upper()} Closure Package\n\n## Decision: {status}\n\n- {reason}\n")
     return payload
 
