@@ -1,0 +1,29 @@
+{
+  "team": "Network Operations",
+  "collected_at": "2026-04-30T10:00:00Z",
+  "teams": [
+    {
+      "name": "Network Operations",
+      "elements": [
+        {
+          "type": "interface",
+          "name": "Eth-Trunk0",
+          "description": "Primary trunk to core",
+          "status": "up"
+        },
+        {
+          "type": "interface",
+          "name": "GigabitEthernet0/0/1",
+          "description": "Access interface 1",
+          "status": "up"
+        },
+        {
+          "type": "vrf",
+          "name": "CUSTOMER-ABC",
+          "rd": "263934:100",
+          "status": "active"
+        }
+      ]
+    }
+  ]
+}

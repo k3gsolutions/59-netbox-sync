@@ -1,0 +1,43 @@
+{
+  "intake_id": "week1-intake-cycle-003-20260430062025",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "intake_at": "2026-04-30T06:20:25.908877+00:00",
+  "decision": "WEEK1_INTAKE_PARTIAL",
+  "reason": "Partial responses (1 file(s))",
+  "response_files": 1,
+  "responses": [
+    {
+      "file": "network-ops-response.json",
+      "size_bytes": 634,
+      "type": "json",
+      "loaded": true,
+      "teams": [
+        {
+          "name": "Network Operations",
+          "elements": [
+            {
+              "type": "interface",
+              "name": "Eth-Trunk0",
+              "description": "Primary trunk to core",
+              "status": "up"
+            },
+            {
+              "type": "interface",
+              "name": "GigabitEthernet0/0/1",
+              "description": "Access interface 1",
+              "status": "up"
+            },
+            {
+              "type": "vrf",
+              "name": "CUSTOMER-ABC",
+              "rd": "263934:100",
+              "status": "active"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

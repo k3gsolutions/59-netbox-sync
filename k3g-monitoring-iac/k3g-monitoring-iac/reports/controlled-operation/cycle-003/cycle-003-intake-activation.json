@@ -1,0 +1,17 @@
+{
+  "activation_id": "intake-cycle-003-20260430062113",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "activated_at": "2026-04-30T06:21:13.104965+00:00",
+  "decision": "CYCLE_INTAKE_ACTIVATED_WITH_RESTRICTIONS",
+  "reason": "Activated with restrictions from previous cycle",
+  "start_gate_decision": "CYCLE_START_READY_WITH_RESTRICTIONS",
+  "restrictions": [
+    "max_items maintained at 3",
+    "allowed_methods POST-only",
+    "STAY_CURRENT_LEVEL expansion policy",
+    "no PATCH/DELETE operations",
+    "no automatic retry/rollback"
+  ]
+}

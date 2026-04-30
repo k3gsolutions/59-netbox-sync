@@ -1,0 +1,14 @@
+{
+  "cycle_id": "cycle-003",
+  "previous_cycle": "cycle-002",
+  "decision": "CYCLE_START_READY_WITH_RESTRICTIONS",
+  "reason": "previous cycle completed with restrictions",
+  "decided_at": "2026-04-30T06:15:00Z",
+  "restrictions": [
+    "max_items maintained at 3",
+    "allowed_methods POST-only",
+    "STAY_CURRENT_LEVEL expansion policy",
+    "no PATCH/DELETE operations",
+    "no automatic retry/rollback"
+  ]
+}
