@@ -1,10 +1,13 @@
 {
-  "validation_id": "exec-pkg-val-cycle-003-20260430140441",
   "cycle_id": "cycle-003",
-  "validated_at": "2026-04-30T14:04:41.325634+00:00",
-  "decision": "CYCLE_REAL_WRITE_EXECUTION_PACKAGE_VALID",
-  "reason": "Execution package valid",
-  "execution_package_id": "EXEC-cycle-003-20260430130110",
-  "items_count": 1,
-  "validation_issues": []
+  "decision": "CYCLE_REAL_WRITE_EXECUTION_PACKAGE_VALID_WITH_WARNINGS",
+  "issues": [
+    "cycle_id mismatch",
+    "required_next_phase mismatch",
+    "AR-cycle-003-1-20260430123220: missing pre_write_checks",
+    "AR-cycle-003-1-20260430123220: missing post_write_checks"
+  ],
+  "execution_package": "execution_package.json",
+  "no_netbox_write": true,
+  "no_apply_execution": true
 }

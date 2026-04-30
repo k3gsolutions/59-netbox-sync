@@ -1,0 +1,42 @@
+{
+  "execution_id": "EXEC-cycle-003-20260430130110",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "operator": "Keslley",
+  "started_at": "2026-04-30T15:51:08.580937+00:00",
+  "finished_at": "2026-04-30T15:51:13.663009+00:00",
+  "status": "CYCLE_REAL_WRITE_PARTIAL_FAILED",
+  "no_write_attempted": false,
+  "one_shot_execution": true,
+  "retry_attempted": false,
+  "rollback_attempted": false,
+  "token_logged": false,
+  "token_saved": false,
+  "items": [
+    {
+      "item_id": "item-1",
+      "approval_id": "AR-cycle-003-1-20260430123220",
+      "object_type": "ip_address",
+      "object_key": "203.0.113.2/32",
+      "endpoint": "/api/ipam/ip-addresses/",
+      "status": "CYCLE_REAL_WRITE_FAILED",
+      "http_error": {
+        "error": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+      }
+    }
+  ],
+  "summary": {
+    "total_items": 1,
+    "created": 0,
+    "failed": 1
+  },
+  "safety_confirmations": {
+    "token_not_logged": true,
+    "token_not_saved": true,
+    "no_sync_called": true,
+    "no_patch_delete": true,
+    "no_equipment_access": true,
+    "one_shot_only": true
+  }
+}

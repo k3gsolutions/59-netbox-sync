@@ -241,7 +241,7 @@ def main() -> int:
     freeze_path = args.freeze_result
     if not freeze_path:
         freeze_path = Path(
-            f"reports/controlled-operation/{args.cycle_id}/real-write-execution/cycle-{args.cycle_id.lower()}-final-no-write-freeze-check.json"
+            f"k3g-monitoring-iac/reports/controlled-operation/{args.cycle_id}/real-write-execution/{args.cycle_id}-final-no-write-freeze-check.json"
         )
     freeze_result = load_json_safe(freeze_path) if freeze_path else {}
 
