@@ -1,4 +1,32 @@
-# Next Actions — 2026-04-29 (FASE 2.38, 2.39, 3.14 + 2.29 + 2.28 + 3.13 + 2.26 + 2.27 + 3.12 + 3.10.2 + 3.10.1 + 3.10 Complete)
+# Next Actions — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39 Complete)
+
+## Immediate Priority (FASES 2.59-4.1)
+
+**2.59 — Final Documentation & Context Sync** (IN PROGRESS)
+- Update context/CURRENT_STATE.md ✓
+- Update context/NEXT_ACTIONS.md (this file) → ADD controlled operation actions
+- Update ROADMAP.md → ADD FASE 4 marker
+- Update CHANGELOG.md → ADD 2.59-3.19 summary
+- Create docs/105-controlled-operation-overview.md
+- Create docs/106-controlled-operation-cycle.md
+- Create docs/107-controlled-write-safety-model.md
+
+**2.60 — Controlled Operation Baseline** (NEXT)
+- Create build_controlled_operation_baseline.py
+- Tool reads handoff decision + closure + archive
+- Emit CONTROLLED_OPERATION_READY/WITH_RESTRICTIONS/NOT_READY
+- Generate CONTROLLED-OPERATION-BASELINE.md + JSON
+
+**3.20 — Web UI Final Tests** (AFTER 2.60)
+- Create test_webui_final_integration.py (20 tests)
+- Validate no dangerous buttons/fields on /real-write/*
+- Run all suites: Web UI + archive + verification + compliance + execution
+- Verify no token exposure anywhere
+
+**4.1 — Controlled Operation Cycle v1** (AFTER 3.20)
+- Create create_controlled_operation_cycle.py
+- Generate cycle-001 structure (PLAN.md, SCOPE.json, CHECKLIST.md, STATUS.md)
+- Set status=PLANNED_NOT_STARTED
 
 ## Current State
 

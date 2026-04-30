@@ -156,6 +156,40 @@ Dashboard & alerts:
 - Secret keyword blocking and traversal blocking enforced
 - No NetBox writes, no apply, no `/sync`, no ApprovalRecord auto-create, no ApplyPlan auto-create
 
+### ✅ FASES 2.47-3.19 — Real Write Full Cycle (2026-04-29)
+
+**Completed:**
+- FASE 2.47-2.52: Pre-execution authorization & validation gates
+- FASE 2.53: Real write execution (one-shot POST)
+- FASE 2.54-2.56: Post-write verification, compliance re-run, closure
+- FASE 2.57: Pilot final archive (SHA256 hashes, secret exclusion)
+- FASE 2.58: Operational handoff decision (READY/WITH_RESTRICTIONS/NOT_READY)
+- FASE 3.19: Web UI post-write integration (5 routes, read-only)
+- 78+ tests passing (FASES 2.47-2.56)
+- Pilot 4WNET-MNS-KTG-RX executed full cycle successfully
+- System ready for controlled operation
+
+### FASE 4.0 — Controlled Operation (Q2-Q3 2026)
+
+**Planned:**
+- FASE 2.59: Final documentation & context sync
+- FASE 2.60: Controlled operation baseline (scope, restrições, fluxo obrigatório)
+- FASE 3.20: Web UI final integration tests (20 tests)
+- FASE 4.1: Controlled operation cycle v1 (first cycle template)
+- FASE 4.2: Controlled operation metrics
+- FASE 4.3: Multi-device readiness assessment
+- FASE 4.4: Controlled expansion (batch operations under governance)
+- FASE 4.5: Production hardening (monitoring, alerting, rollback)
+
+**Guardrails:**
+- One device per cycle initially
+- Max 1-3 objects per cycle
+- POST only (no PATCH/DELETE initially)
+- No /sync, no bulk write, no automatic retry/rollback
+- Week 1 + Week 2 review + approval + dry-run + authorization + preflight + execution + verification + compliance + closure mandatory
+
+**Estimated effort:** 8 weeks (cycles first, then expansion)
+
 ### FASE 2.1 — Tag Bootstrap & Batch Staged Apply (Q2-Q3 2026)
 
 **Planned:**
