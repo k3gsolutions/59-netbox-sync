@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="mb-3">
+        <a href="/real-write" class="btn btn-secondary btn-sm">← Voltar</a>
+    </div>
+
+    <h1>FASE 2.53 — Escrita Real</h1>
+    <p class="text-muted">Device: <strong>{{ device }}</strong></p>
+
+    {% if result %}
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header {% if 'SUCCESS' in result.get('status', '') %}bg-success{% else %}bg-danger{% endif %} text-white">
+                        <h5 class="card-title mb-0">Status: {{ result.get('status', 'DESCONHECIDO') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Execution ID:</strong><br><code>{{ result.get('execution_id', 'N/A') }}</code></p>
+                                <p><strong>Execution Package ID:</strong><br><code>{{ result.get('execution_package_id', 'N/A') }}</code></p>
+                                <p><strong>Operador:</strong> {{ result.get('operator', 'N/A') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Iniciado:</strong> {{ result.get('started_at', 'N/A') }}</p>
+                                <p><strong>Finalizado:</strong> {{ result.get('finished_at', 'N/A') }}</p>
+                                <p><strong>One-shot:</strong>
+                                    {% if result.get('one_shot_execution') %}
+                                        <span class="badge bg-success">Sim</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Segurança</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li>
+                                {% if result.get('token_logged') %}
+                                    ✗ Token logado
+                                {% else %}
+                                    ✓ Token não logado
+                                {% endif %}
+                            </li>
+                            <li>
+                                {% if not result.get('retry_attempted') %}
+                                    ✓ Sem retry
+                                {% else %}
+                                    ✗ Retry tentado
+                                {% endif %}
+                            </li>
+                            <li>
+                                {% if not result.get('rollback_attempted') %}
+                                    ✓ Sem rollback
+                                {% else %}
+                                    ✗ Rollback tentado
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Itens Executados</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item ID</th>
+                            <th>Approval ID</th>
+                            <th>Object Key</th>
+                            <th>Endpoint</th>
+                            <th>HTTP Status</th>
+                            <th>Response ID</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in result.get('items', []) %}
+                        <tr>
+                            <td><code>{{ item.get('item_id') }}</code></td>
+                            <td><code>{{ item.get('approval_id') }}</code></td>
+                            <td>{{ item.get('object_key') }}</td>
+                            <td><code>{{ item.get('endpoint') }}</code></td>
+                            <td>
+                                {% if item.get('http_status') == 201 %}
+                                    <span class="badge bg-success">{{ item.http_status }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ item.http_status or 'N/A' }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.get('response_id', 'N/A') }}</td>
+                            <td>
+                                {% if 'CREATED' in item.get('status', '') %}
+                                    <span class="badge bg-success">{{ item.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ item.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Report -->
+        {% if result_html %}
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">Relatório Completo</h5>
+            </div>
+            <div class="card-body">
+                <div class="markdown-content">
+                    {{ result_html|safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-info">
+            Nenhum resultado de execução disponível.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

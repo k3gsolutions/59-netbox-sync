@@ -1888,6 +1888,129 @@ async def policies_impact(request: Request):
     })
 
 
+# ============================================================================
+# FASE 3.19 — Real Write Post-Execution Integration
+# ============================================================================
+
+@app.get("/real-write", response_class=HTMLResponse)
+async def real_write_overview(request: Request):
+    """Real write post-execution overview."""
+    device = "4WNET-MNS-KTG-RX"
+    rw_dir = REPORTS_DIR / "pilot-device-compliance" / "real-write-execution"
+
+    execution_file = rw_dir / "REAL-WRITE-EXECUTION-RESULT.json"
+    verification_file = rw_dir / "POST-WRITE-VERIFICATION-RESULT.json"
+    compliance_file = rw_dir / "POST-WRITE-COMPLIANCE-RESULT.json"
+    closure_file = rw_dir / "closure" / "closure-summary.json"
+
+    execution_data = load_json(execution_file) if execution_file.exists() else {}
+    verification_data = load_json(verification_file) if verification_file.exists() else {}
+    compliance_data = load_json(compliance_file) if compliance_file.exists() else {}
+    closure_data = load_json(closure_file) if closure_file.exists() else {}
+
+    context = {
+        "request": request,
+        "title": f"Real Write Execution — {device}",
+        "device": device,
+        "execution": execution_data,
+        "verification": verification_data,
+        "compliance": compliance_data,
+        "closure": closure_data,
+    }
+
+    return templates.TemplateResponse("real_write_overview.html", context)
+
+
+@app.get("/real-write/execution", response_class=HTMLResponse)
+async def real_write_execution(request: Request):
+    """Real write execution details."""
+    device = "4WNET-MNS-KTG-RX"
+    rw_dir = REPORTS_DIR / "pilot-device-compliance" / "real-write-execution"
+
+    result_file = rw_dir / "REAL-WRITE-EXECUTION-RESULT.json"
+    result_md = rw_dir / "REAL-WRITE-EXECUTION-RESULT.md"
+
+    result_data = load_json(result_file) if result_file.exists() else {}
+    result_text = render_markdown(load_markdown(result_md)) if result_md.exists() else "No execution result"
+
+    context = {
+        "request": request,
+        "title": f"Real Write Execution — {device}",
+        "device": device,
+        "result": result_data,
+        "result_html": result_text,
+    }
+
+    return templates.TemplateResponse("real_write_execution.html", context)
+
+
+@app.get("/real-write/verification", response_class=HTMLResponse)
+async def real_write_verification(request: Request):
+    """Post-write verification details."""
+    device = "4WNET-MNS-KTG-RX"
+    rw_dir = REPORTS_DIR / "pilot-device-compliance" / "real-write-execution"
+
+    result_file = rw_dir / "POST-WRITE-VERIFICATION-RESULT.json"
+    result_md = rw_dir / "POST-WRITE-VERIFICATION-RESULT.md"
+
+    result_data = load_json(result_file) if result_file.exists() else {}
+    result_text = render_markdown(load_markdown(result_md)) if result_md.exists() else "No verification result"
+
+    context = {
+        "request": request,
+        "title": f"Post-Write Verification — {device}",
+        "device": device,
+        "result": result_data,
+        "result_html": result_text,
+    }
+
+    return templates.TemplateResponse("real_write_verification.html", context)
+
+
+@app.get("/real-write/compliance", response_class=HTMLResponse)
+async def real_write_compliance(request: Request):
+    """Post-write compliance details."""
+    device = "4WNET-MNS-KTG-RX"
+    rw_dir = REPORTS_DIR / "pilot-device-compliance" / "real-write-execution"
+
+    result_file = rw_dir / "POST-WRITE-COMPLIANCE-RESULT.json"
+    result_md = rw_dir / "POST-WRITE-COMPLIANCE-RESULT.md"
+
+    result_data = load_json(result_file) if result_file.exists() else {}
+    result_text = render_markdown(load_markdown(result_md)) if result_md.exists() else "No compliance result"
+
+    context = {
+        "request": request,
+        "title": f"Post-Write Compliance — {device}",
+        "device": device,
+        "result": result_data,
+        "result_html": result_text,
+    }
+
+    return templates.TemplateResponse("real_write_compliance.html", context)
+
+
+@app.get("/real-write/closure", response_class=HTMLResponse)
+async def real_write_closure(request: Request):
+    """Post-write closure decision."""
+    device = "4WNET-MNS-KTG-RX"
+    rw_dir = REPORTS_DIR / "pilot-device-compliance" / "real-write-execution"
+
+    closure_file = rw_dir / "closure" / "closure-summary.json"
+    closure_md = rw_dir / "CLOSURE-PACKAGE.md"
+
+    closure_data = load_json(closure_file) if closure_file.exists() else {}
+    closure_text = render_markdown(load_markdown(closure_md)) if closure_md.exists() else "No closure package"
+
+    context = {
+        "request": request,
+        "title": f"Real Write Closure — {device}",
+        "device": device,
+        "closure": closure_data,
+        "closure_html": closure_text,
+    }
+
+    return templates.TemplateResponse("real_write_closure.html", context)
 
 
 @app.get("/health")
