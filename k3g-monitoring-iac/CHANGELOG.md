@@ -2,6 +2,49 @@
 
 ## [Unreleased]
 
+### Added — FASES 4.11, 4.12, 4.13: Manual Approval, Dry-Run ApplyPlan Generation & Validation (2026-04-29)
+
+**Manual Approval Review (FASE 4.11)**
+- controlled_cycle_manual_approval_review.py — human reviewer approves/rejects ApprovalRecords
+- Validates: status proposed/pending, reviewer present, all safety flags, no secrets in record
+- Creates approved copies with approved_by, approved_at, approval_reason fields
+- Adds state_history events: cycle_manual_approval_reviewed, approved_for_cycle_dryrun_applyplan
+- Decision: CYCLE_APPROVAL_REVIEW_APPROVED / WITH_RESTRICTIONS / BLOCKED
+- Zero NetBox writes, no automatic approvals (human decision required)
+
+**Dry-Run ApplyPlan Generation (FASE 4.12)**
+- controlled_cycle_generate_dryrun_applyplan.py — create dry-run ApplyPlan from approved records
+- Validates each approved record: status/state=approved, reviewer present, no secrets
+- Creates ApplyPlan with mode=dry_run, status=generated (never executed automatically)
+- All safety flags enforced: dry_run_only, no_netbox_write, no_apply_execution, etc.
+- Execution policy: can_execute_real_write=false, requires_next_gate=true
+- Forbidden methods [PATCH, DELETE], forbidden targets [/sync, equipment, ssh, netconf]
+- No execution, no NetBox writes, pure generation from approved decisions
+
+**Dry-Run ApplyPlan Validation (FASE 4.13)**
+- controlled_cycle_validate_dryrun_applyplan.py — structural validation before execution
+- Validates: mode=dry_run, all safety flags true, execution policy enforced
+- Checks each item: required fields, allowed methods, no forbidden targets, no secrets
+- Blocks: can_execute_real_write=true, PATCH/DELETE, /sync, authorization keywords
+- Decision: CYCLE_DRYRUN_APPLYPLAN_VALID / VALID_WITH_WARNINGS / INVALID
+- No writes, no execution, pure validation
+
+**Testing & Validation**
+- test_controlled_cycle_approval_applyplan_flow.py — 16 comprehensive tests
+- Tests cover: approval validation, secret blocking, ApplyPlan generation, validation enforcement
+- Full regression suite: 162+ tests passing (97+ relevant to FASES 4.8-4.13)
+- Validates: no NetBox writes, no automatic approvals, no real write capability
+
+**Key Achievements**
+- Complete approval → dry-run workflow implemented
+- Manual reviewer explicitly approves each record (no automation)
+- ApplyPlan is guaranteed dry_run with no execution capability
+- All safety gates enforced at each phase
+- 16/16 tests passing for FASES 4.11/4.12/4.13
+- Full approval audit trail with timestamps and reviewers
+
+---
+
 ### Added — FASES 4.8, 4.9, 4.10: Week 2 Human Review, Approval Promotion, Readiness Gate (2026-04-29)
 
 **Week 2 Human Review Validation (FASE 4.8)**

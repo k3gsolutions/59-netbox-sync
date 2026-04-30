@@ -185,14 +185,17 @@ Dashboard & alerts:
 - ✅ FASE 4.8: Week 2 human review validation (decision field, reviewer, approval_record_allowed)
 - ✅ FASE 4.9: Promote approved Week 2 drafts to proposed ApprovalRecords
 - ✅ FASE 4.10: Approval readiness gate (validate proposed records, block secrets)
+- ✅ FASE 4.11: Manual approval review (human reviewer approves/rejects ApprovalRecords)
+- ✅ FASE 4.12: Dry-run ApplyPlan generation (generate from approved records, mode=dry_run)
+- ✅ FASE 4.13: Dry-run ApplyPlan validation (validate structure, safety flags, forbidden methods)
 - ✅ System: CONTROLLED_OPERATION_READY confirmed
-- ✅ Test suites: 146+ tests all passing
+- ✅ Test suites: 162+ tests all passing
 
 **Planned (Next):**
-- FASE 4.11: Manual approval review (final decision, approved/rejected/deferred)
-- FASE 4.12: Dry-run ApplyPlan generation & validation
-- FASE 4.13: Real write authorization & execution
-- FASE 4.14: Post-write verification & compliance closure
+- FASE 4.14: Dry-run ApplyPlan execution gate (pre-execution validation)
+- FASE 4.15: Dry-run simulation execution (no real writes, simulation only)
+- FASE 4.16: Real write authorization & execution
+- FASE 4.17: Post-write verification & compliance closure
 
 **Guardrails (Enforced):**
 - One device per cycle initially ✓
