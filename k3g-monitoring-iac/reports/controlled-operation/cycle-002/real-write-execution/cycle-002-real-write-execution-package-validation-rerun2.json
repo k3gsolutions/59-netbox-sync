@@ -1,0 +1,8 @@
+{
+  "cycle_id": "cycle-002",
+  "decision": "CYCLE_REAL_WRITE_EXECUTION_PACKAGE_VALID",
+  "issues": [],
+  "execution_package": "execution_package.json",
+  "no_netbox_write": true,
+  "no_apply_execution": true
+}

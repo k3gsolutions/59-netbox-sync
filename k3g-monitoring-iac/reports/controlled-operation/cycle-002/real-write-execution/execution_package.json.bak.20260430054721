@@ -19,14 +19,19 @@
       "object_type": "ip_address",
       "object_key": "203.0.113.1",
       "method": "POST",
-      "target_endpoint": "/api/ipam/ip-addresses/",
+      "target_endpoint": "/",
       "proposed_payload": {
-        "address": "203.0.113.1/32",
-        "status": "active",
-        "description": "Cycle-002 controlled operation - 4WNET-MNS-KTG-RX - staged IP address"
+        "cycle_id": "cycle-002",
+        "device": "4WNET-MNS-KTG-RX",
+        "device_id": "1890",
+        "team": "bgp",
+        "object_type": "bgp_peer",
+        "object_key": "203.0.113.1",
+        "action": "safe_create_staged",
+        "category": "bgp"
       },
       "rollback_hint": "manual only",
-      "expected_result": "NetBox IP address created with address 203.0.113.1/32",
+      "expected_result": "dry-run only",
       "pre_write_checks": [
         "local_validation",
         "safety_lock"
@@ -44,15 +49,6 @@
           "new_object_type": "ip_address",
           "endpoint": "/api/ipam/ip-addresses/",
           "reason": "object_key is IPv4 address, endpoint is IPAM IP addresses"
-        },
-        {
-          "timestamp": "2026-04-30T05:47:21.931860+00:00",
-          "action": "fix_target_endpoint_and_netbox_payload",
-          "old_target_endpoint": "/",
-          "new_target_endpoint": "/api/ipam/ip-addresses/",
-          "old_payload_summary": "198 chars, keys: ['cycle_id', 'device', 'device_id', 'team', 'object_type', 'object_key', 'action', 'category']",
-          "new_payload_summary": "137 chars, keys: ['address', 'status', 'description']",
-          "reason": "Corrected target_endpoint and converted payload to valid IPAM IP address format"
         }
       ]
     }

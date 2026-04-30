@@ -1,0 +1,24 @@
+{
+  "fix_id": "fix-20260430054721",
+  "cycle_id": "cycle-002",
+  "status": "TARGET_ENDPOINT_PAYLOAD_FIX_APPLIED",
+  "timestamp": "2026-04-30T05:47:21.931860+00:00",
+  "backup_path": "reports/controlled-operation/cycle-002/real-write-execution/execution_package.json.bak.20260430054721",
+  "changed_items": [
+    {
+      "object_key": "203.0.113.1",
+      "object_type": "ip_address",
+      "endpoint": "/api/ipam/ip-addresses/",
+      "target_endpoint": "/api/ipam/ip-addresses/",
+      "reason": "Fixed target_endpoint and payload for 203.0.113.1"
+    }
+  ],
+  "blocked_items": [],
+  "safety_confirmations": {
+    "no_netbox_write": true,
+    "no_token_read": true,
+    "no_network_call": true,
+    "execution_allowed_false_preserved": false,
+    "required_execution_phrase_preserved": true
+  }
+}

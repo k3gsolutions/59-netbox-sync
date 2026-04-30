@@ -1,12 +1,12 @@
 {
-  "execution_id": "exec-result-cycle-002-e186fc78",
+  "execution_id": "exec-result-cycle-002-81f09ee2",
   "cycle_id": "cycle-002",
   "execution_package_id": "exec-cycle-002-a33704d3",
   "device": "4WNET-MNS-KTG-RX",
   "device_id": "1890",
   "operator": "Keslley",
-  "started_at": "2026-04-30T04:02:48.866867+00:00",
-  "finished_at": "2026-04-30T04:02:48.867134+00:00",
+  "started_at": "2026-04-30T05:41:44.769696+00:00",
+  "finished_at": "2026-04-30T05:41:44.770467+00:00",
   "status": "CYCLE_REAL_WRITE_ABORTED_PREFLIGHT_FAILED",
   "one_shot_execution": true,
   "retry_attempted": false,
@@ -18,7 +18,7 @@
     {
       "item_id": "cycle-002-203-0-113-1-57a92698",
       "approval_id": "cycle-002-203-0-113-1-57a92698",
-      "object_type": "bgp_peer",
+      "object_type": "ip_address",
       "object_key": "203.0.113.1",
       "method": "POST",
       "target_endpoint": "/",
@@ -43,7 +43,6 @@
     }
   ],
   "issues": [
-    "NETBOX_WRITE_TOKEN missing",
     "cycle-002-203-0-113-1-57a92698: endpoint blocked"
   ],
   "safety_confirmations": {
