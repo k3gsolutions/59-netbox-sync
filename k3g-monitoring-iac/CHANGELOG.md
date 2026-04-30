@@ -2,6 +2,53 @@
 
 ## [Unreleased]
 
+### Added — FASES 4.94, 4.95, 4.96, 4.97: Cycle-003 Retry-001 Preparation
+
+**FASE 4.94** — Root Cause Confirmation:
+- Tool: `diagnose_cycle003_retry_root_cause.py`
+- Classifies root cause of Cycle-003 real-write execution failure.
+- Classification types: DNS_FAILURE, URL_COMPOSITION_FAILURE, NETBOX_UNREACHABLE, TOKEN_MISSING, PAYLOAD_INVALID, UNKNOWN.
+- Cycle-003 Result: **DNS_FAILURE** (nodename nor servname provided, or not known)
+- Recommendation: **SAFE_TO_RETRY** (network error, not operational issue)
+- Output: cycle-003-retry-001-root-cause.json and markdown report.
+
+**FASE 4.95** — Package Clone:
+- Tool: `build_cycle003_retry_package.py`
+- Clones parent execution package with retry-specific metadata.
+- Creates new execution_id and execution_phrase for Retry-001.
+- Preserves items, payloads, endpoints, expected results.
+- Maintains execution_allowed=false, all safety flags, no_automatic_retry.
+- Validates no secrets in payload, no PATCH/DELETE, endpoints valid.
+- Output: execution_package.json with retry metadata.
+
+**FASE 4.96** — Package Validation:
+- Tool: `validate_cycle003_retry_package.py`
+- 14 validation checks: retry_id, retry_attempt, parent failed, no objects created, execution_allowed=false, safety flags, phrase, items, endpoints, no secrets.
+- Decision: RETRY_PACKAGE_VALID / RETRY_PACKAGE_VALID_WITH_WARNINGS / RETRY_PACKAGE_INVALID.
+- Cycle-003 Result: **RETRY_PACKAGE_VALID** (all 14 checks passed).
+- Output: cycle-003-retry-001-package-validation.json and markdown report.
+
+**FASE 4.97** — Final No-Write Freeze:
+- Tool: `freeze_cycle003_retry_package.py`
+- 5-layer freeze validation: validation passed, no_write, no_token_read, no_network_call, execution_locked.
+- Decision: RETRY_READY_FOR_REAL_WRITE_PHASE / RETRY_READY_WITH_RESTRICTIONS / RETRY_NOT_READY.
+- Cycle-003 Result: **RETRY_READY_FOR_REAL_WRITE_PHASE** (all checks passed, zero issues).
+- Safety confirmations: no_write_executed, no_token_read, no_network_call, execution_allowed=false, one_shot_execution.
+- Output: cycle-003-retry-001-final-no-write-freeze.json and markdown report.
+
+**Test Suite: 14 tests all passing**
+- Root cause DNS classification, response ID null detection.
+- Package clone: preservation of payload, new phrase generation, execution_allowed=false maintenance.
+- Validation: blocks if parent created objects, blocks invalid retry_attempt, invalid endpoint, secrets in payload.
+- Freeze: READY with valid package, no token read, no network call, no NetBox write.
+
+**Cycle-003 Retry-001 Status: FROZEN AND READY**
+- Root cause: DNS resolution error (netbox.k3g.local is fictitious test URL)
+- Recommendation: Correct NetBox URL, provide token, re-run FASE 4.98 (Execute Real Write Once)
+- No objects created in parent (safe for retry)
+- Retry package locked, zero risk of unintended writes
+- Execution phrase: EXECUTAR_ESCRITA_REAL_cycle-003-retry-001_4WNET-MNS-KTG-RX_[UUID]
+
 ### Added — FASE 2.32: Compliance Policy Registry & Convention Validator
 
 - Created policies/compliance/ YAML registry (13 files):
