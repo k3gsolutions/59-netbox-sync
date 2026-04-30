@@ -1,28 +1,35 @@
-# Next Actions — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10 Complete)
+# Next Actions — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.13 Complete)
 
-## Just Completed (FASES 4.8-4.10)
+## Just Completed (FASES 4.11-4.13)
 
-**4.10 — Controlled Operation Cycle Approval Readiness Gate** ✅ COMPLETE
-- ✅ Created controlled_cycle_approval_readiness_gate.py
-- ✅ Validates proposed ApprovalRecords ready for manual review
-- ✅ Checks: status=proposed, state=proposed, valid object_type, safety flags, no secrets
-- ✅ Decision: READY_FOR_MANUAL_APPROVAL_REVIEW / WITH_RESTRICTIONS / NOT_READY
-- ✅ All tests passing (12/12 in comprehensive test suite)
+**4.13 — Controlled Operation Cycle Dry-Run ApplyPlan Validation** ✅ COMPLETE
+- ✅ Created controlled_cycle_validate_dryrun_applyplan.py
+- ✅ Validates dry-run ApplyPlan structure and safety
+- ✅ Enforces: mode=dry_run, safety flags, can_execute_real_write=false, no secrets
+- ✅ Blocks: PATCH/DELETE methods, /sync target, authorization keywords
+- ✅ Decision: CYCLE_DRYRUN_APPLYPLAN_VALID / VALID_WITH_WARNINGS / INVALID
+- ✅ All tests passing (16/16 in comprehensive test suite)
 
-**4.9 — Controlled Operation Cycle Promote Drafts to Proposed ApprovalRecords** ✅ COMPLETE
-- ✅ Created controlled_cycle_promote_to_approval_records.py
-- ✅ Promotes only approved Week 2 decisions to ApprovalRecords
-- ✅ Sets status=proposed (NOT auto-approved)
-- ✅ All safety flags enforced: no_netbox_write, manual_review_required, proposed_only
-- ✅ All tests passing (12/12 in comprehensive test suite)
+**4.12 — Controlled Operation Cycle Generate Dry-Run ApplyPlan** ✅ COMPLETE
+- ✅ Created controlled_cycle_generate_dryrun_applyplan.py
+- ✅ Generates dry-run ApplyPlan from approved ApprovalRecords
+- ✅ Validates each approved record before inclusion
+- ✅ Sets all safety flags: dry_run_only=true, no_apply_execution=true, etc.
+- ✅ Execution policy enforced: no real write capability, requires next gate
+- ✅ All tests passing (16/16 in comprehensive test suite)
 
-**4.8 — Controlled Operation Cycle Week 2 Human Review Validation** ✅ COMPLETE
-- ✅ Created controlled_cycle_week2_review.py
-- ✅ Validates Week 2 human review decisions from CSV
-- ✅ Checks: decision field, reviewer presence, approval_record_allowed flag
-- ✅ Decision: WEEK2_REVIEW_PASSED / WITH_RESTRICTIONS / BLOCKED
-- ✅ All tests passing (12/12 in comprehensive test suite)
-- ✅ Test fix: corrected CSV filename format (CYCLE-001-WEEK2-DECISIONS.csv)
+**4.11 — Controlled Operation Cycle Manual Approval Decision** ✅ COMPLETE
+- ✅ Created controlled_cycle_manual_approval_review.py
+- ✅ Validates and approves proposed ApprovalRecords
+- ✅ Creates approved copies with human reviewer attribution
+- ✅ Adds required state_history events for audit trail
+- ✅ Decision: CYCLE_APPROVAL_REVIEW_APPROVED / WITH_RESTRICTIONS / BLOCKED
+- ✅ All tests passing (16/16 in comprehensive test suite)
+
+## Status
+- Complete workflow: Week 2 review → approval decision → dry-run ApplyPlan → validation
+- All 162+ tests passing across all FASES 2.47-4.13
+- Cycle-001 ready for next phase (execution testing)
 
 ## Current State
 

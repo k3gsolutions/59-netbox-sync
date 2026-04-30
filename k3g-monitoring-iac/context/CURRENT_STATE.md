@@ -1,4 +1,4 @@
-# Current State — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10 Complete)
+# Current State — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.13 Complete)
 
 ## Operational Status
 
@@ -43,7 +43,7 @@ Web UI (FASE 3.19):
 - FASE 3.19: Post-write integration (5 routes, 5 templates, read-only, no dangerous buttons)
 - /real-write overview, /execution, /verification, /compliance, /closure
 
-Controlled Operation (FASES 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10):
+Controlled Operation (FASES 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.13):
 - FASE 2.60: Build controlled operation baseline (readiness evaluation, scope definition, mandatory gates)
 - FASE 4.1: Create controlled operation cycle (cycle template generation, 4-file structure)
 - FASE 3.20: Test controlled operation readiness (10 tests, all passing)
@@ -56,14 +56,16 @@ Controlled Operation (FASES 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 
 - FASE 4.8: Week 2 human review validation (decision field, reviewer, approval_record_allowed flag)
 - FASE 4.9: Promote approved Week 2 drafts to proposed ApprovalRecords (status=proposed, safety flags set)
 - FASE 4.10: Approval readiness gate (validate proposed records, block secrets, READY/WITH_RESTRICTIONS/NOT_READY)
+- FASE 4.11: Manual approval review (approve/reject/defer/block proposed ApprovalRecords, create approved copies)
+- FASE 4.12: Dry-run ApplyPlan generation (create dry_run ApplyPlan from approved records, mode=dry_run, no real write)
+- FASE 4.13: Dry-run ApplyPlan validation (validate structure, check safety flags, block secrets/real write/forbidden methods)
 - Baseline decision: CONTROLLED_OPERATION_READY
-- Cycle-001: INTAKE_READY, Week1 responses collected, Week1 validated, Week2 prepared
-- Week2: Human review decisions validated, approved items promoted to proposed ApprovalRecords
-- Approval readiness: READY_FOR_MANUAL_APPROVAL_REVIEW (all records validated)
+- Cycle-001: INTAKE_READY → Week1 responses → Week1 validated → Week2 prepared → Manual approval → Dry-run ApplyPlan
+- Status flow: proposed → approved → applyplan_generated → validated → (ready for execution phase)
 - Scope: 1 device/cycle, 3 objects max, POST-only, 14 mandatory gates
-- All tools read-only, no network calls, no token handling, no NetBox writes
+- All tools read-only, no network calls, no token handling, no NetBox writes, no automatic approvals
 
-Test Suites (146+ tests all passing):
+Test Suites (162+ tests all passing):
 - 20 tests (FASES 2.47-2.52 pre-execution)
 - 18 tests (FASE 2.53 execution)
 - 15 tests (FASE 2.54 verification)
@@ -73,8 +75,43 @@ Test Suites (146+ tests all passing):
 - 15 tests (FASES 4.2/4.3/4.4 cycle flow)
 - 16 tests (FASES 4.5/4.6/4.7 week 1-2 flow)
 - 12 tests (FASES 4.8/4.9/4.10 week 2 review → approval readiness)
+- 16 tests (FASES 4.11/4.12/4.13 manual approval → dry-run ApplyPlan)
 - 15 tests (Compliance registry)
 - 38+ pre-write tests (all passing)
+
+**FASE 4.13 COMPLETE** — Controlled Operation Cycle Dry-Run ApplyPlan Validation
+  - Validates dry-run ApplyPlan structure before execution
+  - Checks: mode=dry_run, safety flags all true (dry_run_only, no_netbox_write, no_token_required, etc.)
+  - Validates execution policy: can_execute_real_write=false, requires_next_gate=true, forbidden methods/targets
+  - Blocks PATCH/DELETE methods, forbidden targets (/sync, equipment, ssh, netconf), secrets in payloads
+  - Decision: CYCLE_DRYRUN_APPLYPLAN_VALID / VALID_WITH_WARNINGS / INVALID
+  - Tool: `tools/local/controlled_cycle_validate_dryrun_applyplan.py`
+  - Output: CYCLE-{ID}-DRYRUN-APPLYPLAN-VALIDATION.md and cycle-{id}-dryrun-applyplan-validation.json
+  - Security: read-only validation only, NO writes, NO network calls
+  - **Deliverables:** controlled_cycle_validate_dryrun_applyplan.py
+
+**FASE 4.12 COMPLETE** — Controlled Operation Cycle Generate Dry-Run ApplyPlan
+  - Generate dry-run ApplyPlan from approved ApprovalRecords
+  - Validates each approved record: status=approved, state=approved, reviewer present, no secrets
+  - Creates ApplyPlan JSON with mode=dry_run, status=generated, safety flags enforced
+  - All items contain: approval_id, object_type, proposed_payload, evidence_hash, expected_result, rollback_hint
+  - Execution policy: can_execute_real_write=false, requires_next_gate=true, forbidden=[PATCH,DELETE,/sync]
+  - Tool: `tools/local/controlled_cycle_generate_dryrun_applyplan.py`
+  - Output: apply-plans/dry-run/{apply_plan_id}.json and CYCLE-{ID}-DRYRUN-APPLYPLAN-GENERATION.md
+  - Security: no NetBox writes, no ApplyPlan execution, no token handling
+  - **Deliverables:** controlled_cycle_generate_dryrun_applyplan.py
+
+**FASE 4.11 COMPLETE** — Controlled Operation Cycle Manual Approval Decision
+  - Enable human reviewer to explicitly approve/reject/defer/block proposed ApprovalRecords
+  - Validates record structure: status proposed/pending, reviewer present, all safety flags, no secrets
+  - For approve: creates approved copy with approved_by, approved_at, approval_reason fields
+  - Adds state_history events: cycle_manual_approval_reviewed, approved_for_cycle_dryrun_applyplan
+  - Decision: CYCLE_APPROVAL_REVIEW_APPROVED / WITH_RESTRICTIONS / BLOCKED
+  - Tool: `tools/local/controlled_cycle_manual_approval_review.py`
+  - Output: approvals/approved/ directory with approved ApprovalRecords
+  - Report: CYCLE-{ID}-MANUAL-APPROVAL-REVIEW.md and cycle-{id}-manual-approval-review.json
+  - Security: no NetBox writes, no ApplyPlan creation, no automatic approvals, human decision required
+  - **Deliverables:** controlled_cycle_manual_approval_review.py
 
 **FASE 4.10 COMPLETE** — Controlled Operation Cycle Approval Readiness Gate
   - Validates proposed ApprovalRecords ready for manual approval review
