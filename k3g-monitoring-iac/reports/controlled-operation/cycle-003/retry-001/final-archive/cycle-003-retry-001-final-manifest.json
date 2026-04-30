@@ -1,0 +1,86 @@
+{
+  "archived_at": "2026-04-30T16:44:33.257690+00:00",
+  "retry_id": "cycle-003-retry-001",
+  "parent_cycle_id": "cycle-003",
+  "parent_status": "CYCLE_CLOSED_ACTION_REQUIRED",
+  "retry_status": "CYCLE_CLOSED_WITH_WARNINGS",
+  "object_created": true,
+  "object_id": 6325,
+  "artifacts": {
+    "CYCLE-003-RETRY-001-CLOSURE.md": {
+      "hash": "b9fb0c5540b8874a9cc16166ce2b1c27e545c16b789757098aed79e401b26a45",
+      "size": 1508
+    },
+    "CYCLE-003-RETRY-001-PACKAGE-VALIDATION.md": {
+      "hash": "0397aad8af857353a0a1249fde3929eb53823095b23b728b781e2b98066edb06",
+      "size": 338
+    },
+    "cycle-003-retry-001-root-cause.json": {
+      "hash": "f2dd3892f1f512b5f460e699aac4ab6f86433d4146972f24efbf445203bdebf4",
+      "size": 786
+    },
+    "CYCLE-003-RETRY-001-REAL-WRITE-EXECUTION-RESULT.md": {
+      "hash": "8b5479eece3fd6a8088886ba8b54059c93fd05ca3accbfbfd34e4497b57b83ad",
+      "size": 733
+    },
+    "CYCLE-003-RETRY-001-EXECUTION-PACKAGE.md": {
+      "hash": "05ec7423434b158e8a9cbe1f79584e4b9b8fbf1c261b4efde86a056d22a965b1",
+      "size": 744
+    },
+    "CYCLE-003-RETRY-001-FINAL-NO-WRITE-FREEZE.md": {
+      "hash": "440078ecf784287468b44eb1d4ac67b2138a6b2329f07aa3ccdfc1c36f5b907f",
+      "size": 1045
+    },
+    "CYCLE-003-RETRY-001-POST-WRITE-VERIFICATION.md": {
+      "hash": "3e61baf7b5930e0770a045317b812bc6058fa2438c899f2670d485fcfdf249c3",
+      "size": 413
+    },
+    "CYCLE-003-RETRY-001-POST-WRITE-COMPLIANCE.json": {
+      "hash": "5c427f684d8992a81032dce1e88a65efea4ee2fa514b3c4579e28569e51a694c",
+      "size": 493
+    },
+    "CYCLE-003-RETRY-001-POST-WRITE-COMPLIANCE.md": {
+      "hash": "293ec28fee5d90e3d9801bdfa3597f471bbf7d02aae3db9debf89be9e9ea2d8d",
+      "size": 466
+    },
+    "CYCLE-003-RETRY-001-REAL-WRITE-EXECUTION-RESULT.json": {
+      "hash": "bd59fd148068625da82d2a58038b8193f4a90a406159576b8f0a0b3658f16d40",
+      "size": 1115
+    },
+    "cycle-003-retry-001-final-no-write-freeze.json": {
+      "hash": "b6d7dde9f85b8a3f9dddd30e4a323d9fb1bb86bcb2b89e50e276ef4eb4654b5f",
+      "size": 382
+    },
+    "CYCLE-003-RETRY-001-POST-WRITE-VERIFICATION.json": {
+      "hash": "02489b8e5d50d192a9d12e48fb66cd911c6a72ab609a1e5005574ac7d855fecb",
+      "size": 658
+    },
+    "execution_package.json": {
+      "hash": "030c85e094dde4b2e71d5d8032c04b76e3bb9cb4babe28343dbc7e459384966a",
+      "size": 1264
+    },
+    "CYCLE-003-RETRY-001-ROOT-CAUSE.md": {
+      "hash": "0c8ff400f87dc7446fa195dc4062f7c8643e98d91f8b77691d1e6749f06b1922",
+      "size": 916
+    },
+    "cycle-003-retry-001-package-validation.json": {
+      "hash": "16f7b64818311c87685660e979c69441d4beda5206408f1527aa836a062c18b2",
+      "size": 278
+    },
+    "closure/cycle-cycle-003-retry-001-closure-summary.json": {
+      "hash": "7709bcfa2da7f04777797a618ef8fa74a8ed4e9376aa75d8e66f055dc59e9136",
+      "size": 562
+    }
+  },
+  "secrets_detected": [
+    "CYCLE-003-RETRY-001-REAL-WRITE-EXECUTION-RESULT.md: token",
+    "CYCLE-003-RETRY-001-FINAL-NO-WRITE-FREEZE.md: token",
+    "CYCLE-003-RETRY-001-REAL-WRITE-EXECUTION-RESULT.json: token",
+    "cycle-003-retry-001-final-no-write-freeze.json: token",
+    "CYCLE-003-RETRY-001-ROOT-CAUSE.md: token"
+  ],
+  "archive_decision": "RETRY_ARCHIVED_ACTION_REQUIRED",
+  "execution_status": null,
+  "verification_status": null,
+  "compliance_status": null
+}

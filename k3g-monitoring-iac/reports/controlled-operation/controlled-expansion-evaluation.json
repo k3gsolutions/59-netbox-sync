@@ -1,9 +1,9 @@
 {
-  "evaluated_at": "2026-04-30T06:09:18.822487+00:00",
-  "total_cycles": 2,
+  "evaluated_at": "2026-04-30T16:44:55.038300+00:00",
+  "total_cycles": 3,
   "successful_cycles": 0,
-  "action_required_cycles": 0,
-  "recommendation": "STAY_CURRENT_LEVEL",
+  "action_required_cycles": 1,
+  "recommendation": "EXPANSION_BLOCKED",
   "limits_changed": false,
   "current_limits": {
     "max_devices_per_cycle": 1,
@@ -26,8 +26,8 @@
   },
   "policy_version": "1.0",
   "metrics_snapshot": {
-    "measured_at": "2026-04-30T06:09:18.409311+00:00",
-    "total_cycles_defined": 2,
+    "measured_at": "2026-04-30T16:44:49.470271+00:00",
+    "total_cycles_defined": 3,
     "cycles_completed": 0,
     "cycles_closed_success": 0,
     "cycles_closed_with_warnings": 0,

@@ -1,9 +1,9 @@
 # Controlled Operation Index
 
 ## 1. Overall Status
-- Status: WITH_RESTRICTIONS
-- Total Cycles: 2
-- Measured at: 2026-04-30T06:09:18.616041+00:00
+- Status: BLOCKED
+- Total Cycles: 3
+- Measured at: 2026-04-30T16:44:49.717002+00:00
 
 ## 2. Cycle Summary
 
@@ -11,6 +11,7 @@
 |-------|--------|--------|-------|---------|-------------|
 | cycle-001 | 4WNET-MNS-KTG-RX | closed_with_restrictions | 0/3 | READY_WITH_RESTRICTIONS | Revisar restrições antes de ampliar |
 | cycle-002 | 4WNET-MNS-KTG-RX | closed_with_restrictions | 0/3 | CYCLE_CLOSED_WITH_RESTRICTIONS | Revisar restrições antes de ampliar |
+| cycle-003 | 4WNET-MNS-KTG-RX | action_required | 0/3 | N/A | Bloquear novo ciclo |
 
 ## 3. Detailed Status
 
@@ -44,6 +45,21 @@
 
 ---
 
+### cycle-003 — 4WNET-MNS-KTG-RX
+
+- **Status:** action_required
+- **Device ID:** 1890
+- **Max Items:** 3
+- **Total Items Processed:** 0
+- **Allowed Methods:** POST
+- **Forbidden Methods:** PATCH, DELETE
+- **Handoff Decision:** N/A
+- **Closure Decision:** CYCLE_CLOSED_ACTION_REQUIRED
+- **Artifacts:** cycle-003/CYCLE-003-SCOPE.json, cycle-003/real-write-execution/closure/cycle-003-closure-summary.json
+- **Next Action:** Bloquear novo ciclo
+
+---
+
 ## 4. Key Artifacts
 
 Cycles and their essential files:
@@ -53,4 +69,4 @@ Cycles and their essential files:
 - Closure summaries in `cycle-*/real-write-execution/closure/` or `cycle-*/final-archive/`
 
 ---
-Index built at 2026-04-30T06:09:18.616041+00:00
+Index built at 2026-04-30T16:44:49.717002+00:00

@@ -1,7 +1,7 @@
 {
-  "measured_at": "2026-04-30T06:09:18.616041+00:00",
-  "total_cycles": 2,
-  "overall_status": "WITH_RESTRICTIONS",
+  "measured_at": "2026-04-30T16:44:49.717002+00:00",
+  "total_cycles": 3,
+  "overall_status": "BLOCKED",
   "cycles": [
     {
       "cycle_id": "cycle-001",
@@ -85,6 +85,51 @@
       "manifest_file": null,
       "closure_file": "cycle-002/real-write-execution/closure/cycle-002-closure-summary.json",
       "sensitive_hits": []
+    },
+    {
+      "cycle_id": "cycle-003",
+      "device": "4WNET-MNS-KTG-RX",
+      "device_id": 1890,
+      "current_status": "action_required",
+      "handoff_decision": "",
+      "closure_decision": "CYCLE_CLOSED_ACTION_REQUIRED",
+      "total_items": 0,
+      "max_items": 3,
+      "allowed_methods": [
+        "POST"
+      ],
+      "forbidden_methods": [
+        "PATCH",
+        "DELETE"
+      ],
+      "forbidden_targets": [
+        "/sync",
+        "equipment",
+        "ssh",
+        "netconf"
+      ],
+      "requires_week1": true,
+      "requires_week2": true,
+      "requires_approval_records": true,
+      "requires_applyplan_dryrun": true,
+      "requires_real_write_authorization": true,
+      "requires_post_write_verification": true,
+      "next_action": "Bloquear novo ciclo",
+      "key_artifacts": [
+        "cycle-003/CYCLE-003-SCOPE.json",
+        "cycle-003/real-write-execution/closure/cycle-003-closure-summary.json"
+      ],
+      "scope_file": "cycle-003/CYCLE-003-SCOPE.json",
+      "status_file": null,
+      "handoff_file": null,
+      "manifest_file": null,
+      "closure_file": "cycle-003/real-write-execution/closure/cycle-003-closure-summary.json",
+      "sensitive_hits": [
+        "CYCLE-003-REAL-WRITE-FAILURE-DIAGNOSIS.md",
+        "CYCLE-003-RETRY-001-FINAL-NO-WRITE-FREEZE.md",
+        "CYCLE-003-RETRY-001-ROOT-CAUSE.md",
+        "cycle-003-real-write-failure-diagnosis.json"
+      ]
     }
   ]
 }
