@@ -34,7 +34,7 @@ def load_json(path: Path) -> dict:
 
 def main() -> int:
 	"""Run test suite."""
-	test_dir = Path("k3g-monitoring-iac/reports/controlled-operation/cycle-003")
+	test_dir = Path("reports/controlled-operation/cycle-003")
 	week1_dir = test_dir / "week1"
 
 	print("=" * 60)
