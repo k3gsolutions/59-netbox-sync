@@ -185,13 +185,13 @@ class TestRejectionDiagnostics:
         assert reason == "compliance_disabled"
 
     def test_get_rejection_reason_no_tenant(self):
-        """Device without tenant has reason 'no_tenant'."""
+        """Device without tenant = tenant_missing."""
         device = {
             "status": "active",
             "custom_fields": {"Compliance": True},
         }
         reason = get_rejection_reason(device)
-        assert reason == "no_tenant"
+        assert reason == "tenant_missing"
 
     def test_get_rejection_reason_wrong_tenant_group(self):
         """Device with wrong tenant group has reason 'wrong_tenant_group'."""
