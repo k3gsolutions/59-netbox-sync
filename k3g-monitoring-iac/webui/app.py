@@ -1,7 +1,7 @@
 """
 Web UI for k3g-monitoring-iac — Read-only compliance and governance dashboard.
 
-No writes, no tokens, no NetBox API calls.
+No writes, no tokens. NetBox API: GET-only /api/dcim/devices/.
 """
 
 from fastapi import FastAPI, Query, HTTPException
@@ -54,6 +54,16 @@ from .services.controlled_operation import (
     load_cycle_week2_artifacts,
     safe_cycle_id,
     list_controlled_cycles,
+)
+from .services.netbox_client import (
+    get_netbox_client,
+    NetBoxNotConfiguredError,
+    NetBoxAuthError,
+    NetBoxClientError,
+)
+from .services.compliance_candidates import (
+    list_compliance_candidates,
+    is_compliance_candidate,
 )
 
 
@@ -2551,6 +2561,150 @@ async def real_write_closure(request: Request):
     }
 
     return templates.TemplateResponse("real_write_closure.html", context)
+
+
+# Compliance candidate discovery routes
+@app.get("/compliance", response_class=HTMLResponse)
+async def compliance_candidates_page(request: Request):
+    """Compliance > Candidatos dashboard."""
+    error = None
+    candidates = {"count": 0, "results": [], "safety": {}}
+
+    try:
+        client = get_netbox_client()
+        candidates = list_compliance_candidates(client)
+    except NetBoxNotConfiguredError as e:
+        error = f"NetBox não configurado: {e}"
+    except NetBoxAuthError:
+        error = "Falha de autenticação no NetBox (401/403). Verifique o NETBOX_TOKEN."
+    except NetBoxClientError as e:
+        error = f"Erro ao conectar ao NetBox: {e}"
+
+    context = {
+        "request": request,
+        "title": "Compliance — Candidatos",
+        "candidates": candidates,
+        "error": error,
+    }
+
+    return templates.TemplateResponse("compliance_candidates.html", context)
+
+
+@app.get("/compliance/candidates", response_class=JSONResponse)
+async def get_compliance_candidates(
+    limit: int = Query(100),
+    offset: int = Query(0),
+    site: Optional[str] = Query(None),
+    role: Optional[str] = Query(None),
+    tenant_group: Optional[str] = Query(None),
+):
+    """Get compliance candidates as JSON."""
+    filters = {}
+    if site:
+        filters["site"] = site
+    if role:
+        filters["role"] = role
+    if tenant_group:
+        filters["tenant_group"] = tenant_group
+
+    try:
+        client = get_netbox_client()
+        result = list_compliance_candidates(client, limit=limit, offset=offset, filters=filters)
+        return JSONResponse(result)
+    except NetBoxNotConfiguredError:
+        return JSONResponse(
+            {"error": "NetBox não configurado. Defina NETBOX_URL e NETBOX_TOKEN."},
+            status_code=503,
+        )
+    except NetBoxAuthError:
+        return JSONResponse(
+            {"error": "Falha de autenticação no NetBox (401/403)."},
+            status_code=401,
+        )
+    except NetBoxClientError as e:
+        return JSONResponse(
+            {"error": f"Erro ao conectar ao NetBox: {e}"},
+            status_code=500,
+        )
+
+
+@app.post("/compliance/analyze", response_class=JSONResponse)
+async def analyze_compliance(request: Request):
+    """Manual compliance start guard — re-validates eligibility."""
+    try:
+        payload = await request.json()
+    except Exception as e:
+        return JSONResponse(
+            {"success": False, "error": f"Payload inválido: {e}"},
+            status_code=400,
+        )
+
+    device_ids = payload.get("device_ids", [])
+    if not isinstance(device_ids, list) or len(device_ids) == 0:
+        return JSONResponse(
+            {"success": False, "error": "device_ids deve ser uma lista não vazia"},
+            status_code=400,
+        )
+
+    try:
+        client = get_netbox_client()
+        # Re-fetch devices and re-validate eligibility
+        devices = client.get_devices(limit=len(device_ids) + 10)
+
+        eligible_ids = []
+        ineligible_ids = []
+
+        for device in devices:
+            if device.get("id") in device_ids:
+                if is_compliance_candidate(device):
+                    eligible_ids.append(device["id"])
+                else:
+                    ineligible_ids.append(device["id"])
+
+        # Check for missing devices
+        found_ids = set(eligible_ids) | set(ineligible_ids)
+        missing_ids = [did for did in device_ids if did not in found_ids]
+
+        if missing_ids or ineligible_ids:
+            return JSONResponse(
+                {
+                    "success": False,
+                    "error": "Dispositivos perderam elegibilidade ou não encontrados",
+                    "missing": missing_ids,
+                    "ineligible": ineligible_ids,
+                },
+                status_code=422,
+            )
+
+        return JSONResponse(
+            {
+                "success": True,
+                "confirmed_eligible": eligible_ids,
+                "ineligible": [],
+                "message": "Dispositivos confirmados elegíveis. Análise pode prosseguir.",
+                "safety": {
+                    "read_only": True,
+                    "netbox_write": False,
+                    "device_connection": False,
+                },
+            }
+        )
+
+    except NetBoxNotConfiguredError:
+        return JSONResponse(
+            {"error": "NetBox não configurado. Defina NETBOX_URL e NETBOX_TOKEN."},
+            status_code=503,
+        )
+    except NetBoxAuthError:
+        return JSONResponse(
+            {"error": "Falha de autenticação no NetBox (401/403)."},
+            status_code=401,
+        )
+    except NetBoxClientError as e:
+        return JSONResponse(
+            {"error": f"Erro ao conectar ao NetBox: {e}"},
+            status_code=500,
+        )
 
 
 @app.get("/health")
