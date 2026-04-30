@@ -176,13 +176,23 @@ Dashboard & alerts:
 - ✅ FASE 2.60: Controlled operation baseline (scope, restrições, fluxo obrigatório)
 - ✅ FASE 3.20: Controlled operation readiness tests (10 tests, all passing)
 - ✅ FASE 4.1: Controlled operation cycle v1 (first cycle template)
+- ✅ FASE 4.2: Cycle intake validation (scope guardrails, decision, markdown report)
+- ✅ FASE 4.3: Week 1 preparation (structure creation, instructions, status)
+- ✅ FASE 4.4: Operational metrics (cycle tracking, item metrics, guardrail status)
+- ✅ FASE 4.5: Week 1 response intake (count, classify by team, decision)
+- ✅ FASE 4.6: Week 1 validation (secret blocking, compliance checks, decision)
+- ✅ FASE 4.7: Week 2 preparation (review board, decisions CSV, approval drafts)
+- ✅ FASE 4.8: Week 2 human review validation (decision field, reviewer, approval_record_allowed)
+- ✅ FASE 4.9: Promote approved Week 2 drafts to proposed ApprovalRecords
+- ✅ FASE 4.10: Approval readiness gate (validate proposed records, block secrets)
 - ✅ System: CONTROLLED_OPERATION_READY confirmed
+- ✅ Test suites: 146+ tests all passing
 
 **Planned (Next):**
-- FASE 4.2: Controlled operation metrics (cycle execution tracking)
-- FASE 4.3: Multi-device readiness assessment
-- FASE 4.4: Controlled expansion (batch operations under governance)
-- FASE 4.5: Production hardening (monitoring, alerting, rollback)
+- FASE 4.11: Manual approval review (final decision, approved/rejected/deferred)
+- FASE 4.12: Dry-run ApplyPlan generation & validation
+- FASE 4.13: Real write authorization & execution
+- FASE 4.14: Post-write verification & compliance closure
 
 **Guardrails (Enforced):**
 - One device per cycle initially ✓

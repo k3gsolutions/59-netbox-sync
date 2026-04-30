@@ -2,6 +2,44 @@
 
 ## [Unreleased]
 
+### Added — FASES 4.8, 4.9, 4.10: Week 2 Human Review, Approval Promotion, Readiness Gate (2026-04-29)
+
+**Week 2 Human Review Validation (FASE 4.8)**
+- controlled_cycle_week2_review.py — validates human review decisions from CSV
+- Checks: decision field (approve_for_approval_record|request_changes|rejected|deferred|pending)
+- For approve: requires reviewer present + approval_record_allowed=true flag
+- Decision: WEEK2_REVIEW_PASSED / WITH_RESTRICTIONS / BLOCKED
+- Output: CYCLE-{ID}-WEEK2-HUMAN-REVIEW.md and cycle-{id}-week2-human-review.json
+- All read-only validation, no NetBox writes
+
+**Approve Promotion to Proposed ApprovalRecords (FASE 4.9)**
+- controlled_cycle_promote_to_approval_records.py — promotes approved Week 2 decisions
+- Promotion criteria: decision=approve_for_approval_record AND approval_record_allowed=true AND reviewer
+- Creates ApprovalRecords with status=proposed (NOT auto-approved)
+- All safety flags: no_netbox_write, manual_review_required, proposed_only, no_automatic_approval
+- Computes evidence_hash for integrity verification
+- Zero NetBox writes, no ApplyPlan creation
+
+**Approval Readiness Gate (FASE 4.10)**
+- controlled_cycle_approval_readiness_gate.py — validates proposed records ready for manual review
+- Checks: status=proposed, state=proposed, valid object_type, object_id required
+- Verifies review.status=proposed, all safety flags true, no secrets (token/password/secret keywords)
+- Requires state_history with promoted_to_proposed event
+- Decision: READY_FOR_MANUAL_APPROVAL_REVIEW / WITH_RESTRICTIONS / NOT_READY
+
+**Testing & Validation**
+- test_controlled_cycle_week2_approval_flow.py — 12 comprehensive tests
+- Full regression suite: 146+ tests all passing (up from 134+)
+- Tests cover: decision validation, reviewer checks, secret blocking, status checks, safety flags
+
+**Key Achievements**
+- Complete Week 2 → Approval Readiness flow implemented
+- All 12 FASE 4.8/4.9/4.10 tests passing
+- Comprehensive regression testing (91/91 tests FASES 2.47-4.10)
+- Cycle-001: ready for manual approval review with all proposed ApprovalRecords validated
+
+---
+
 ### Added — FASES 2.60, 4.1, 3.20: Controlled Operation Baseline & Cycle (2026-04-29)
 
 **Controlled Operation Readiness (FASE 2.60)**
