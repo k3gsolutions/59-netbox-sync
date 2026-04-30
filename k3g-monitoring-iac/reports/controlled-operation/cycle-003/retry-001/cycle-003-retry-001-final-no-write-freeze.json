@@ -1,7 +1,7 @@
 {
   "frozen_at": "2026-04-30T16:26:17.910911+00:00",
   "retry_id": "cycle-003-retry-001",
-  "decision": "RETRY_READY_FOR_REAL_WRITE_PHASE",
+  "decision": "CYCLE_FINAL_NO_WRITE_FREEZE_CLEARED",
   "freeze_issues": [],
   "safety_confirmations": {
     "no_write_executed": true,

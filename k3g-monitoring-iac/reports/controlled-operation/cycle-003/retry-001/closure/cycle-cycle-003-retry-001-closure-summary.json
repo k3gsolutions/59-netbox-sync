@@ -1,0 +1,23 @@
+{
+  "cycle_id": "cycle-003-retry-001",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decision": "CYCLE_CLOSED_ACTION_REQUIRED",
+  "closed_at": "2026-04-30T16:36:17.021497+00:00",
+  "execution": {
+    "status": "CYCLE_REAL_WRITE_PARTIAL_FAILED",
+    "operator": "Keslley",
+    "created": 0,
+    "failed": 1
+  },
+  "verification": {
+    "status": "CYCLE_POST_WRITE_VERIFICATION_PASSED",
+    "verified": 0,
+    "drift": 0
+  },
+  "compliance": {
+    "status": "CYCLE_POST_WRITE_COMPLIANCE_FAILED",
+    "passed": 0,
+    "warnings": 0
+  }
+}
