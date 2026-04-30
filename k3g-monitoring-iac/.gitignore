@@ -5,3 +5,8 @@ reports/pilot-device-compliance/*payload*.local.json
 reports/pilot-device-compliance/*raw*.json
 .env
 .env.local
+.env.realwrite.local
+
+# Local real-write secrets
+.env.realwrite.local
+.env*.local

@@ -1,6 +1,6 @@
 # Week 2 Activation Gate — 4WNET-MNS-KTG-RX
 
-**Generated:** 2026-04-29T22:20:15.109964Z
+**Generated:** 2026-04-30T00:44:47.918996Z
 **Decision:** GO_WEEK2_REVIEW
 
 ## Summary
