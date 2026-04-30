@@ -2,20 +2,30 @@
   "cycle_id": "cycle-003-retry-001",
   "device": "4WNET-MNS-KTG-RX",
   "device_id": "1890",
-  "status": "CYCLE_POST_WRITE_VERIFICATION_PASSED",
-  "verified_at": "2026-04-30T16:37:36.421880+00:00",
+  "status": "CYCLE_POST_WRITE_VERIFICATION_PASSED_WITH_DRIFT",
+  "verified_at": "2026-04-30T16:38:54.582459+00:00",
   "summary": {
     "total_items": 1,
     "verified": 0,
-    "drift": 0,
+    "drift": 1,
     "failed": 0,
     "skipped": 0
   },
   "items": [
     {
       "item_id": "item-1",
-      "status": "CYCLE_VERIFICATION_SKIPPED",
-      "reason": "no_response_id"
+      "response_id": 6325,
+      "status": "CYCLE_VERIFIED_WITH_DRIFT",
+      "drift_fields": [
+        {
+          "field": "status",
+          "expected": "active",
+          "actual": {
+            "value": "active",
+            "label": "Active"
+          }
+        }
+      ]
     }
   ]
 }

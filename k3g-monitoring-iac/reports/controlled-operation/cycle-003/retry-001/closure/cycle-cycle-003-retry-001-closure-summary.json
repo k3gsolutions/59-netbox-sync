@@ -2,22 +2,22 @@
   "cycle_id": "cycle-003-retry-001",
   "device": "4WNET-MNS-KTG-RX",
   "device_id": "1890",
-  "decision": "CYCLE_CLOSED_ACTION_REQUIRED",
-  "closed_at": "2026-04-30T16:36:17.021497+00:00",
+  "decision": "CYCLE_CLOSED_WITH_WARNINGS",
+  "closed_at": "2026-04-30T16:38:54.838661+00:00",
   "execution": {
-    "status": "CYCLE_REAL_WRITE_PARTIAL_FAILED",
+    "status": "CYCLE_REAL_WRITE_SUCCESS",
     "operator": "Keslley",
-    "created": 0,
-    "failed": 1
+    "created": 1,
+    "failed": 0
   },
   "verification": {
-    "status": "CYCLE_POST_WRITE_VERIFICATION_PASSED",
+    "status": "CYCLE_POST_WRITE_VERIFICATION_PASSED_WITH_DRIFT",
     "verified": 0,
-    "drift": 0
+    "drift": 1
   },
   "compliance": {
-    "status": "CYCLE_POST_WRITE_COMPLIANCE_FAILED",
-    "passed": 0,
-    "warnings": 0
+    "status": "CYCLE_POST_WRITE_COMPLIANCE_PASSED_WITH_WARNINGS",
+    "passed": 1,
+    "warnings": 1
   }
 }

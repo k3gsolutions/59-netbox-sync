@@ -4,9 +4,9 @@
   "device": "4WNET-MNS-KTG-RX",
   "device_id": "1890",
   "operator": "Keslley",
-  "started_at": "2026-04-30T16:37:17.689525+00:00",
-  "finished_at": "2026-04-30T16:37:18.017134+00:00",
-  "status": "CYCLE_REAL_WRITE_PARTIAL_FAILED",
+  "started_at": "2026-04-30T16:38:28.346042+00:00",
+  "finished_at": "2026-04-30T16:38:30.272645+00:00",
+  "status": "CYCLE_REAL_WRITE_SUCCESS",
   "no_write_attempted": false,
   "one_shot_execution": true,
   "retry_attempted": false,
@@ -20,16 +20,15 @@
       "object_type": "ip_address",
       "object_key": "203.0.113.2/32",
       "endpoint": "/api/ipam/ip-addresses/",
-      "status": "CYCLE_REAL_WRITE_FAILED",
-      "http_error": {
-        "detail": "Invalid v1 token"
-      }
+      "response_id": 6325,
+      "status": "CYCLE_REAL_WRITE_CREATED",
+      "verification_status": "verified"
     }
   ],
   "summary": {
     "total_items": 1,
-    "created": 0,
-    "failed": 1
+    "created": 1,
+    "failed": 0
   },
   "safety_confirmations": {
     "token_not_logged": true,
