@@ -1,0 +1,16 @@
+{
+  "cycle_id": "cycle-002",
+  "decision": "CYCLE_POST_WRITE_VERIFICATION_NOT_APPLICABLE",
+  "status": "NOT_APPLICABLE",
+  "issues": [
+    "execution aborted preflight"
+  ],
+  "items": [],
+  "safety_confirmations": {
+    "local_only": true,
+    "no_network_call": true,
+    "no_token_read": true,
+    "no_netbox_write": true,
+    "no_apply_execution": true
+  }
+}

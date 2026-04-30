@@ -1,0 +1,57 @@
+{
+  "execution_id": "exec-result-cycle-002-e186fc78",
+  "cycle_id": "cycle-002",
+  "execution_package_id": "exec-cycle-002-a33704d3",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "operator": "Keslley",
+  "started_at": "2026-04-30T04:02:48.866867+00:00",
+  "finished_at": "2026-04-30T04:02:48.867134+00:00",
+  "status": "CYCLE_REAL_WRITE_ABORTED_PREFLIGHT_FAILED",
+  "one_shot_execution": true,
+  "retry_attempted": false,
+  "rollback_attempted": false,
+  "token_logged": false,
+  "token_saved": false,
+  "no_write_attempted": true,
+  "items": [
+    {
+      "item_id": "cycle-002-203-0-113-1-57a92698",
+      "approval_id": "cycle-002-203-0-113-1-57a92698",
+      "object_type": "bgp_peer",
+      "object_key": "203.0.113.1",
+      "method": "POST",
+      "target_endpoint": "/",
+      "proposed_payload": {
+        "cycle_id": "cycle-002",
+        "device": "4WNET-MNS-KTG-RX",
+        "device_id": "1890",
+        "team": "bgp",
+        "object_type": "bgp_peer",
+        "object_key": "203.0.113.1",
+        "action": "safe_create_staged",
+        "category": "bgp"
+      },
+      "expected_result": "dry-run only",
+      "rollback_hint": "manual only",
+      "response_status": null,
+      "response_id": null,
+      "response_url": null,
+      "verification_status": "not_attempted",
+      "status": "CYCLE_REAL_WRITE_NOT_ATTEMPTED",
+      "error": "preflight aborted"
+    }
+  ],
+  "issues": [
+    "NETBOX_WRITE_TOKEN missing",
+    "cycle-002-203-0-113-1-57a92698: endpoint blocked"
+  ],
+  "safety_confirmations": {
+    "token_not_logged": true,
+    "token_not_saved": true,
+    "no_sync_called": true,
+    "no_patch_delete": true,
+    "no_equipment_access": true,
+    "one_shot_only": true
+  }
+}

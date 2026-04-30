@@ -1,0 +1,54 @@
+{
+  "execution_package_id": "exec-cycle-002-a33704d3",
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "apply_plan_id": "apply-plan-cycle-002-4bb0729f",
+  "authorization_id": "auth-cycle-002-cd91ff5a",
+  "generated_at": "2026-04-30T03:53:19.479381+00:00",
+  "status": "prepared",
+  "mode": "real_write_prepared",
+  "execution_allowed": false,
+  "token_required_in_next_phase": true,
+  "explicit_confirm_required": true,
+  "one_shot_execution": true,
+  "max_items": 3,
+  "items": [
+    {
+      "approval_id": "cycle-002-203-0-113-1-57a92698",
+      "object_type": "bgp_peer",
+      "object_key": "203.0.113.1",
+      "method": "POST",
+      "target_endpoint": "/",
+      "proposed_payload": {
+        "cycle_id": "cycle-002",
+        "device": "4WNET-MNS-KTG-RX",
+        "device_id": "1890",
+        "team": "bgp",
+        "object_type": "bgp_peer",
+        "object_key": "203.0.113.1",
+        "action": "safe_create_staged",
+        "category": "bgp"
+      },
+      "rollback_hint": "manual only",
+      "expected_result": "dry-run only",
+      "pre_write_checks": [
+        "local_validation",
+        "safety_lock"
+      ],
+      "post_write_checks": [
+        "GET verify",
+        "drift check"
+      ]
+    }
+  ],
+  "safety_confirmations": {
+    "no_write_executed": true,
+    "no_token_read": true,
+    "no_network_call": true,
+    "package_only": true,
+    "real_write_not_executed": true
+  },
+  "required_next_phase": "FASE_4_59_CYCLE002_EXECUTE_REAL_WRITE_ONCE",
+  "required_execution_phrase": "EXECUTAR_ESCRITA_REAL_CYCLE-002_4WNET-MNS-KTG-RX_exec-cycle-002-a33704d3"
+}

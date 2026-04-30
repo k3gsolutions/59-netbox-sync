@@ -1,0 +1,18 @@
+{
+  "cycle_id": "cycle-002",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decision": "CYCLE_POST_WRITE_COMPLIANCE_NOT_APPLICABLE",
+  "status": "NOT_APPLICABLE",
+  "items": [],
+  "issues": [
+    "execution aborted preflight"
+  ],
+  "safety_confirmations": {
+    "local_only": true,
+    "no_network_call": true,
+    "no_token_read": true,
+    "no_netbox_write": true,
+    "no_apply_execution": true
+  }
+}
