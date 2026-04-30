@@ -23,7 +23,15 @@
 - Device 1890 case: now correctly enriched and passes eligibility gates
 - API response diagnostics for rejected devices (tenant_id, tenant name, group)
 
-**Test Suite: 58 compliance candidate unit tests all passing**
+**FASES CANDIDATES-025–027** — UX hardening, job artifact creation:
+- FASE-025: Dashboard UX improvements (button labels, modal messaging, no misleading language)
+- FASE-026: Fixed POST /compliance/analyze — per-ID validation instead of bulk fetch, job artifact response
+- FASE-027: New compliance_jobs.py service — writes local job artifacts (4 files: job-request.json, selected-devices.json, eligibility-recheck.json, COMPLIANCE-JOB-START-GATE.md)
+- Job status: COMPLIANCE_JOB_PREPARED (no analysis triggered automatically)
+- Safety: read_only, no NetBox writes, no device connections, no SSH/SNMP/NETCONF
+- 18 new tests covering job creation, per-ID validation, safety flags
+
+**Test Suite: 76 compliance candidate tests all passing (58 from FASES-001–024 + 18 from FASES-025–027)**
 
 ### Added — FASES 4.94, 4.95, 4.96, 4.97: Cycle-003 Retry-001 Preparation
 
