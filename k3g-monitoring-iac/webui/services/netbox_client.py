@@ -43,6 +43,96 @@ class NetBoxClient:
             "Accept": "application/json",
         })
 
+    def _fetch(self, endpoint: str, params: Dict[str, Any]) -> list[dict]:
+        """Helper to fetch from NetBox endpoint."""
+        try:
+            resp = self.session.get(
+                f"{self.url}{endpoint}",
+                params=params,
+                timeout=10,
+            )
+
+            if resp.status_code in (401, 403):
+                raise NetBoxAuthError(
+                    f"NetBox authentication failed ({resp.status_code})"
+                )
+
+            resp.raise_for_status()
+            data = resp.json()
+
+            # Handle both single object and list endpoints
+            if isinstance(data, dict) and "results" in data:
+                return data.get("results", [])
+            elif isinstance(data, dict):
+                return [data]  # Single device endpoint
+
+            return []
+
+        except requests.RequestException as e:
+            raise NetBoxClientError(f"NetBox request failed: {e}")
+        except (ValueError, KeyError) as e:
+            raise NetBoxClientError(f"NetBox response parsing failed: {e}")
+
+    def get_device_by_id(self, device_id: int) -> Optional[dict]:
+        """
+        Fetch single device by ID.
+
+        Args:
+            device_id: NetBox device ID
+
+        Returns:
+            Device dict, or None if not found
+
+        Raises:
+            NetBoxAuthError: on 401/403
+            NetBoxClientError: on request or parsing error
+        """
+        try:
+            results = self._fetch(f"/api/dcim/devices/{device_id}/", {})
+            return results[0] if results else None
+        except NetBoxClientError:
+            raise
+
+    def search_devices_by_name(self, name: str, limit: int = 10) -> list[dict]:
+        """
+        Search devices by exact name.
+
+        Args:
+            name: Device name
+            limit: Max results (capped at 10)
+
+        Returns:
+            List of matching devices
+        """
+        limit = min(limit, 10)
+        return self._fetch(
+            "/api/dcim/devices/",
+            {"name": name, "limit": limit}
+        )
+
+    def search_devices(
+        self,
+        q: str,
+        limit: int = 10,
+        offset: int = 0,
+    ) -> list[dict]:
+        """
+        Search devices by partial query.
+
+        Args:
+            q: Search query
+            limit: Max results (capped at 25)
+            offset: Pagination offset
+
+        Returns:
+            List of matching devices
+        """
+        limit = min(limit, 25)
+        return self._fetch(
+            "/api/dcim/devices/",
+            {"q": q, "limit": limit, "offset": offset}
+        )
+
     def get_devices(
         self,
         limit: int = 100,
@@ -81,26 +171,7 @@ class NetBoxClient:
 
         params.update(filters)
 
-        try:
-            resp = self.session.get(
-                f"{self.url}/api/dcim/devices/",
-                params=params,
-                timeout=10,
-            )
-
-            if resp.status_code in (401, 403):
-                raise NetBoxAuthError(
-                    f"NetBox authentication failed ({resp.status_code})"
-                )
-
-            resp.raise_for_status()
-            data = resp.json()
-            return data.get("results", [])
-
-        except requests.RequestException as e:
-            raise NetBoxClientError(f"NetBox request failed: {e}")
-        except (ValueError, KeyError) as e:
-            raise NetBoxClientError(f"NetBox response parsing failed: {e}")
+        return self._fetch("/api/dcim/devices/", params)
 
 
 def get_netbox_client() -> NetBoxClient:

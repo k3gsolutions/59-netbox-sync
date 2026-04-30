@@ -16,80 +16,99 @@
 </div>
 {% else %}
 
-<!-- Safety message -->
+<!-- Safety banner -->
 <div class="alert alert-info">
     <strong>ℹ Listagem somente leitura.</strong>
     Nenhuma conexão com equipamento foi iniciada.
 </div>
 
-<!-- If no candidates -->
-{% if candidates.count == 0 %}
-<div class="alert alert-warning">
-    Nenhum dispositivo candidato encontrado no NetBox.
-    <br>Verifique se algum dispositivo atende aos critérios:
-    <ul>
-        <li>Status: ativo</li>
-        <li>Custom Field "Compliance": marcado</li>
-        <li>Tenant: K3G Solutions</li>
-    </ul>
+<!-- Search form -->
+<div style="background-color: #f8f9fa; padding: 1.5em; border-radius: 4px; margin: 1em 0;">
+    <h3>Buscar Candidatos</h3>
+    <p style="color: #666; font-size: 0.95em;">Informe nome ou ID do dispositivo:</p>
+
+    <form id="search-form" style="display: flex; gap: 1em; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px;">
+            <label for="search-input" style="display: block; margin-bottom: 0.3em; font-weight: 500;">Nome ou ID</label>
+            <input type="text" id="search-input" placeholder="Ex: 4WNET-MNS-KTG-RX ou 1890"
+                   style="width: 100%; padding: 0.6em; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
+        </div>
+        <button type="button" id="search-btn"
+                style="padding: 0.6em 1.5em; background-color: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+            Buscar
+        </button>
+    </form>
+
+    <div style="margin-top: 1em; font-size: 0.85em; color: #666;">
+        <label style="display: flex; align-items: center; gap: 0.5em; margin-top: 0.5em;">
+            <input type="checkbox" id="include-rejected" />
+            Mostrar dispositivos rejeitados (não elegíveis)
+        </label>
+    </div>
 </div>
 
-{% else %}
-
-<!-- Candidates table -->
-<div style="overflow-x: auto; margin: 1em 0;">
-    <table style="width: 100%; border-collapse: collapse; font-size: 0.95em;">
-        <thead>
-            <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
-                <th style="padding: 0.5em; text-align: left; width: 40px;">
-                    <input type="checkbox" id="select-all" />
-                </th>
-                <th style="padding: 0.5em; text-align: left;">Nome</th>
-                <th style="padding: 0.5em; text-align: left;">Status</th>
-                <th style="padding: 0.5em; text-align: left;">Tenant</th>
-                <th style="padding: 0.5em; text-align: left;">Tenant Group</th>
-                <th style="padding: 0.5em; text-align: left;">Site</th>
-                <th style="padding: 0.5em; text-align: left;">Função</th>
-                <th style="padding: 0.5em; text-align: left;">IP Primário</th>
-            </tr>
-        </thead>
-        <tbody id="candidates-table">
-            {% for candidate in candidates.results %}
-            <tr style="border-bottom: 1px solid #eee;" data-device-id="{{ candidate.id }}">
-                <td style="padding: 0.5em;">
-                    <input type="checkbox" class="device-checkbox" value="{{ candidate.id }}" />
-                </td>
-                <td style="padding: 0.5em; font-weight: 500;">{{ candidate.name }}</td>
-                <td style="padding: 0.5em;">
-                    <span style="background-color: #d4edda; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.85em;">
-                        {{ candidate.status }}
-                    </span>
-                </td>
-                <td style="padding: 0.5em;">{{ candidate.tenant or '—' }}</td>
-                <td style="padding: 0.5em;">{{ candidate.tenant_group or '—' }}</td>
-                <td style="padding: 0.5em;">{{ candidate.site or '—' }}</td>
-                <td style="padding: 0.5em;">{{ candidate.role or '—' }}</td>
-                <td style="padding: 0.5em; font-family: monospace; font-size: 0.9em;">
-                    {{ candidate.primary_ip4 or '—' }}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- Loading indicator -->
+<div id="loading" style="display: none; text-align: center; padding: 2em;">
+    <p>⏳ Buscando...</p>
 </div>
 
-<!-- Selected count -->
-<div style="margin: 1em 0;">
-    <p><strong>Selecionados:</strong> <span id="selected-count">0</span> / {{ candidates.count }}</p>
-</div>
+<!-- Results section -->
+<div id="results-section" style="display: none; margin-top: 2em;">
+    <!-- Message if no criteria -->
+    <div id="no-criteria-msg" style="display: none; padding: 1em; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; color: #856404;">
+        Informe nome ou ID para buscar candidatos.
+    </div>
 
-<!-- Start Compliance button -->
-<div style="margin: 1em 0;">
-    <button id="start-compliance-btn"
-            style="padding: 0.7em 1.5em; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; opacity: 0.5; pointer-events: none;"
-            disabled>
-        Iniciar Compliance
-    </button>
+    <!-- Results table -->
+    <div id="candidates-table-container" style="display: none; overflow-x: auto; margin: 1em 0;">
+        <p><strong>Candidatos encontrados: <span id="candidate-count">0</span></strong></p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.95em;">
+            <thead>
+                <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+                    <th style="padding: 0.5em; text-align: left; width: 40px;">
+                        <input type="checkbox" id="select-all" />
+                    </th>
+                    <th style="padding: 0.5em; text-align: left;">Nome</th>
+                    <th style="padding: 0.5em; text-align: left;">Status</th>
+                    <th style="padding: 0.5em; text-align: left;">Tenant</th>
+                    <th style="padding: 0.5em; text-align: left;">Site</th>
+                    <th style="padding: 0.5em; text-align: left;">Função</th>
+                    <th style="padding: 0.5em; text-align: left;">IP Primário</th>
+                </tr>
+            </thead>
+            <tbody id="candidates-tbody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Rejected table (if include_rejected checked) -->
+    <div id="rejected-table-container" style="display: none; margin-top: 2em;">
+        <p style="color: #d9534f;"><strong>⚠ Dispositivos não elegíveis: <span id="rejected-count">0</span></strong></p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.95em;">
+            <thead>
+                <tr style="background-color: #f8d7da; border-bottom: 2px solid #f5c6cb;">
+                    <th style="padding: 0.5em; text-align: left;">Nome</th>
+                    <th style="padding: 0.5em; text-align: left;">Razão</th>
+                </tr>
+            </thead>
+            <tbody id="rejected-tbody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Start button -->
+    <div id="start-section" style="display: none; margin-top: 2em;">
+        <p><strong>Selecionados: <span id="selected-count">0</span></strong></p>
+        <button id="start-compliance-btn"
+                style="padding: 0.7em 1.5em; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; opacity: 0.5; pointer-events: none;"
+                disabled>
+            Iniciar Compliance
+        </button>
+    </div>
+
+    <!-- Error message -->
+    <div id="error-msg" style="display: none; padding: 1em; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; color: #721c24; margin-top: 1em;">
+    </div>
 </div>
 
 <!-- Confirmation modal -->
@@ -113,10 +132,6 @@
     </div>
 </div>
 
-{% endif %}
-
-{% endif %}
-
 <style>
 .alert {
     padding: 1em;
@@ -134,11 +149,6 @@
     border-left-color: #0066cc;
     color: #004085;
 }
-.alert-warning {
-    background-color: #fff3cd;
-    border-left-color: #ffc107;
-    color: #856404;
-}
 table th, table td {
     text-align: left;
 }
@@ -146,19 +156,127 @@ table th, table td {
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const selectAllCheckbox = document.getElementById("select-all");
-    const deviceCheckboxes = document.querySelectorAll(".device-checkbox");
+    const searchInput = document.getElementById("search-input");
+    const searchBtn = document.getElementById("search-btn");
+    const includeRejected = document.getElementById("include-rejected");
+    const loading = document.getElementById("loading");
+    const resultsSection = document.getElementById("results-section");
+    const noCriteriaMsg = document.getElementById("no-criteria-msg");
+    const errorMsg = document.getElementById("error-msg");
+    const candidatesTableContainer = document.getElementById("candidates-table-container");
+    const rejectedTableContainer = document.getElementById("rejected-table-container");
+    const candidatesTbody = document.getElementById("candidates-tbody");
+    const rejectedTbody = document.getElementById("rejected-tbody");
+    const selectAll = document.getElementById("select-all");
+    const startSection = document.getElementById("start-section");
     const startBtn = document.getElementById("start-compliance-btn");
     const selectedCountSpan = document.getElementById("selected-count");
-    const confirmModalBg = document.getElementById("confirm-modal-bg");
-    const confirmModal = document.getElementById("confirm-modal");
-    const confirmCancel = document.getElementById("confirm-cancel");
-    const confirmProceed = document.getElementById("confirm-proceed");
-    const confirmDevices = document.getElementById("confirm-devices");
+    const candidateCountSpan = document.getElementById("candidate-count");
+    const rejectedCountSpan = document.getElementById("rejected-count");
 
-    // Helper to update count and button state
+    // Search
+    function performSearch() {
+        const searchValue = searchInput.value.trim();
+        if (!searchValue) {
+            resultsSection.style.display = "block";
+            noCriteriaMsg.style.display = "block";
+            candidatesTableContainer.style.display = "none";
+            rejectedTableContainer.style.display = "none";
+            startSection.style.display = "none";
+            errorMsg.style.display = "none";
+            return;
+        }
+
+        loading.style.display = "block";
+        resultsSection.style.display = "block";
+
+        let url = "/compliance/candidates?";
+        // Determine search type
+        if (/^\d+$/.test(searchValue)) {
+            url += `id=${searchValue}`;
+        } else {
+            url += `name=${encodeURIComponent(searchValue)}`;
+        }
+
+        if (includeRejected.checked) {
+            url += "&include_rejected=true";
+        }
+
+        fetch(url)
+            .then(resp => resp.json())
+            .then(data => {
+                loading.style.display = "none";
+                noCriteriaMsg.style.display = "none";
+                errorMsg.style.display = "none";
+
+                if (data.error) {
+                    errorMsg.style.display = "block";
+                    errorMsg.textContent = data.error;
+                    candidatesTableContainer.style.display = "none";
+                    startSection.style.display = "none";
+                    return;
+                }
+
+                // Populate candidates table
+                if (data.results && data.results.length > 0) {
+                    candidateCountSpan.textContent = data.count;
+                    candidatesTbody.innerHTML = "";
+                    data.results.forEach(device => {
+                        const row = document.createElement("tr");
+                        row.style.borderBottom = "1px solid #eee";
+                        row.dataset.deviceId = device.id;
+                        row.innerHTML = `
+                            <td style="padding: 0.5em;"><input type="checkbox" class="device-checkbox" value="${device.id}" /></td>
+                            <td style="padding: 0.5em; font-weight: 500;">${device.name}</td>
+                            <td style="padding: 0.5em;"><span style="background-color: #d4edda; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.85em;">${device.status}</span></td>
+                            <td style="padding: 0.5em;">${device.tenant || '—'}</td>
+                            <td style="padding: 0.5em;">${device.site || '—'}</td>
+                            <td style="padding: 0.5em;">${device.role || '—'}</td>
+                            <td style="padding: 0.5em; font-family: monospace; font-size: 0.9em;">${device.primary_ip4 || '—'}</td>
+                        `;
+                        candidatesTbody.appendChild(row);
+
+                        row.querySelector(".device-checkbox").addEventListener("change", updateSelection);
+                    });
+                    candidatesTableContainer.style.display = "block";
+                    startSection.style.display = "block";
+                } else {
+                    candidatesTableContainer.style.display = "none";
+                    startSection.style.display = "none";
+                }
+
+                // Populate rejected table (if included)
+                if (data.rejected && data.rejected.length > 0) {
+                    rejectedCountSpan.textContent = data.rejected.length;
+                    rejectedTbody.innerHTML = "";
+                    data.rejected.forEach(device => {
+                        const row = document.createElement("tr");
+                        row.style.borderBottom = "1px solid #f5c6cb";
+                        row.innerHTML = `
+                            <td style="padding: 0.5em;">${device.name}</td>
+                            <td style="padding: 0.5em; color: #d9534f;">${device.reason}</td>
+                        `;
+                        rejectedTbody.appendChild(row);
+                    });
+                    rejectedTableContainer.style.display = "block";
+                } else {
+                    rejectedTableContainer.style.display = "none";
+                }
+
+                updateSelection();
+            })
+            .catch(err => {
+                loading.style.display = "none";
+                errorMsg.style.display = "block";
+                errorMsg.textContent = "Erro ao buscar candidatos: " + err;
+                candidatesTableContainer.style.display = "none";
+                startSection.style.display = "none";
+            });
+    }
+
     function updateSelection() {
-        const selected = Array.from(deviceCheckboxes).filter(cb => cb.checked).length;
+        const checkboxes = document.querySelectorAll(".device-checkbox");
+        const selected = Array.from(checkboxes).filter(cb => cb.checked).length;
         selectedCountSpan.textContent = selected;
 
         if (selected > 0) {
@@ -171,32 +289,30 @@ document.addEventListener("DOMContentLoaded", function() {
             startBtn.disabled = true;
         }
 
-        // Update select-all checkbox
-        const allChecked = Array.from(deviceCheckboxes).every(cb => cb.checked);
-        const someChecked = Array.from(deviceCheckboxes).some(cb => cb.checked);
-        selectAllCheckbox.checked = allChecked;
-        selectAllCheckbox.indeterminate = someChecked && !allChecked;
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        const someChecked = Array.from(checkboxes).some(cb => cb.checked);
+        selectAll.checked = allChecked;
+        selectAll.indeterminate = someChecked && !allChecked;
     }
 
-    // Select all / deselect all
-    selectAllCheckbox.addEventListener("change", function() {
-        const checked = this.checked;
-        deviceCheckboxes.forEach(cb => cb.checked = checked);
+    // Event listeners
+    searchBtn.addEventListener("click", performSearch);
+    searchInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") performSearch();
+    });
+
+    selectAll.addEventListener("change", function() {
+        const checkboxes = document.querySelectorAll(".device-checkbox");
+        checkboxes.forEach(cb => cb.checked = this.checked);
         updateSelection();
     });
 
-    // Individual checkbox changes
-    deviceCheckboxes.forEach(cb => {
-        cb.addEventListener("change", updateSelection);
-    });
-
-    // Start Compliance button
+    // Start compliance button
     startBtn.addEventListener("click", function() {
-        const selected = Array.from(deviceCheckboxes)
-            .filter(cb => cb.checked)
-            .map(cb => parseInt(cb.value));
+        const checkboxes = document.querySelectorAll(".device-checkbox:checked");
+        const selected = Array.from(checkboxes).map(cb => parseInt(cb.value));
 
-        // Build confirmation modal
+        const confirmDevices = document.getElementById("confirm-devices");
         confirmDevices.innerHTML = "";
         selected.forEach(deviceId => {
             const row = document.querySelector(`tr[data-device-id="${deviceId}"]`);
@@ -206,32 +322,25 @@ document.addEventListener("DOMContentLoaded", function() {
             confirmDevices.appendChild(li);
         });
 
-        // Show modal
-        confirmModalBg.style.display = "block";
-        confirmModal.style.display = "block";
-
-        // Store selected for confirmation
+        document.getElementById("confirm-modal-bg").style.display = "block";
+        document.getElementById("confirm-modal").style.display = "block";
         window.pendingDeviceIds = selected;
     });
 
-    // Cancel modal
-    confirmCancel.addEventListener("click", function() {
-        confirmModalBg.style.display = "none";
-        confirmModal.style.display = "none";
+    document.getElementById("confirm-cancel").addEventListener("click", function() {
+        document.getElementById("confirm-modal-bg").style.display = "none";
+        document.getElementById("confirm-modal").style.display = "none";
     });
 
-    // Proceed with analysis
-    confirmProceed.addEventListener("click", function() {
-        confirmModalBg.style.display = "none";
-        confirmModal.style.display = "none";
+    document.getElementById("confirm-proceed").addEventListener("click", function() {
+        document.getElementById("confirm-modal-bg").style.display = "none";
+        document.getElementById("confirm-modal").style.display = "none";
 
         const deviceIds = window.pendingDeviceIds || [];
 
         fetch("/compliance/analyze", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 device_ids: deviceIds,
                 mode: "read_only",
@@ -240,7 +349,7 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(resp => {
             if (resp.ok) {
-                alert("✓ Dispositivos confirmados como elegíveis. Análise pode prosseguir.");
+                alert("✓ Dispositivos confirmados elegíveis. Análise pode prosseguir.");
                 location.reload();
             } else {
                 return resp.json().then(data => {
@@ -252,9 +361,8 @@ document.addEventListener("DOMContentLoaded", function() {
             alert("✗ Erro de conexão: " + err);
         });
     });
-
-    // Initial update
-    updateSelection();
 });
 </script>
+
+{% endif %}
 {% endblock %}

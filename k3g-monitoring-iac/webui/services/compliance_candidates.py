@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from .netbox_client import NetBoxClient
+from .netbox_client import NetBoxClient, NetBoxClientError
 
 
 def get_status_value(device: dict) -> str:
@@ -99,6 +99,33 @@ def get_tenant_group_name(device: dict) -> Optional[str]:
     return None
 
 
+def get_rejection_reason(device: dict) -> Optional[str]:
+    """
+    Determine why device is not eligible (or return None if eligible).
+
+    Returns single reason string for UI display.
+    """
+    status = get_status_value(device)
+    if status != "active":
+        return "inactive"
+
+    if not get_custom_field_bool(device, "Compliance", "compliance"):
+        return "compliance_disabled"
+
+    if not device.get("tenant"):
+        return "no_tenant"
+
+    group_name = get_tenant_group_name(device)
+    if not group_name or group_name not in ("K3G Solutions", "k3g-solutions"):
+        import os
+        expected_id = os.getenv("K3G_SOLUTIONS_TENANT_GROUP_ID", "").strip()
+        if expected_id and group_name == expected_id:
+            return None  # Eligible
+        return "wrong_tenant_group"
+
+    return None  # Eligible
+
+
 def is_compliance_candidate(device: dict) -> bool:
     """
     Check if device meets all 4 eligibility gates.
@@ -144,6 +171,35 @@ def is_compliance_candidate(device: dict) -> bool:
         return False
 
     return True
+
+
+def sanitize_device_for_candidate(device: dict) -> dict:
+    """
+    Extract only allowed fields, never return config_context/local_context_data/payload.
+
+    Keeps only:
+    - id, name, status, tenant, site, device_role/role, device_type
+    - primary_ip4, primary_ip6, custom_fields["Compliance"]
+
+    Removes:
+    - config_context, local_context_data, all raw config payload
+    - full custom_fields object (only extract Compliance bool)
+    - comments, interfaces, full nested objects
+    """
+    return {
+        "id": device.get("id"),
+        "name": device.get("name"),
+        "status": device.get("status"),
+        "tenant": device.get("tenant"),
+        "site": device.get("site"),
+        "device_role": device.get("device_role"),
+        "role": device.get("role"),
+        "device_type": device.get("device_type"),
+        "primary_ip4": device.get("primary_ip4"),
+        "primary_ip6": device.get("primary_ip6"),
+        # Only Compliance custom field value, not full object
+        "compliance_field_value": get_custom_field_bool(device, "Compliance", "compliance"),
+    }
 
 
 def normalize_compliance_candidate(device: dict) -> dict:
@@ -233,21 +289,31 @@ def normalize_compliance_candidate(device: dict) -> dict:
 
 def list_compliance_candidates(
     netbox_client: NetBoxClient,
-    limit: int = 100,
+    device_id: Optional[int] = None,
+    name: Optional[str] = None,
+    q: Optional[str] = None,
+    limit: int = 10,
     offset: int = 0,
+    include_rejected: bool = False,
     filters: Optional[dict] = None,
 ) -> dict:
     """
     Fetch and filter devices to return only compliance candidates.
 
+    Selective search: if id/name/q provided, search specifically. Otherwise return empty.
+
     Args:
         netbox_client: NetBoxClient instance
-        limit: Max results per page
+        device_id: Optional device ID (exact match)
+        name: Optional device name (exact match)
+        q: Optional search query (partial match, limit max 25)
+        limit: Max results per page (default 10)
         offset: Pagination offset
-        filters: Optional query filters (site, role, tenant_group, etc.)
+        include_rejected: If True, include rejected devices with reasons
+        filters: Optional additional query filters
 
     Returns:
-        Response dict with candidates + safety block
+        Response dict with candidates + optional rejected + safety block
 
     Raises:
         NetBoxClientError: if NetBox request fails
@@ -256,19 +322,38 @@ def list_compliance_candidates(
     if filters is None:
         filters = {}
 
-    # Ensure we're only getting active devices
-    filters["status"] = "active"
+    devices = []
+    message = None
 
-    devices = netbox_client.get_devices(limit=limit, offset=offset, **filters)
+    # Selective search logic
+    if device_id:
+        device = netbox_client.get_device_by_id(device_id)
+        devices = [device] if device else []
+    elif name:
+        devices = netbox_client.search_devices_by_name(name, limit=limit)
+    elif q:
+        devices = netbox_client.search_devices(q, limit=limit, offset=offset)
+    else:
+        # No search criteria
+        message = "Informe id, name ou q para buscar candidatos."
+        devices = []
 
-    # Filter to only candidates
-    candidates = [
-        normalize_compliance_candidate(device)
-        for device in devices
-        if is_compliance_candidate(device)
-    ]
+    # Filter to candidates
+    candidates = []
+    rejected = []
 
-    return {
+    for device in devices:
+        if is_compliance_candidate(device):
+            candidates.append(normalize_compliance_candidate(device))
+        elif include_rejected:
+            reason = get_rejection_reason(device)
+            rejected.append({
+                "id": device.get("id"),
+                "name": device.get("name"),
+                "reason": reason,
+            })
+
+    result = {
         "count": len(candidates),
         "results": candidates,
         "safety": {
@@ -278,3 +363,11 @@ def list_compliance_candidates(
             "auto_compliance_started": False,
         },
     }
+
+    if message:
+        result["message"] = message
+
+    if include_rejected and rejected:
+        result["rejected"] = rejected
+
+    return result

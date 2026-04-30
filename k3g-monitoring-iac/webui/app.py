@@ -2566,13 +2566,12 @@ async def real_write_closure(request: Request):
 # Compliance candidate discovery routes
 @app.get("/compliance", response_class=HTMLResponse)
 async def compliance_candidates_page(request: Request):
-    """Compliance > Candidatos dashboard."""
+    """Compliance > Candidatos dashboard — no auto-load."""
     error = None
-    candidates = {"count": 0, "results": [], "safety": {}}
 
+    # Check if NetBox is configured
     try:
-        client = get_netbox_client()
-        candidates = list_compliance_candidates(client)
+        get_netbox_client()
     except NetBoxNotConfiguredError as e:
         error = f"NetBox não configurado: {e}"
     except NetBoxAuthError:
@@ -2583,7 +2582,6 @@ async def compliance_candidates_page(request: Request):
     context = {
         "request": request,
         "title": "Compliance — Candidatos",
-        "candidates": candidates,
         "error": error,
     }
 
@@ -2592,24 +2590,25 @@ async def compliance_candidates_page(request: Request):
 
 @app.get("/compliance/candidates", response_class=JSONResponse)
 async def get_compliance_candidates(
-    limit: int = Query(100),
+    id: Optional[int] = Query(None),
+    name: Optional[str] = Query(None),
+    q: Optional[str] = Query(None),
+    limit: int = Query(10),
     offset: int = Query(0),
-    site: Optional[str] = Query(None),
-    role: Optional[str] = Query(None),
-    tenant_group: Optional[str] = Query(None),
+    include_rejected: bool = Query(False),
 ):
-    """Get compliance candidates as JSON."""
-    filters = {}
-    if site:
-        filters["site"] = site
-    if role:
-        filters["role"] = role
-    if tenant_group:
-        filters["tenant_group"] = tenant_group
-
+    """Get compliance candidates as JSON — selective search only."""
     try:
         client = get_netbox_client()
-        result = list_compliance_candidates(client, limit=limit, offset=offset, filters=filters)
+        result = list_compliance_candidates(
+            client,
+            device_id=id,
+            name=name,
+            q=q,
+            limit=limit,
+            offset=offset,
+            include_rejected=include_rejected,
+        )
         return JSONResponse(result)
     except NetBoxNotConfiguredError:
         return JSONResponse(
