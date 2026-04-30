@@ -1,4 +1,4 @@
-# Current State — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7 Complete)
+# Current State — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10 Complete)
 
 ## Operational Status
 
@@ -43,7 +43,7 @@ Web UI (FASE 3.19):
 - FASE 3.19: Post-write integration (5 routes, 5 templates, read-only, no dangerous buttons)
 - /real-write overview, /execution, /verification, /compliance, /closure
 
-Controlled Operation (FASES 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7):
+Controlled Operation (FASES 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10):
 - FASE 2.60: Build controlled operation baseline (readiness evaluation, scope definition, mandatory gates)
 - FASE 4.1: Create controlled operation cycle (cycle template generation, 4-file structure)
 - FASE 3.20: Test controlled operation readiness (10 tests, all passing)
@@ -53,12 +53,17 @@ Controlled Operation (FASES 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7):
 - FASE 4.5: Week 1 response intake (count, classify by team, decision)
 - FASE 4.6: Week 1 validation (secret blocking, compliance checks, decision)
 - FASE 4.7: Week 2 preparation (review board, decisions CSV, approval drafts)
+- FASE 4.8: Week 2 human review validation (decision field, reviewer, approval_record_allowed flag)
+- FASE 4.9: Promote approved Week 2 drafts to proposed ApprovalRecords (status=proposed, safety flags set)
+- FASE 4.10: Approval readiness gate (validate proposed records, block secrets, READY/WITH_RESTRICTIONS/NOT_READY)
 - Baseline decision: CONTROLLED_OPERATION_READY
 - Cycle-001: INTAKE_READY, Week1 responses collected, Week1 validated, Week2 prepared
+- Week2: Human review decisions validated, approved items promoted to proposed ApprovalRecords
+- Approval readiness: READY_FOR_MANUAL_APPROVAL_REVIEW (all records validated)
 - Scope: 1 device/cycle, 3 objects max, POST-only, 14 mandatory gates
 - All tools read-only, no network calls, no token handling, no NetBox writes
 
-Test Suites (134+ tests all passing):
+Test Suites (146+ tests all passing):
 - 20 tests (FASES 2.47-2.52 pre-execution)
 - 18 tests (FASE 2.53 execution)
 - 15 tests (FASE 2.54 verification)
@@ -67,8 +72,43 @@ Test Suites (134+ tests all passing):
 - 10 tests (FASES 2.60/4.1 controlled operation readiness)
 - 15 tests (FASES 4.2/4.3/4.4 cycle flow)
 - 16 tests (FASES 4.5/4.6/4.7 week 1-2 flow)
+- 12 tests (FASES 4.8/4.9/4.10 week 2 review → approval readiness)
 - 15 tests (Compliance registry)
 - 38+ pre-write tests (all passing)
+
+**FASE 4.10 COMPLETE** — Controlled Operation Cycle Approval Readiness Gate
+  - Validates proposed ApprovalRecords ready for manual approval review
+  - Checks: status=proposed, state=proposed, valid object_type, object_id required
+  - Verifies review.status=proposed, all safety flags true, no secrets in any field
+  - Requires state_history with promoted_to_proposed event
+  - Decision: READY_FOR_MANUAL_APPROVAL_REVIEW / WITH_RESTRICTIONS / NOT_READY
+  - Tool: `tools/local/controlled_cycle_approval_readiness_gate.py`
+  - Report: CYCLE-{ID}-APPROVAL-READINESS-GATE.md with validation results
+  - Security: read-only validation only, NO writes, NO network calls
+  - **Deliverables:** controlled_cycle_approval_readiness_gate.py
+
+**FASE 4.9 COMPLETE** — Controlled Operation Cycle Promote Drafts to Proposed ApprovalRecords
+  - Promotes only approved Week 2 human review decisions to ApprovalRecords
+  - Promotion criteria: decision=approve_for_approval_record, approval_record_allowed=true, reviewed_by set
+  - Creates ApprovalRecords with status=proposed (NOT auto-approved)
+  - All safety flags set: no_netbox_write, manual_review_required, proposed_only, no_automatic_approval
+  - Computes evidence_hash of source draft for integrity verification
+  - Tool: `tools/local/controlled_cycle_promote_to_approval_records.py`
+  - Output: {approvals-dir}/pending/*.json (proposed ApprovalRecords with audit trail)
+  - Report: CYCLE-{ID}-PROPOSED-APPROVALS.md showing promoted count and status
+  - Security: no NetBox writes, no ApplyPlan creation, no automatic approvals
+  - **Deliverables:** controlled_cycle_promote_to_approval_records.py
+
+**FASE 4.8 COMPLETE** — Controlled Operation Cycle Week 2 Human Review Validation
+  - Validates and records human review decisions from Week 2 decisions CSV
+  - Checks: decision field valid (approve_for_approval_record|request_changes|rejected|deferred|pending)
+  - For approve: requires reviewer present and approval_record_allowed=true flag
+  - Decision: WEEK2_REVIEW_PASSED / WITH_RESTRICTIONS / BLOCKED
+  - Tool: `tools/local/controlled_cycle_week2_review.py`
+  - Output: CYCLE-{ID}-WEEK2-HUMAN-REVIEW.md and cycle-{id}-week2-human-review.json
+  - Security: read-only validation only, NO writes, NO NetBox access
+  - Testing: 12/12 tests pass (decision validation, reviewer checks, secret blocking, safety flags)
+  - **Deliverables:** controlled_cycle_week2_review.py
 
 **FASE 2.39 COMPLETE** — ApplyPlan Readiness Gate
   - Gate validates proposed ApprovalRecords before ApplyPlan creation

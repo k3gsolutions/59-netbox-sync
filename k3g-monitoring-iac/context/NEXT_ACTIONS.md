@@ -1,30 +1,28 @@
-# Next Actions — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20 Complete)
+# Next Actions — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10 Complete)
 
-## Just Completed (FASES 2.59-4.1)
+## Just Completed (FASES 4.8-4.10)
 
-**2.59 — Final Documentation & Context Sync** ✅ COMPLETE
-- ✅ Updated context/CURRENT_STATE.md with CONTROLLED_OPERATION_READY status
-- ✅ Updated context/NEXT_ACTIONS.md with controlled operation actions
-- ✅ Status: 103+ tests passing, all FASES 2.47-2.60 complete
+**4.10 — Controlled Operation Cycle Approval Readiness Gate** ✅ COMPLETE
+- ✅ Created controlled_cycle_approval_readiness_gate.py
+- ✅ Validates proposed ApprovalRecords ready for manual review
+- ✅ Checks: status=proposed, state=proposed, valid object_type, safety flags, no secrets
+- ✅ Decision: READY_FOR_MANUAL_APPROVAL_REVIEW / WITH_RESTRICTIONS / NOT_READY
+- ✅ All tests passing (12/12 in comprehensive test suite)
 
-**2.60 — Controlled Operation Baseline** ✅ COMPLETE
-- ✅ Created build_controlled_operation_baseline.py
-- ✅ Tool reads handoff decision + closure + archive
-- ✅ Emits CONTROLLED_OPERATION_READY/WITH_RESTRICTIONS/NOT_READY
-- ✅ Generates baseline markdown report + JSON with scope definition
-- ✅ 10/10 tests passing
+**4.9 — Controlled Operation Cycle Promote Drafts to Proposed ApprovalRecords** ✅ COMPLETE
+- ✅ Created controlled_cycle_promote_to_approval_records.py
+- ✅ Promotes only approved Week 2 decisions to ApprovalRecords
+- ✅ Sets status=proposed (NOT auto-approved)
+- ✅ All safety flags enforced: no_netbox_write, manual_review_required, proposed_only
+- ✅ All tests passing (12/12 in comprehensive test suite)
 
-**3.20 — Web UI Final Tests** ✅ COMPLETE
-- ✅ Created test_controlled_operation_readiness.py (10 tests)
-- ✅ Validates baseline decision logic and cycle creation
-- ✅ All tests passing (10/10)
-- ✅ 38+ pre-write tests still passing
-
-**4.1 — Controlled Operation Cycle v1** ✅ COMPLETE
-- ✅ Created create_controlled_operation_cycle.py
-- ✅ Generates cycle structure (PLAN.md, SCOPE.json, CHECKLIST.md, STATUS.json)
-- ✅ Sets status=PLANNED_NOT_STARTED
-- ✅ 1 device/cycle, 3 objects max, POST-only scope confirmed
+**4.8 — Controlled Operation Cycle Week 2 Human Review Validation** ✅ COMPLETE
+- ✅ Created controlled_cycle_week2_review.py
+- ✅ Validates Week 2 human review decisions from CSV
+- ✅ Checks: decision field, reviewer presence, approval_record_allowed flag
+- ✅ Decision: WEEK2_REVIEW_PASSED / WITH_RESTRICTIONS / BLOCKED
+- ✅ All tests passing (12/12 in comprehensive test suite)
+- ✅ Test fix: corrected CSV filename format (CYCLE-001-WEEK2-DECISIONS.csv)
 
 ## Current State
 
