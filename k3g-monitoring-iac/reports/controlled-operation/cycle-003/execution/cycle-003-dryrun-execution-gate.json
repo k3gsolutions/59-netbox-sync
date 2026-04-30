@@ -1,7 +1,7 @@
 {
-  "gate_id": "dryrun-exec-gate-cycle-003-20260430140440",
+  "gate_id": "dryrun-exec-gate-cycle-003-20260430130428",
   "cycle_id": "cycle-003",
-  "validated_at": "2026-04-30T14:04:40.544773+00:00",
+  "validated_at": "2026-04-30T13:04:28.502292+00:00",
   "decision": "CYCLE_DRYRUN_EXECUTION_BLOCKED",
   "reason": "Validation issues: ApplyPlan not found; validation report not found",
   "apply_plan_id": null,

@@ -1,0 +1,43 @@
+{
+  "approval_id": "AR-cycle-003-001-verified",
+  "cycle_id": "cycle-003",
+  "status": "approved",
+  "state": "approved",
+  "object_type": "interface",
+  "object_key": "Eth-Trunk0",
+  "proposed_payload": {
+    "name": "Eth-Trunk0",
+    "description": "Test interface",
+    "enabled": true,
+    "type": "1000base-t"
+  },
+  "expected_result": {
+    "id": 1001,
+    "name": "Eth-Trunk0",
+    "status": "active"
+  },
+  "rollback_hint": "If write fails, interface remains unchanged",
+  "reviewed_by": "network-admin",
+  "reviewed_at": "2026-04-30T13:04:24.879108+00:00",
+  "approval_reason": "Approved for dry-run execution",
+  "approved_by": "approver-001",
+  "approved_at": "2026-04-30T13:04:24.880481+00:00",
+  "evidence_hash": "sha256_test_hash_001",
+  "safety_flags": {
+    "no_netbox_write": true,
+    "manual_review_required": true,
+    "proposed_only": true,
+    "human_decision_required": true,
+    "dry_run_only": true
+  },
+  "state_history": [
+    {
+      "event": "cycle_manual_approval_reviewed",
+      "timestamp": "2026-04-30T13:04:24.880734+00:00"
+    },
+    {
+      "event": "approved_for_cycle_dryrun_applyplan",
+      "timestamp": "2026-04-30T13:04:24.880835+00:00"
+    }
+  ]
+}

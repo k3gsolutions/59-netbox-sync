@@ -1,0 +1,60 @@
+{
+  "approval_id": "AR-cycle-003-1-20260430123220",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "status": "approved",
+  "state": "approved",
+  "object_type": "ip_address",
+  "object_id": "1",
+  "object_key": "203.0.113.2/32",
+  "proposed_payload": {
+    "address": "203.0.113.2/32",
+    "vrf": "default",
+    "status": "active",
+    "description": "Cycle-003 test object"
+  },
+  "review": {
+    "status": "proposed",
+    "reviewed_by": "tech_lead",
+    "reviewed_at": "2026-04-30T12:32:20.020830+00:00",
+    "reason": "Approved for cycle approval"
+  },
+  "source_week2_review": "reports/controlled-operation/cycle-003/week2/cycle-003-week2-human-review.json",
+  "source_draft": "approval-drafts/draft-1.json",
+  "source_decision_csv": "CYCLE-003-WEEK2-DECISIONS.csv",
+  "evidence_hash": "a006900bad2b72798991a4bd788d43f1e5237dcf99e9ff8c81d82107c670c571",
+  "safety_flags": {
+    "no_netbox_write": true,
+    "no_apply_plan_created": true,
+    "manual_review_required": true,
+    "human_decision_required": true,
+    "proposed_only": true
+  },
+  "state_history": [
+    {
+      "event": "cycle_week2_reviewed",
+      "timestamp": "2026-04-30T12:32:20.020887+00:00",
+      "actor": "human_reviewer"
+    },
+    {
+      "event": "promoted_to_proposed",
+      "timestamp": "2026-04-30T12:32:20.020893+00:00",
+      "actor": "promotion_tool"
+    },
+    {
+      "event": "cycle_manual_approval_reviewed",
+      "timestamp": "2026-04-30T12:50:26.838078+00:00",
+      "actor": "tech_lead"
+    },
+    {
+      "event": "approved_for_cycle_dryrun_applyplan",
+      "timestamp": "2026-04-30T12:50:26.838084+00:00",
+      "actor": "tech_lead"
+    }
+  ],
+  "created_at": "2026-04-30T12:32:20.020896+00:00",
+  "approved_by": "tech_lead",
+  "approved_at": "2026-04-30T12:50:26.837692+00:00",
+  "approval_reason": "Aprovado para ApplyPlan dry-run"
+}

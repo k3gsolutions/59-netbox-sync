@@ -1,0 +1,18 @@
+{
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": 1890,
+  "status": "PLANNED_NOT_STARTED",
+  "max_items": 3,
+  "allowed_methods": ["POST"],
+  "forbidden_methods": ["PATCH", "DELETE"],
+  "forbidden_targets": ["/sync", "equipment", "ssh", "netconf"],
+  "requires_week1": true,
+  "requires_week2": true,
+  "requires_approval_records": true,
+  "requires_applyplan_dryrun": true,
+  "requires_real_write_authorization": true,
+  "requires_post_write_verification": true,
+  "expansion_policy": "STAY_CURRENT_LEVEL",
+  "notes": "Cycle-003 continues with restrictions from Cycle-002 success"
+}

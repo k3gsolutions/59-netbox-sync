@@ -1,0 +1,10 @@
+{
+  "review_id": "approval-review-cycle-003-20260430125026",
+  "cycle_id": "cycle-003",
+  "approval_id": "AR-cycle-003-1-20260430123220",
+  "decision": "CYCLE_APPROVAL_REVIEW_APPROVED",
+  "reason": "Approved by tech_lead",
+  "reviewer": "tech_lead",
+  "reviewed_at": "2026-04-30T12:50:26.838538+00:00",
+  "validation_issues": []
+}

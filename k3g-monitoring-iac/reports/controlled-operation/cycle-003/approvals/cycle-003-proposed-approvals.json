@@ -1,0 +1,18 @@
+{
+  "promotion_id": "promote-cycle-003-20260430123220",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "promoted_at": "2026-04-30T12:32:20.021538+00:00",
+  "decision": "PROPOSED_APPROVALS_CREATED_WITH_RESTRICTIONS",
+  "reason": "Created 1 proposed ApprovalRecord(s) with restrictions from review",
+  "approvals_created": 1,
+  "approval_records": [
+    {
+      "approval_id": "AR-cycle-003-1-20260430123220",
+      "status": "proposed",
+      "object_type": "ip_address",
+      "object_key": "203.0.113.2/32"
+    }
+  ]
+}

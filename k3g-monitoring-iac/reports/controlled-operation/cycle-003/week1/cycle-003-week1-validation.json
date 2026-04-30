@@ -1,0 +1,14 @@
+{
+  "validation_id": "week1-validate-cycle-003-20260430062026",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "validated_at": "2026-04-30T06:20:26.024681+00:00",
+  "decision": "WEEK1_VALIDATION_PASSED",
+  "reason": "All validations passed",
+  "files_validated": 1,
+  "violations_total": 0,
+  "violations_errors": 0,
+  "violations_warnings": 0,
+  "violations": []
+}

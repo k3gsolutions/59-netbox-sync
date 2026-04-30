@@ -1,0 +1,59 @@
+{
+  "apply_plan_id": "APPLYPLAN-cycle-003-20260430125030",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "mode": "dry_run",
+  "status": "generated",
+  "generated_at": "2026-04-30T12:50:30.529983+00:00",
+  "source_approval_records": [
+    "AR-cycle-003-1-20260430123220"
+  ],
+  "items": [
+    {
+      "item_id": "item-1",
+      "approval_id": "AR-cycle-003-1-20260430123220",
+      "object_type": "ip_address",
+      "object_key": "203.0.113.2/32",
+      "action": "create",
+      "method": "POST",
+      "target_endpoint": "/api/ipam/ip-addresses/",
+      "proposed_payload": {
+        "address": "203.0.113.2/32",
+        "vrf": "default",
+        "status": "active",
+        "description": "Cycle-003 test object"
+      },
+      "expected_result": "proposed",
+      "rollback_hint": "Delete 203.0.113.2/32 if created",
+      "evidence_hash": "a006900bad2b72798991a4bd788d43f1e5237dcf99e9ff8c81d82107c670c571"
+    }
+  ],
+  "safety_flags": {
+    "dry_run_only": true,
+    "no_netbox_write": true,
+    "no_token_required": true,
+    "no_apply_execution": true,
+    "manual_execution_gate_required": true,
+    "generated_from_approved_records": true
+  },
+  "execution_policy": {
+    "can_execute_real_write": false,
+    "requires_next_gate": true,
+    "next_gate": "FASE_4_81_CYCLE003_DRYRUN_VALIDATION",
+    "max_items": 3,
+    "allowed_methods": [
+      "POST"
+    ],
+    "forbidden_methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "forbidden_targets": [
+      "/sync",
+      "equipment",
+      "ssh",
+      "netconf"
+    ]
+  }
+}

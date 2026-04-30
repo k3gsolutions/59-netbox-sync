@@ -1,0 +1,55 @@
+{
+  "apply_plan_id": "APPLYPLAN-cycle-003-001",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "mode": "dry_run",
+  "status": "validated",
+  "created_at": "2026-04-30T13:04:24.882923+00:00",
+  "validated_at": "2026-04-30T13:04:24.882941+00:00",
+  "safety_flags": {
+    "dry_run_only": true,
+    "no_netbox_write": true,
+    "no_token_required": true,
+    "no_apply_execution": true,
+    "manual_execution_gate_required": true,
+    "generated_from_approved_records": true
+  },
+  "execution_policy": {
+    "can_execute_real_write": false,
+    "requires_next_gate": true,
+    "max_items": 3,
+    "allowed_methods": [
+      "POST"
+    ],
+    "forbidden_methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "forbidden_targets": [
+      "/sync",
+      "equipment",
+      "ssh",
+      "netconf"
+    ]
+  },
+  "items": [
+    {
+      "item_id": "item-001",
+      "approval_id": "AR-cycle-003-001-verified",
+      "object_type": "interface",
+      "object_key": "Eth-Trunk0",
+      "method": "POST",
+      "target_endpoint": "/api/dcim/interfaces/",
+      "proposed_payload": {
+        "name": "Eth-Trunk0",
+        "description": "Test interface"
+      },
+      "expected_result": {
+        "id": 1001,
+        "name": "Eth-Trunk0"
+      },
+      "rollback_hint": "Interface remains unchanged",
+      "evidence_hash": "sha256_test_hash_001"
+    }
+  ]
+}
