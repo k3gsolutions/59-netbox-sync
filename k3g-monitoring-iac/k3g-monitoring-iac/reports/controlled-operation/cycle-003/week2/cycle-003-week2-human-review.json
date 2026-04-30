@@ -1,0 +1,14 @@
+{
+  "review_id": "week2-review-cycle-003-20260430123219",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "reviewed_at": "2026-04-30T12:32:19.894100+00:00",
+  "decision": "WEEK2_REVIEW_PASSED",
+  "reason": "Reviewed 1; 1 approved for ApprovalRecord",
+  "decisions_total": 1,
+  "decisions_pending": 0,
+  "decisions_reviewed": 1,
+  "decisions_approved": 1,
+  "validation_issues": []
+}

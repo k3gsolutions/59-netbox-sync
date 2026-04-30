@@ -1,0 +1,2 @@
+item_id,device,decision,reviewed_by,reviewed_at,approval_record_allowed,reason,notes
+1,4WNET-MNS-KTG-RX,approve_for_approval_record,tech_lead,2026-04-30T06:25:00Z,true,Approved for approval record,Ready for ApprovalRecord creation

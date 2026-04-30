@@ -1,0 +1,11 @@
+{
+  "readiness_id": "readiness-cycle-003-20260430123220",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "validated_at": "2026-04-30T12:32:20.134979+00:00",
+  "decision": "READY_FOR_MANUAL_APPROVAL_REVIEW",
+  "reason": "All 1 proposed ApprovalRecord(s) valid",
+  "approvals_count": 1,
+  "validation_issues": []
+}
