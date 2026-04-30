@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Added — FASES 4.75, 4.76, 4.77, 4.78: Cycle-003 Week 2 Approval Flow
+
+- Cycle-003 Week 2 preparation: plan, review board, decisions CSV, approval drafts directory.
+- Week 2 human review: decision validation, reviewer tracking, approval_record_allowed enforcement.
+- Promote to proposed ApprovalRecords: creates status=proposed records only (never auto-approved).
+- Approval readiness gate: validates proposed records, checks safety flags, scans for secrets.
+- Test suite: 43 tests covering full Week 2 workflow, all passing.
+- Zero-write governance: no NetBox writes, no tokens, proposed-only ApprovalRecords.
+- Evidence hash computed for integrity verification.
+- Manual review required for all approval decisions.
+
 ### Added — FASES 4.71, 4.72, 4.73, 4.74: Cycle-003 Week 1 Operations
 
 - Cycle-003 intake activation with restriction inheritance from Cycle-002.
