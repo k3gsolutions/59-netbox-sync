@@ -1,4 +1,4 @@
-# Current State — 2026-04-30 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.78 Complete)
+# Current State — 2026-04-30 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.81 Complete)
 
 ## Operational Status
 
@@ -1027,3 +1027,23 @@ Test Suite: 43/43 tests (FASES 4.75-4.78) all passing
 **Total Test Coverage: 293+ tests all passing** (250+ prior + 43 new)
 
 Cycle-003 Week 2 approval workflow complete. Proposed ApprovalRecords created with status=proposed only (never auto-approved). Evidence hash computed for integrity. Ready for manual approval review phase (FASES 4.79+).
+
+**FASES 4.79-4.81 Complete** — Cycle-003 Manual Approval & Dry-Run ApplyPlan
+
+- **FASE 4.79** — Manual Approval Decision: Reviewer explicitly approves proposed ApprovalRecord. Creates approved copy with status=approved, state=approved, approved_by, approved_at, approval_reason. Adds state_history events (cycle_manual_approval_reviewed, approved_for_cycle_dryrun_applyplan). Result: CYCLE_APPROVAL_REVIEW_APPROVED
+- **FASE 4.80** — Dry-Run ApplyPlan Generation: Reads approved ApprovalRecords, creates ApplyPlan with mode=dry_run, status=generated. Sets safety_flags (dry_run_only, no_netbox_write, no_apply_execution) and execution_policy (can_execute_real_write=false, requires_next_gate=true). Result: CYCLE_DRYRUN_APPLYPLAN_GENERATED
+- **FASE 4.81** — Dry-Run ApplyPlan Validation: Validates ApplyPlan structure, safety_flags, execution_policy, methods (POST only), forbidden targets (/sync, equipment, ssh, netconf). Scans for secrets, validates evidence_hash. Result: CYCLE_DRYRUN_APPLYPLAN_VALID
+
+Test Suite: 39/39 tests (FASES 4.79-4.81) all passing
+  - Approval decision validation (reviewer, reason, secret scanning)
+  - ApprovalRecord transformation (proposed→approved with fields)
+  - State history tracking (cycle_manual_approval_reviewed, approved_for_cycle_dryrun_applyplan)
+  - ApplyPlan generation (mode=dry_run, safety_flags, execution_policy)
+  - ApplyPlan validation (structure, safety, policy enforcement)
+  - Secret scanning (no NETBOX_WRITE_TOKEN, password, secret, api_key)
+  - No NetBox writes, no tokens, no ApplyPlan execution
+  - All 39/39 tests passing
+
+**Total Test Coverage: 332+ tests all passing** (293+ prior + 39 new)
+
+Cycle-003 approval and dry-run ApplyPlan workflow complete. ApplyPlan locked to dry-run mode (can_execute_real_write=false), requires manual execution gate. Ready for dry-run execution simulation (FASES 4.82+).

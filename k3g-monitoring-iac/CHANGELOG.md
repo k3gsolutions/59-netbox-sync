@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Added — FASES 4.79, 4.80, 4.81: Cycle-003 Manual Approval & Dry-Run ApplyPlan
+
+- Manual approval decision: transform proposed ApprovalRecord to approved status with reviewer attribution.
+- Dry-run ApplyPlan generation: create mode=dry_run ApplyPlan from approved records.
+- Dry-run ApplyPlan validation: validate structure, safety flags, execution policy before simulation.
+- Test suite: 39 tests covering approval flow and ApplyPlan generation/validation.
+- Zero-write governance: no NetBox writes, no tokens, ApplyPlan locked to dry-run (can_execute_real_write=false).
+- Evidence hash computed for integrity verification.
+- State history tracks approval decision and ApplyPlan readiness events.
+
 ### Added — FASES 4.75, 4.76, 4.77, 4.78: Cycle-003 Week 2 Approval Flow
 
 - Cycle-003 Week 2 preparation: plan, review board, decisions CSV, approval drafts directory.
