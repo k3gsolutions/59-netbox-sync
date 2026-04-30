@@ -23,12 +23,12 @@
       "target_endpoint": "/api/ipam/ip-addresses/",
       "proposed_payload": {
         "address": "203.0.113.2/32",
-        "vrf": "default",
         "status": "active",
         "description": "Cycle-003 test object"
       },
       "rollback_hint": "Delete 203.0.113.2/32 if created",
-      "expected_result": "proposed"
+      "expected_result": "proposed",
+      "endpoint": "/api/ipam/ip-addresses/"
     }
   ],
   "safety_confirmations": {
@@ -39,5 +39,16 @@
     "real_write_not_executed": true
   },
   "required_next_phase": "FASE_4_90_CYCLE003_EXECUTE_REAL_WRITE_ONCE",
-  "required_execution_phrase": "EXECUTAR_ESCRITA_REAL_cycle-003_4WNET-MNS-KTG-RX_EXEC-cycle-003-20260430130110"
+  "required_execution_phrase": "EXECUTAR_ESCRITA_REAL_cycle-003_4WNET-MNS-KTG-RX_EXEC-cycle-003-20260430130110",
+  "change_history": [
+    {
+      "timestamp": "2026-04-30T15:28:37.651669+00:00",
+      "action": "fix_cycle003_endpoint_and_default_vrf",
+      "changes": [
+        "endpoint",
+        "removed_vrf_default_string"
+      ],
+      "reason": "Make execution package coherent before real write. NetBox IPAM endpoint is required and vrf=default string may be invalid."
+    }
+  ]
 }
