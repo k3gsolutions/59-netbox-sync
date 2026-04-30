@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Added — FASES 4.71, 4.72, 4.73, 4.74: Cycle-003 Week 1 Operations
+
+- Cycle-003 intake activation with restriction inheritance from Cycle-002.
+- Week 1 preparation: plan generation, response collection directory setup.
+- Week 1 response intake: team submission tracking (JSON/CSV).
+- Week 1 validation: compliance policy registry checks (interface, VRF, BGP, routing policy naming).
+- Test suite: 30 tests covering full Week 1 workflow, all passing.
+- Zero-write governance: no NetBox writes, no token exposure, pure validation flow.
+- Restrictions locked: Cycle-003 inherits max_items=3, POST-only, STAY_CURRENT_LEVEL.
+
 ### Added — FASES 4.59, 4.60, 4.61, 4.62: Cycle-002 Real-Write Attempt, Verification, Compliance, and Closure
 
 - Real-write execution script with one-shot preflight and env-token only handling.
