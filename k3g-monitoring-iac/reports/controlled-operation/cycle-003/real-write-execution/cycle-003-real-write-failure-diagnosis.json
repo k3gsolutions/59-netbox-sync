@@ -1,0 +1,29 @@
+{
+  "cycle_id": "cycle-003",
+  "diagnosed_at": "2026-04-30T16:16:27.102894+00:00",
+  "execution_status": "CYCLE_REAL_WRITE_PARTIAL_FAILED",
+  "error_type": "network_failure",
+  "error_message": {
+    "error": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+  },
+  "details": {
+    "netbox_url_configured": "https://netbox.k3g.local",
+    "item_target_endpoint": "/api/ipam/ip-addresses/",
+    "full_url_attempted": "https://netbox.k3g.local/api/ipam/ip-addresses/",
+    "error_code": "CONNECTION_FAILED",
+    "root_cause": "DNS resolution failed for netbox.k3g.local (fictitious hostname)"
+  },
+  "recommendations": [
+    "1. Verify correct NetBox hostname/IP address",
+    "2. Ensure DNS resolution works from execution environment",
+    "3. Test connectivity: curl -k https://actual-netbox-host/api/",
+    "4. Verify NETBOX_WRITE_TOKEN has permission on target endpoint",
+    "5. Prepare new controlled cycle with correct URL after validation"
+  ],
+  "safety_status": {
+    "no_partial_write": true,
+    "no_token_exposed": true,
+    "no_retry_attempted": true,
+    "no_rollback_needed": true
+  }
+}
