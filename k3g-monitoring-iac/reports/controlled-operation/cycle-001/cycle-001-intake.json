@@ -1,0 +1,26 @@
+{
+  "cycle_id": "cycle-001",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "decision": "CYCLE_INTAKE_READY",
+  "validated_at": "2026-04-30T00:51:34.579412+00:00",
+  "scope_validation": {
+    "valid": true,
+    "issues": []
+  },
+  "status_validation": {
+    "valid": true,
+    "issues": []
+  },
+  "guardrails": {
+    "max_items_enforced": true,
+    "post_only_enforced": true,
+    "patch_forbidden": true,
+    "delete_forbidden": true,
+    "sync_forbidden": true,
+    "equipment_forbidden": true,
+    "one_shot_enforced": true,
+    "no_auto_retry": true,
+    "no_auto_rollback": true
+  }
+}

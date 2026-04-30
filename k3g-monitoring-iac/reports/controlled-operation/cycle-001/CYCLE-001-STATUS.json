@@ -1,0 +1,27 @@
+{
+  "cycle_id": "cycle-001",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "status": "PLANNED_NOT_STARTED",
+  "created_at": "2026-04-30T00:51:30.414158+00:00",
+  "phase": "planning",
+  "gates": {
+    "week1_response": null,
+    "week2_review": null,
+    "approval_record": null,
+    "applyplan_dryrun": null,
+    "real_write_authorization": null,
+    "execute_real_write_once": null,
+    "post_write_verification": null,
+    "compliance_rerun": null,
+    "closure": null,
+    "archive": null
+  },
+  "events": [
+    {
+      "timestamp": "2026-04-30T00:51:30.414191+00:00",
+      "event": "CYCLE_CREATED",
+      "status": "PLANNED_NOT_STARTED"
+    }
+  ]
+}

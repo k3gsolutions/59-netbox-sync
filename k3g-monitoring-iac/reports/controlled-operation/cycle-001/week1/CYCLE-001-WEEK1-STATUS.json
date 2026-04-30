@@ -1,0 +1,43 @@
+{
+  "cycle_id": "cycle-001",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "week": 1,
+  "status": "WEEK1_READY_FOR_RESPONSES",
+  "created_at": "2026-04-30T00:51:37.423182+00:00",
+  "responses": {
+    "total_needed": 0,
+    "submitted": 0,
+    "valid": 0,
+    "invalid": 0
+  },
+  "teams": {
+    "service": {
+      "status": "pending",
+      "assigned": 0,
+      "responses": 0
+    },
+    "network_ops": {
+      "status": "pending",
+      "assigned": 0,
+      "responses": 0
+    },
+    "bgp": {
+      "status": "pending",
+      "assigned": 0,
+      "responses": 0
+    }
+  },
+  "gates": {
+    "all_responses_submitted": false,
+    "all_responses_valid": false,
+    "ready_for_week2": false
+  },
+  "events": [
+    {
+      "timestamp": "2026-04-30T00:51:37.423182+00:00",
+      "event": "WEEK1_PREPARED",
+      "status": "WEEK1_READY_FOR_RESPONSES"
+    }
+  ]
+}
