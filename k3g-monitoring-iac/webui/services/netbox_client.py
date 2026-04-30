@@ -42,6 +42,7 @@ class NetBoxClient:
             "Authorization": f"Token {token}",
             "Accept": "application/json",
         })
+        self._tenant_cache: Dict[int, dict] = {}
 
     def _fetch(self, endpoint: str, params: Dict[str, Any]) -> list[dict]:
         """Helper to fetch from NetBox endpoint."""
@@ -132,6 +133,35 @@ class NetBoxClient:
             "/api/dcim/devices/",
             {"q": q, "limit": limit, "offset": offset}
         )
+
+    def get_tenant_by_id(self, tenant_id: int) -> Optional[dict]:
+        """
+        Fetch tenant details by ID (for group enrichment).
+
+        Uses in-memory cache to avoid repeated calls for same tenant.
+
+        Args:
+            tenant_id: NetBox tenant ID
+
+        Returns:
+            Tenant dict with group details, or None if not found
+
+        Raises:
+            NetBoxAuthError: on 401/403
+            NetBoxClientError: on request or parsing error
+        """
+        # Check cache first
+        if tenant_id in self._tenant_cache:
+            return self._tenant_cache[tenant_id]
+
+        try:
+            results = self._fetch(f"/api/tenancy/tenants/{tenant_id}/", {})
+            tenant = results[0] if results else None
+            if tenant:
+                self._tenant_cache[tenant_id] = tenant
+            return tenant
+        except NetBoxClientError:
+            raise
 
     def get_devices(
         self,

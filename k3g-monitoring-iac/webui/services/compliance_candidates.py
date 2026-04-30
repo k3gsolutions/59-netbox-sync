@@ -99,11 +99,61 @@ def get_tenant_group_name(device: dict) -> Optional[str]:
     return None
 
 
+def enrich_tenant_group_if_missing(
+    device: dict,
+    netbox_client: NetBoxClient,
+) -> tuple[dict, Optional[str]]:
+    """
+    Enrich device.tenant.group from tenant detail if missing.
+
+    Calls GET /api/tenancy/tenants/{id}/ if:
+    - device.tenant exists
+    - device.tenant.group is missing
+    - device.tenant.id exists
+
+    Args:
+        device: Device dict (mutated in place)
+        netbox_client: NetBox client with cache
+
+    Returns:
+        Tuple (device, enrichment_note):
+        - device: original or enriched
+        - enrichment_note: "tenant_detail" if enriched, None otherwise
+
+    Raises:
+        NetBoxClientError: if GET tenant fails (NOT raised, returns error flag)
+    """
+    tenant = device.get("tenant")
+    if not tenant or not isinstance(tenant, dict):
+        return device, None
+
+    # Already has group
+    if tenant.get("group"):
+        return device, None
+
+    # No tenant ID to enrich with
+    tenant_id = tenant.get("id")
+    if not tenant_id:
+        return device, None
+
+    try:
+        tenant_detail = netbox_client.get_tenant_by_id(tenant_id)
+        if tenant_detail and tenant_detail.get("group"):
+            # Inject group into device
+            device["tenant"]["group"] = tenant_detail["group"]
+            return device, "tenant_detail"
+    except NetBoxClientError:
+        # Mark as unresolved but don't break the flow
+        pass
+
+    return device, None
+
+
 def get_rejection_reason(device: dict) -> Optional[str]:
     """
     Determine why device is not eligible (or return None if eligible).
 
-    Returns single reason string for UI display.
+    Returns single reason string for UI display (improved categorization).
     """
     status = get_status_value(device)
     if status != "active":
@@ -112,11 +162,16 @@ def get_rejection_reason(device: dict) -> Optional[str]:
     if not get_custom_field_bool(device, "Compliance", "compliance"):
         return "compliance_disabled"
 
-    if not device.get("tenant"):
-        return "no_tenant"
+    tenant = device.get("tenant")
+    if not tenant:
+        return "tenant_missing"
 
     group_name = get_tenant_group_name(device)
-    if not group_name or group_name not in ("K3G Solutions", "k3g-solutions"):
+    if not group_name:
+        # Tenant exists but no group (and enrichment didn't add it)
+        return "tenant_group_missing"
+
+    if group_name not in ("K3G Solutions", "k3g-solutions"):
         import os
         expected_id = os.getenv("K3G_SOLUTIONS_TENANT_GROUP_ID", "").strip()
         if expected_id and group_name == expected_id:
@@ -301,6 +356,7 @@ def list_compliance_candidates(
     Fetch and filter devices to return only compliance candidates.
 
     Selective search: if id/name/q provided, search specifically. Otherwise return empty.
+    Enriches tenant group from NetBox if missing.
 
     Args:
         netbox_client: NetBoxClient instance
@@ -309,7 +365,7 @@ def list_compliance_candidates(
         q: Optional search query (partial match, limit max 25)
         limit: Max results per page (default 10)
         offset: Pagination offset
-        include_rejected: If True, include rejected devices with reasons
+        include_rejected: If True, include rejected devices with reasons + details
         filters: Optional additional query filters
 
     Returns:
@@ -338,20 +394,40 @@ def list_compliance_candidates(
         message = "Informe id, name ou q para buscar candidatos."
         devices = []
 
-    # Filter to candidates
+    # Filter to candidates with enrichment
     candidates = []
     rejected = []
 
     for device in devices:
+        # Try to enrich tenant group
+        device, enrichment_source = enrich_tenant_group_if_missing(device, netbox_client)
+
         if is_compliance_candidate(device):
-            candidates.append(normalize_compliance_candidate(device))
+            candidate = normalize_compliance_candidate(device)
+            # Add enrichment source if applicable
+            if enrichment_source:
+                candidate["tenant_group_source"] = enrichment_source
+            candidates.append(candidate)
         elif include_rejected:
             reason = get_rejection_reason(device)
-            rejected.append({
+            rejected_item = {
                 "id": device.get("id"),
                 "name": device.get("name"),
                 "reason": reason,
-            })
+            }
+            # Add diagnostic details
+            tenant = device.get("tenant")
+            if tenant and isinstance(tenant, dict):
+                details = {"tenant_id": tenant.get("id")}
+                details["tenant"] = tenant.get("name")
+                group = tenant.get("group")
+                if isinstance(group, dict):
+                    details["tenant_group"] = group.get("name") or group.get("slug")
+                    if enrichment_source:
+                        details["tenant_group_source"] = enrichment_source
+                if details:
+                    rejected_item["details"] = details
+            rejected.append(rejected_item)
 
     result = {
         "count": len(candidates),
