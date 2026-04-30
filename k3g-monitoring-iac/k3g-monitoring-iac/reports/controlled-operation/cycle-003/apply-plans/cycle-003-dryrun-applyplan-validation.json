@@ -1,0 +1,12 @@
+{
+  "validation_id": "validate-cycle-003-20260430125050",
+  "cycle_id": "cycle-003",
+  "device": "4WNET-MNS-KTG-RX",
+  "device_id": "1890",
+  "validated_at": "2026-04-30T12:50:50.914391+00:00",
+  "decision": "CYCLE_DRYRUN_APPLYPLAN_VALID",
+  "reason": "ApplyPlan valid for dry-run simulation",
+  "apply_plan_id": "APPLYPLAN-cycle-003-20260430125030",
+  "items_count": 1,
+  "validation_issues": []
+}
