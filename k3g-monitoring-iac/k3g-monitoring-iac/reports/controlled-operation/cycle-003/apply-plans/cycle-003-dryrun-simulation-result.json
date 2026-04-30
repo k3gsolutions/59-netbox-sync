@@ -1,0 +1,34 @@
+{
+  "simulation_id": "sim-cycle-003-20260430130101",
+  "cycle_id": "cycle-003",
+  "apply_plan_id": "APPLYPLAN-cycle-003-20260430125030",
+  "device": "4WNET-MNS-KTG-RX",
+  "simulated_at": "2026-04-30T13:01:01.261729+00:00",
+  "status": "CYCLE_DRYRUN_SIMULATION_PASSED",
+  "items_simulated": 1,
+  "items": [
+    {
+      "item_id": "item-1",
+      "approval_id": "AR-cycle-003-1-20260430123220",
+      "object_type": "ip_address",
+      "object_key": "203.0.113.2/32",
+      "method": "POST",
+      "target_endpoint": "/api/ipam/ip-addresses/",
+      "status": "simulated_success",
+      "payload_valid": true,
+      "endpoint_valid": true,
+      "expected_result": "proposed",
+      "rollback_hint": "Delete 203.0.113.2/32 if created"
+    }
+  ],
+  "safety_confirmations": {
+    "local_only": true,
+    "no_network_call": true,
+    "no_token_read": true,
+    "no_netbox_write": true,
+    "no_apply_execution": true
+  },
+  "next_gate_required": true,
+  "next_gate": "FASE_4_84_CYCLE003_REAL_WRITE_READINESS_GATE",
+  "validation_issues": []
+}

@@ -1,0 +1,9 @@
+{
+  "gate_id": "dryrun-exec-gate-cycle-003-20260430130101",
+  "cycle_id": "cycle-003",
+  "validated_at": "2026-04-30T13:01:01.147324+00:00",
+  "decision": "CYCLE_DRYRUN_EXECUTION_READY",
+  "reason": "ApplyPlan and validation passed, ready for simulation",
+  "apply_plan_id": "APPLYPLAN-cycle-003-20260430125030",
+  "validation_issues": []
+}

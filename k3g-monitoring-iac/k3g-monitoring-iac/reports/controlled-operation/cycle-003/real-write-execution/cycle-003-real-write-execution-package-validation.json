@@ -1,0 +1,10 @@
+{
+  "validation_id": "exec-pkg-val-cycle-003-20260430130110",
+  "cycle_id": "cycle-003",
+  "validated_at": "2026-04-30T13:01:10.315739+00:00",
+  "decision": "CYCLE_REAL_WRITE_EXECUTION_PACKAGE_VALID",
+  "reason": "Execution package valid",
+  "execution_package_id": "EXEC-cycle-003-20260430130110",
+  "items_count": 1,
+  "validation_issues": []
+}
