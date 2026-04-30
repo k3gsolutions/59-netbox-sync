@@ -3,7 +3,7 @@
   "device": "4WNET-MNS-KTG-RX",
   "device_id": "1890",
   "status": "CYCLE_POST_WRITE_COMPLIANCE_FAILED",
-  "compliance_checked_at": "2026-04-30T16:36:07.185378+00:00",
+  "compliance_checked_at": "2026-04-30T16:37:36.581573+00:00",
   "execution_status": "CYCLE_REAL_WRITE_PARTIAL_FAILED",
   "verification_status": "CYCLE_POST_WRITE_VERIFICATION_PASSED",
   "summary": {
