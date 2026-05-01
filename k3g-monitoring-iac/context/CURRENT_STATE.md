@@ -1,4 +1,4 @@
-# Current State — 2026-04-30 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.93, 2.32, CANDIDATES-001–027 Complete)
+# Current State — 2026-05-01 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.93, 2.32, CANDIDATES-001–027 Complete, COMPLIANCE-COMPARE-001–004 Complete)
 
 ## Operational Status
 
@@ -13,6 +13,53 @@ FASE 2.60: Baseline generated with scope definition (1 device/cycle, 3 objects, 
 FASE 4.1: Cycle template generation functional. First cycle can be created via template.
 
 ## Latest Status
+
+**COMPLIANCE-PARSE-001-004 COMPLETE** — Huawei NE8000 Parser Baseline + Parsed Inventory + Parser Safety Validation + UI Summary
+
+- Huawei NE8000 baseline parser reads local redacted outputs and writes parsed inventory artifacts.
+- Parsed inventory and parser result artifacts live under `collection-results/`.
+- Parser safety validation checks for password/token/cipher drift and confirms no NetBox/SSH/ApprovalRecord/ApplyPlan usage.
+- Job detail UI now shows parsed summary and PARSED-INVENTORY.md links, with raw content still hidden.
+
+**COMPLIANCE-COLLECT-008-011 COMPLETE** — Vendor Profiles + Huawei Safe Set + Redaction + Parser Staging
+
+- `policies/compliance/collection-profiles/` now selects read-only command sets by vendor/model.
+- Huawei NE8000 uses a safe initial command set without full config dump by default.
+- Raw SSH outputs create redacted copies and metadata records.
+- Parser staging manifest/markdown generated under `collection-results/`.
+- UI shows profile, planned commands, redaction status, and parser staging. Raw content is not displayed.
+
+**COMPLIANCE-COLLECT-004-007 COMPLETE** — SSH Read-Only Policy + Preflight + Controlled SSH Execution + Raw Validation
+
+- `POST /compliance/jobs/{job_id}/collection/ssh-preflight` validates env and command policy without connecting.
+- `POST /compliance/jobs/{job_id}/collection/ssh-execute` runs controlled SSH read-only collection with `paramiko`.
+- `GET /compliance/jobs/{job_id}/collection/raw-validation` validates raw outputs locally after execution.
+- SSH execution is blocked before connect if any command is forbidden or preflight is not ready.
+- No NetBox write, no `/sync`, no NETCONF, no SNMP write, no config mode, no ApprovalRecord, no ApplyPlan.
+
+**COMPLIANCE-COLLECT-001-003 COMPLETE** — Read-Only Collection Executor + Collection Result Artifact + Safety Validation
+
+- `POST /compliance/jobs/{job_id}/collection/execute` prepares a local simulation only.
+- `collection-results/` artifacts are written locally with planned commands and safety validation.
+- `GET /compliance/jobs/{job_id}/collection/validation` exposes the local validation artifact.
+- No device connection, no NetBox write, no `/sync`, no ApprovalRecord, no ApplyPlan.
+
+**COMPLIANCE-JOB-001-003 COMPLETE** — Job Review Dashboard + Collection Start Gate + Read-Only Collection Plan
+
+- `GET /compliance/jobs` and `GET /compliance/jobs/{job_id}` now show prepared jobs and local gate artifacts.
+- `POST /compliance/jobs/{job_id}/collection/start-gate` validates the explicit gate and writes local start-gate artifacts only.
+- `POST /compliance/jobs/{job_id}/collection/plan` builds a read-only plan per device and never starts collection.
+- New artifacts live in `reports/compliance/jobs/<job_id>/` and remain local-only.
+
+**COMPLIANCE-COMPARE-001-004 COMPLETE** — Policy Registry Loader + Compare Engine + Findings Artifacts + Findings UI
+
+- Policy registry loader at `webui/services/compliance_policy_loader.py` loads 13 required YAML compliance policies (no silent fallback).
+- Compare engine at `webui/services/compliance_compare.py` compares parsed inventory to policies and generates findings.
+- Comparators: interfaces, BGP, route-policies, prefix-lists, SNMP — missing data generates info/warning, does not fail.
+- Each finding has `write_required=false` and `approval_required=false` — no automatic remediation.
+- Endpoint `POST /compliance/jobs/{job_id}/compare` writes findings artifacts locally.
+- Job detail UI shows "Achados de Compliance" with findings table, severity badges, links to markdown reports.
+- Status: COMPLIANCE_COMPARE_COMPLETED, COMPLIANCE_COMPARE_COMPLETED_WITH_FINDINGS, COMPLIANCE_COMPARE_BLOCKED.
 
 **FASES 2.47-3.19 COMPLETE** — Real Write Full Cycle: Authorization → Execution → Verification → Closure
 

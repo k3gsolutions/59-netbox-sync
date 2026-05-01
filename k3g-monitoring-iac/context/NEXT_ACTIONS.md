@@ -1,10 +1,49 @@
-# Next Actions — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2-4.58 Complete)
+# Next Actions — 2026-05-01 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2-4.58, COMPLIANCE-COMPARE-001–004 Complete)
 
 ## Current Focus (FASES 4.51-4.58)
 
 - Dry-run execution gate, simulation, readiness, authorization, preflight, execution package, validation, and freeze are being built
 - Next step after these gates: FASE 4.59 real-write execution once human confirms
 - Keep guardrails: no NetBox writes, no apply, no sync, no automatic approval
+
+## Current Focus (COMPLIANCE-JOB-001-003)
+
+- Job review dashboard, explicit collection start gate, and read-only collection plan are complete
+- Next operator action is manual review of `reports/compliance/jobs/<job_id>/` and explicit gate confirmation
+- Keep guardrails: no automatic collection, no SSH/SNMP/NETCONF, no NetBox writes, no `/sync`
+
+## Current Focus (COMPLIANCE-COLLECT-001-003)
+
+- Local collection simulation executor, collection-results artifacts, and safety validation are complete
+- Next operator action is inspect planned commands and validation output under `collection-results/`
+- Keep guardrails: no real device connection, no SSH/SNMP/NETCONF, no NetBox writes, no `/sync`
+
+## Current Focus (COMPLIANCE-COLLECT-004-007)
+
+- SSH read-only policy, preflight, controlled SSH execution, and raw validation are complete
+- Next operator action is review the SSH policy and confirm read-only credentials before any live collection
+- Keep guardrails: no config mode, no NetBox writes, no `/sync`, no ApprovalRecord, no ApplyPlan
+
+## Current Focus (COMPLIANCE-COLLECT-008-011)
+
+- Vendor profiles, redaction, and parser staging are complete
+- Next operator action is inspect the profile selection and redacted outputs for each job
+- Keep guardrails: raw content hidden from UI, no NetBox writes, no `/sync`, no ApprovalRecord, no ApplyPlan
+
+## Current Focus (COMPLIANCE-PARSE-001-004)
+
+- Huawei NE8000 parser baseline, parsed inventory, safety validation, and UI summary are complete
+- Next operator action is review parsed inventory artifacts and validation output for a prepared job
+- Keep guardrails: no raw in UI, no NetBox writes, no `/sync`, no ApprovalRecord, no ApplyPlan, no new collection
+
+## Current Focus (COMPLIANCE-COMPARE-001-004)
+
+- Policy registry loader, compare engine, findings artifacts, and findings UI are complete
+- 13 required compliance policies are validated and loaded without silent fallbacks
+- Findings are generated for: interfaces, BGP, route-policies, prefix-lists, SNMP
+- Missing data generates info/warning findings but does not fail global compare
+- Next operator action is inspect `reports/compliance/jobs/<job_id>/comparison/` and review findings in UI
+- Keep guardrails: no automatic remediation, no NetBox writes, no SSH/SNMP/NETCONF, no ApprovalRecord, no ApplyPlan
 
 ## Current Focus (FASE 4.59)
 

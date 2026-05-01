@@ -2,6 +2,51 @@
 
 ## [Unreleased]
 
+### Added — COMPLIANCE-PARSE-001–004: Huawei Parser Baseline, Parsed Inventory, Safety Validation, UI Summary
+
+- Huawei NE8000 parser baseline added for local redacted outputs.
+- Parsed inventory artifacts are written per device under `collection-results/devices/<device_id>/parsed/`.
+- Parser safety validation checks parsed artifacts for sensitive terms and governance drift.
+- Job detail UI now shows parsed summary and PARSED-INVENTORY.md links without exposing raw content.
+- Added tests for parser functions, parsed artifacts, and parser validation.
+
+### Added — COMPLIANCE-COLLECT-008–011: Vendor Profiles, Huawei Safe Set, Redaction, Parser Staging
+
+- New collection profile registry under `policies/compliance/collection-profiles/`.
+- Huawei NE8000 safe command profile selected automatically from vendor/model.
+- Raw outputs now produce redacted copies before later analysis.
+- Parser staging manifest and markdown generated from collected files.
+- Job detail UI now surfaces profile, planned commands, redaction status, and parser staging.
+- Added tests for profiles, redaction, parser staging, and SSH regression.
+
+### Added — COMPLIANCE-COLLECT-004–007: SSH Read-Only Policy, Preflight, Execution, and Raw Validation
+
+- New SSH read-only policy file and helper functions for env and command validation.
+- New SSH preflight route: `POST /compliance/jobs/{job_id}/collection/ssh-preflight`.
+- New controlled SSH execution route: `POST /compliance/jobs/{job_id}/collection/ssh-execute`.
+- New raw output validation route: `GET /compliance/jobs/{job_id}/collection/raw-validation`.
+- New local artifacts under `reports/compliance/jobs/<job_id>/collection-results/` for SSH preflight, SSH execution, and raw safety validation.
+- SSH execution remains read-only and blocks forbidden commands before any connection.
+- Added tests with `paramiko` mocks and no real SSH connectivity.
+
+### Added — COMPLIANCE-COLLECT-001–003: Read-Only Collection Executor and Safety Validation
+
+- New execution simulation route: `POST /compliance/jobs/{job_id}/collection/execute`.
+- New safety validation route: `GET /compliance/jobs/{job_id}/collection/validation`.
+- New local artifacts under `reports/compliance/jobs/<job_id>/collection-results/`.
+- Planned commands are read-only only and block forbidden config/write tokens.
+- Safety validation stays local: no SSH, SNMP, NETCONF, NetBox write, `/sync`, ApprovalRecord, or ApplyPlan.
+- Added tests for gates, planned commands, safety validation, and no-network guarantees.
+
+### Added — COMPLIANCE-JOB-001–003: Job Review Dashboard, Start Gate, Read-Only Collection Plan
+
+- New job review dashboard routes: `GET /compliance/jobs` and `GET /compliance/jobs/{job_id}`.
+- New explicit collection start gate: `POST /compliance/jobs/{job_id}/collection/start-gate`.
+- New read-only collection plan: `POST /compliance/jobs/{job_id}/collection/plan`.
+- New local artifacts: `collection-start-gate.json`, `COLLECTION-START-GATE.md`, `collection-plan.json`, `COLLECTION-PLAN.md`.
+- Safety kept local-only: no SSH, SNMP, NETCONF, NetBox write, `/sync`, ApprovalRecord, or ApplyPlan.
+- Added tests for dashboard, gates, plan generation, and write-blocking guarantees.
+
 ### Added — FASES CANDIDATES-001–024: Complete Compliance Candidate Discovery
 
 **FASES CANDIDATES-001–004** — Read-only NetBox integration:
@@ -32,6 +77,19 @@
 - 18 new tests covering job creation, per-ID validation, safety flags
 
 **Test Suite: 76 compliance candidate tests all passing (58 from FASES-001–024 + 18 from FASES-025–027)**
+
+### Added — COMPLIANCE-COMPARE-001–004: Policy Registry Loader, Compare Engine, Findings Artifacts, Findings UI
+
+- New policy registry loader at `webui/services/compliance_policy_loader.py` — loads 13 required YAML compliance policy files with explicit PyYAML requirement (no silent fallback).
+- New compare engine at `webui/services/compliance_compare.py` — compares parsed inventory to compliance policies, generates findings artifacts.
+- Comparators: interfaces (description, state consistency, naming), BGP (description, policies, state), route-policies (nodes, references, naming), prefix-lists (entries, naming), SNMP (sys-info).
+- Missing data tolerance: generates info/warning finding when parsed data incomplete, does not fail global compare.
+- Each finding has `write_required=false` and `approval_required=false` — no automatic remediation.
+- New endpoint `POST /compliance/jobs/{job_id}/compare` writes 4 local artifact files per job/device.
+- Job detail UI now shows "Achados de Compliance" section with findings table, severity badges, links to COMPLIANCE-FINDINGS.md.
+- Status values: COMPLIANCE_COMPARE_COMPLETED, COMPLIANCE_COMPARE_COMPLETED_WITH_FINDINGS, COMPLIANCE_COMPARE_BLOCKED.
+- Safety: no NetBox write, no SSH/SNMP/NETCONF, no ApprovalRecord, no ApplyPlan.
+- 15 tests covering policy loading, comparators, findings artifacts, UI rendering — all passing.
 
 ### Added — FASES 4.94, 4.95, 4.96, 4.97: Cycle-003 Retry-001 Preparation
 
