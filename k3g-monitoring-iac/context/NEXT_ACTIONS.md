@@ -1,4 +1,4 @@
-# Next Actions — 2026-05-01 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2-4.58, COMPLIANCE-COMPARE-001–004 Complete)
+# Next Actions — 2026-05-01 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2-4.93, COMPLIANCE-COMPARE-001–004 Complete, COMPLIANCE-REVIEW-001–004 Complete)
 
 ## Current Focus (FASES 4.51-4.58)
 
@@ -35,6 +35,17 @@
 - Huawei NE8000 parser baseline, parsed inventory, safety validation, and UI summary are complete
 - Next operator action is review parsed inventory artifacts and validation output for a prepared job
 - Keep guardrails: no raw in UI, no NetBox writes, no `/sync`, no ApprovalRecord, no ApplyPlan, no new collection
+
+## Current Focus (COMPLIANCE-REVIEW-001-004)
+
+- Findings review workflow, decision audit trail, and remediation draft eligibility gate are complete
+- Decision service supports 6 allowed decisions: accepted, false_positive, ignored_temporarily, needs_remediation, needs_more_evidence, blocked
+- Audit trail stores immutable JSON files per decision for full traceability
+- HTTP endpoints: POST decision, GET review-summary, POST draft-eligibility (eligibility gate evaluation)
+- Job detail UI shows review section with per-finding action buttons and decision status display
+- Eligibility gate has 4 independent checks (has_findings, critical_reviewed, no_blocked_findings, has_remediation_candidates)
+- Next operator action is review findings in "Revisão dos Achados" section, record decisions, and evaluate remediation draft eligibility
+- Keep guardrails: no NetBox writes, no device connections, no ApprovalRecord, no ApplyPlan, decisions local-only
 
 ## Current Focus (COMPLIANCE-COMPARE-001-004)
 

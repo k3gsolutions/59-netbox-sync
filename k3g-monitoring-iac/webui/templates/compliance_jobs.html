@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Compliance Jobs{% endblock %}
+
+{% block content %}
+<h2>Compliance Jobs</h2>
+
+<div class="alert alert-info">
+    <strong>Leitura local apenas.</strong>
+    Jobs preparados em `reports/compliance/jobs/` sem coleta automática.
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">Jobs preparados</div>
+        <div class="summary-value">{{ jobs|length }}</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-label">Gate collection</div>
+        <div class="summary-value">{{ jobs|selectattr('collection_start_gate', 'equalto', 'COLLECTION_START_GATE_READY')|list|length }}</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-label">Planos read-only</div>
+        <div class="summary-value">{{ jobs|selectattr('collection_plan', 'equalto', 'COLLECTION_PLAN_PREPARED')|list|length }}</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-label">NetBox write</div>
+        <div class="summary-value">Bloqueado</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Dashboard de jobs</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Job</th>
+                <th>Status</th>
+                <th>Devices</th>
+                <th>Safety</th>
+                <th>Start gate</th>
+                <th>Collection gate</th>
+                <th>Plano</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for job in jobs %}
+            <tr>
+                <td>
+                    <a href="/compliance/jobs/{{ job.job_id }}"><code>{{ job.job_id }}</code></a>
+                    <div class="muted mono">{{ job.created_at or 'sem created_at' }}</div>
+                </td>
+                <td><span class="badge badge-info">{{ job.status | status_label }}</span></td>
+                <td>{{ job.selected_count or 0 }}</td>
+                <td>
+                    {% if job.safety %}
+                        <span class="badge badge-success">read-only</span>
+                        <span class="badge badge-neutral">netbox_write=false</span>
+                    {% else %}
+                        <span class="badge badge-warning">sem safety</span>
+                    {% endif %}
+                </td>
+                <td><span class="badge badge-info">{{ 'Disponível' if job.start_gate_markdown else 'Ausente' }}</span></td>
+                <td><span class="badge {{ 'badge-success' if job.collection_start_gate == 'COLLECTION_START_GATE_READY' else 'badge-warning' }}">{{ job.collection_start_gate | status_label }}</span></td>
+                <td><span class="badge {{ 'badge-success' if job.collection_plan == 'COLLECTION_PLAN_PREPARED' else 'badge-warning' }}">{{ job.collection_plan | status_label }}</span></td>
+                <td><a class="btn btn-primary btn-small" href="/compliance/jobs/{{ job.job_id }}">Abrir</a></td>
+            </tr>
+        {% endfor %}
+        {% if not jobs %}
+            <tr><td colspan="8">Nenhum job preparado localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -78,6 +78,18 @@
 
 **Test Suite: 76 compliance candidate tests all passing (58 from FASES-001–024 + 18 from FASES-025–027)**
 
+### Added — COMPLIANCE-REVIEW-001–004: Findings Review Workflow, Decision Audit Trail, Remediation Draft Eligibility Gate
+
+- New findings review service at `webui/services/compliance_findings_review.py` — 6 functions: load_findings, load_review_decisions, validate_finding_decision, save_finding_decision, summarize_review, evaluate_remediation_draft_eligibility.
+- Decision validation and persistence: 6 allowed decisions (accepted, false_positive, ignored_temporarily, needs_remediation, needs_more_evidence, blocked) mapped to logical statuses.
+- Audit trail: immutable JSON files written per decision under `review/audit/{finding_id}-{ISO-timestamp}.json` for traceability.
+- New endpoints: `POST /compliance/jobs/{job_id}/findings/{finding_id}/decision` (record decision), `GET /compliance/jobs/{job_id}/findings/review-summary` (aggregated counts), `POST /compliance/jobs/{job_id}/remediation/draft-eligibility` (eligibility gate).
+- Eligibility gate: 4 independent checks (has_findings, critical_reviewed, no_blocked_findings, has_remediation_candidates) → REMEDIATION_DRAFT_ELIGIBLE, ELIGIBLE_WITH_WARNINGS, or BLOCKED.
+- Job detail UI now shows "Revisão dos Achados" section with review summary cards, per-finding decision buttons (✓ Aceitar, FP, ↷ Ignorar, ⚡ Correção, ? Evidência, ⊗ Bloquear), decision status display, and eligibility evaluation button.
+- All review operations are local: no NetBox writes, no device connections, no ApprovalRecord or ApplyPlan creation.
+- New artifacts: `review/finding-decisions.json`, `review/FINDING-DECISIONS.md`, `review/remediation-draft-eligibility.json`, `review/REMEDIATION-DRAFT-ELIGIBILITY.md`, audit trail files.
+- 40 tests covering decision validation, persistence, audit trails, eligibility gate evaluation, safety blocks — all passing.
+
 ### Added — COMPLIANCE-COMPARE-001–004: Policy Registry Loader, Compare Engine, Findings Artifacts, Findings UI
 
 - New policy registry loader at `webui/services/compliance_policy_loader.py` — loads 13 required YAML compliance policy files with explicit PyYAML requirement (no silent fallback).

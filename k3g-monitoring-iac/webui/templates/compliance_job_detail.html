@@ -1,0 +1,743 @@
+{% extends "base.html" %}
+
+{% block title %}Compliance Job {{ job.job_id }}{% endblock %}
+
+{% block content %}
+<h2>Compliance Job: {{ job.job_id }}</h2>
+{% set ssh_preflight_ready = job.ssh_preflight and job.ssh_preflight.decision in ['SSH_PREFLIGHT_READY_CONFIG_ONLY', 'SSH_PREFLIGHT_READY_CONNECTIVITY_CHECKED'] %}
+{% set parser_ready = job.parser_manifest and job.parser_manifest.devices %}
+{% set parsed_ready = job.parser_result and job.parser_result.devices %}
+{% set compare_ready = job.parser_result and job.parser_safety_validation and job.parser_safety_validation.decision != 'PARSER_SAFETY_INVALID' %}
+
+<div class="pending-validation-links">
+    <button type="button" class="btn btn-primary btn-small" id="prepare-start-gate-btn">
+        Preparar plano de coleta read-only
+    </button>
+    <button type="button" class="btn btn-primary btn-small" id="prepare-collection-btn"
+        {% if not (job.collection_start_gate and job.collection_start_gate.decision == 'COLLECTION_START_GATE_READY' and job.collection_plan and job.collection_plan.decision == 'COLLECTION_PLAN_PREPARED') %}disabled{% endif %}>
+        Preparar coleta read-only
+    </button>
+    <button type="button" class="btn btn-primary btn-small" id="ssh-preflight-btn">
+        Validar pré-requisitos SSH
+    </button>
+    <button type="button" class="btn btn-primary btn-small" id="ssh-execute-btn"
+        {% if not ssh_preflight_ready %}disabled{% endif %}>
+        Executar coleta SSH read-only
+    </button>
+    <button type="button" class="btn btn-primary btn-small" id="parse-btn"
+        {% if not parser_ready %}disabled{% endif %}>
+        Executar parser local
+    </button>
+    <button type="button" class="btn btn-primary btn-small" id="parse-validation-btn"
+        {% if not parsed_ready %}disabled{% endif %}>
+        Validar parser
+    </button>
+    <button type="button" class="btn btn-primary btn-small" id="compare-btn"
+        {% if not compare_ready %}disabled{% endif %}>
+        Comparar com políticas
+    </button>
+    <a class="btn btn-small" href="/compliance/jobs">Voltar para jobs</a>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-label">Status</div>
+        <div class="summary-value">{{ job.job_request.status | status_label if job.job_request else 'N/A' }}</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-label">Devices</div>
+        <div class="summary-value">{{ job.selected_devices.selected_count if job.selected_devices else 0 }}</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-label">Collection start gate</div>
+        <div class="summary-value">{{ job.collection_start_gate.decision if job.collection_start_gate else 'missing' }}</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-label">Collection plan</div>
+        <div class="summary-value">{{ job.collection_plan.decision if job.collection_plan else 'missing' }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Safety</div>
+    {% if job.job_request and job.job_request.safety %}
+    <table>
+        <tbody>
+            {% for key, value in job.job_request.safety.items() %}
+            <tr>
+                <td><code>{{ key }}</code></td>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Nenhuma safety block localizada.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Selected devices</div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Primary IP4</th>
+                <th>Platform</th>
+                <th>Manufacturer</th>
+                <th>Model</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if job.selected_devices and job.selected_devices.devices %}
+            {% for device in job.selected_devices.devices %}
+            <tr>
+                <td><code>{{ device.id }}</code></td>
+                <td>{{ device.name }}</td>
+                <td><code>{{ device.primary_ip4 or '-' }}</code></td>
+                <td>{{ device.platform or '-' }}</td>
+                <td>{{ device.manufacturer or '-' }}</td>
+                <td>{{ device.model or '-' }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="6">Nenhum device selecionado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">Job request</div>
+    <pre class="pre-wrap">{{ job.job_request | tojson(indent=2) }}</pre>
+</div>
+
+<div class="card">
+    <div class="card-header">Start gate original</div>
+    {% if job.start_gate_markdown %}
+    <pre class="pre-wrap">{{ job.start_gate_markdown }}</pre>
+    {% else %}
+    <p>Nenhum start gate markdown localizado.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Collection start gate</div>
+    {% if job.collection_start_gate_markdown %}
+    <pre class="pre-wrap">{{ job.collection_start_gate_markdown }}</pre>
+    {% elif job.collection_start_gate %}
+    <pre class="pre-wrap">{{ job.collection_start_gate | tojson(indent=2) }}</pre>
+    {% else %}
+    <p>Nenhum collection start gate localizado.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Collection plan</div>
+    {% if job.collection_plan_markdown %}
+    <pre class="pre-wrap">{{ job.collection_plan_markdown }}</pre>
+    {% elif job.collection_plan %}
+    <pre class="pre-wrap">{{ job.collection_plan | tojson(indent=2) }}</pre>
+    {% else %}
+    <p>Nenhum collection plan localizado.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Collection execution</div>
+    {% if job.collection_results_markdown %}
+    <pre class="pre-wrap">{{ job.collection_results_markdown }}</pre>
+    {% elif job.collection_results %}
+    <pre class="pre-wrap">{{ job.collection_results | tojson(indent=2) }}</pre>
+    {% else %}
+    <p>Nenhuma simulação de coleta preparada ainda.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Safety validation</div>
+    {% if job.collection_safety_validation_markdown %}
+    <pre class="pre-wrap">{{ job.collection_safety_validation_markdown }}</pre>
+    {% elif job.collection_safety_validation %}
+    <pre class="pre-wrap">{{ job.collection_safety_validation | tojson(indent=2) }}</pre>
+    {% else %}
+    <p>Nenhuma safety validation localizada.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Coleta SSH Read-Only</div>
+    <p>Somente comandos display/show. Nenhuma configuração será aplicada.</p>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">SSH preflight</div>
+            <div class="summary-value">{{ job.ssh_preflight.decision if job.ssh_preflight else 'missing' }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">SSH collection</div>
+            <div class="summary-value">{{ job.ssh_collection_result.status if job.ssh_collection_result else 'missing' }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Raw validation</div>
+            <div class="summary-value">{{ job.raw_output_safety_validation.decision if job.raw_output_safety_validation else 'missing' }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Parser staging</div>
+            <div class="summary-value">{{ 'ready' if parser_ready else 'missing' }}</div>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Device</th>
+                <th>Profile</th>
+                <th>Planned Commands</th>
+                <th>Redacted</th>
+                <th>Parsed</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if job.parser_manifest and job.parser_manifest.devices %}
+            {% for device in job.parser_manifest.devices %}
+            <tr>
+                <td>{{ device.name }}</td>
+                <td><code>{{ device.profile }}</code></td>
+                <td>
+                    {% if job.collection_plan and job.collection_plan.devices %}
+                        {% for planned in job.collection_plan.devices %}
+                            {% if planned.device_id|string == device.device_id|string %}
+                                <ul>
+                                {% for command in planned.planned_commands or [] %}
+                                    <li><code>{{ command }}</code></li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </td>
+                <td>
+                    {% for redacted_file in device.redacted_files or [] %}
+                        <div><code>{{ redacted_file | replace(job.job_dir ~ '/collection-results/', '') }}</code></div>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for parsed_file in device.parsed_files or [] %}
+                        <div><code>{{ parsed_file | replace(job.job_dir ~ '/collection-results/', '') }}</code></div>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="5">Nenhum staging localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+    {% if job.ssh_preflight_markdown %}
+    <pre class="pre-wrap">{{ job.ssh_preflight_markdown }}</pre>
+    {% elif job.ssh_preflight %}
+    <pre class="pre-wrap">{{ job.ssh_preflight | tojson(indent=2) }}</pre>
+    {% endif %}
+    {% if job.raw_output_safety_validation_markdown %}
+    <pre class="pre-wrap">{{ job.raw_output_safety_validation_markdown }}</pre>
+    {% elif job.raw_output_safety_validation %}
+    <pre class="pre-wrap">{{ job.raw_output_safety_validation | tojson(indent=2) }}</pre>
+    {% endif %}
+    {% if job.parser_staging_markdown %}
+    <pre class="pre-wrap">{{ job.parser_staging_markdown }}</pre>
+    {% elif job.parser_manifest %}
+    <pre class="pre-wrap">{{ job.parser_manifest | tojson(indent=2) }}</pre>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Inventário parseado</div>
+    <p>Parser local-only. Nenhum raw exibido.</p>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">Parser</div>
+            <div class="summary-value">{{ job.parser_result.decision if job.parser_result else 'missing' }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Parser validation</div>
+            <div class="summary-value">{{ job.parser_safety_validation.decision if job.parser_safety_validation else 'missing' }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Interfaces</div>
+            <div class="summary-value">{{ job.parser_result.summary.interfaces_count if job.parser_result else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Warnings</div>
+            <div class="summary-value">{{ job.parser_result.summary.warnings_count if job.parser_result else 0 }}</div>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Device</th>
+                <th>Profile</th>
+                <th>Summary</th>
+                <th>Warnings</th>
+                <th>PARSED-INVENTORY.md</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if job.parser_result and job.parser_result.devices %}
+            {% for device in job.parser_result.devices %}
+            <tr>
+                <td>{{ device.name }}</td>
+                <td><code>{{ device.profile }}</code></td>
+                <td>
+                    <ul>
+                        <li>interfaces: {{ device.summary.interfaces_count }}</li>
+                        <li>ipv4: {{ device.summary.ipv4_interfaces_count }}</li>
+                        <li>ipv6: {{ device.summary.ipv6_interfaces_count }}</li>
+                        <li>bgp: {{ device.summary.bgp_peers_count }}</li>
+                    </ul>
+                </td>
+                <td>
+                    {% if device.warnings %}
+                        <ul>
+                        {% for warning in device.warnings %}
+                            <li>{{ warning }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span>Nenhum aviso.</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if device.files and device.files.parsed_inventory_report_path %}
+                        <a href="/reports/download?path={{ device.files.parsed_inventory_report_path }}">PARSED-INVENTORY.md</a>
+                    {% else %}
+                        <span>missing</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="5">Nenhum inventário parseado localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+    {% if job.parser_result_markdown %}
+    <pre class="pre-wrap">{{ job.parser_result_markdown }}</pre>
+    {% endif %}
+    {% if job.parser_safety_validation_markdown %}
+    <pre class="pre-wrap">{{ job.parser_safety_validation_markdown }}</pre>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Achados de Compliance</div>
+    <p>Comparação local-only entre inventário parseado e registry de políticas. Nenhuma correção é gerada.</p>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">Blockers</div>
+            <div class="summary-value">{{ job.comparison_result.summary.blockers if job.comparison_result else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Errors</div>
+            <div class="summary-value">{{ job.comparison_result.summary.errors if job.comparison_result else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Warnings</div>
+            <div class="summary-value">{{ job.comparison_result.summary.warnings if job.comparison_result else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Info</div>
+            <div class="summary-value">{{ job.comparison_result.summary.info if job.comparison_result else 0 }}</div>
+        </div>
+    </div>
+    {% if job.comparison_result and job.comparison_result.files and job.comparison_result.files.comparison_result_report_path %}
+    <p><a href="/reports/download?path={{ job.comparison_result.files.comparison_result_report_path }}">COMPLIANCE-COMPARISON-RESULT.md</a></p>
+    {% endif %}
+    {% if job.comparison_result and job.comparison_result.devices %}
+    <div class="summary-grid">
+        {% for device in job.comparison_result.devices %}
+        <div class="summary-card">
+            <div class="summary-label">{{ device.name }}</div>
+            {% if device.files and device.files.findings_markdown_report_path %}
+            <div class="summary-value"><a href="/reports/download?path={{ device.files.findings_markdown_report_path }}">COMPLIANCE-FINDINGS.md</a></div>
+            {% else %}
+            <div class="summary-value">missing</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <table>
+        <thead>
+            <tr>
+                <th>Severity</th>
+                <th>Scope</th>
+                <th>Object</th>
+                <th>Rule</th>
+                <th>Title</th>
+                <th>Recommendation</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if job.comparison_result and job.comparison_result.devices %}
+            {% for device in job.comparison_result.devices %}
+                {% for finding in device.findings %}
+                <tr>
+                    <td><code>{{ finding.severity }}</code></td>
+                    <td>{{ finding.scope }}</td>
+                    <td>{{ finding.object_name }}</td>
+                    <td><code>{{ finding.rule_id }}</code></td>
+                    <td>{{ finding.title }}</td>
+                    <td>{{ finding.recommendation }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="6">Nenhum finding localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+    {% if job.comparison_result_markdown %}
+    <pre class="pre-wrap">{{ job.comparison_result_markdown }}</pre>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Revisão dos Achados</div>
+    <p>Registro local de decisões sobre achados. Nenhuma escrita em NetBox.</p>
+    {% if job.comparison_result %}
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">Total de achados</div>
+            <div class="summary-value">
+                {% if job.remediation_draft_eligibility and job.remediation_draft_eligibility.summary %}
+                    {{ job.remediation_draft_eligibility.summary.total_findings }}
+                {% elif job.comparison_result and job.comparison_result.summary %}
+                    {{ job.comparison_result.summary.blockers + job.comparison_result.summary.errors + job.comparison_result.summary.warnings + job.comparison_result.summary.info }}
+                {% else %}
+                    0
+                {% endif %}
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Pendentes</div>
+            <div class="summary-value">
+                {% if job.remediation_draft_eligibility and job.remediation_draft_eligibility.summary %}
+                    {{ job.remediation_draft_eligibility.summary.pending }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Requer correção</div>
+            <div class="summary-value">
+                {% if job.remediation_draft_eligibility and job.remediation_draft_eligibility.summary %}
+                    {{ job.remediation_draft_eligibility.summary.needs_remediation }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Bloqueados</div>
+            <div class="summary-value">
+                {% if job.remediation_draft_eligibility and job.remediation_draft_eligibility.summary %}
+                    {{ job.remediation_draft_eligibility.summary.blocked }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Severity</th>
+                <th>Scope</th>
+                <th>Object</th>
+                <th>Rule</th>
+                <th>Title</th>
+                <th>Recommendation</th>
+                <th>Decisão</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if job.comparison_result and job.comparison_result.devices %}
+            {% for device in job.comparison_result.devices %}
+                {% for finding in device.findings %}
+                <tr class="finding-row" data-finding-id="{{ finding.finding_id }}">
+                    <td><code>{{ finding.severity }}</code></td>
+                    <td>{{ finding.scope }}</td>
+                    <td>{{ finding.object_name }}</td>
+                    <td><code>{{ finding.rule_id }}</code></td>
+                    <td>{{ finding.title }}</td>
+                    <td>{{ finding.recommendation }}</td>
+                    <td class="decision-cell">
+                        {% if job.review_decisions and job.review_decisions.decisions and finding.finding_id in job.review_decisions.decisions %}
+                            <span class="decision-status">{{ job.review_decisions.decisions[finding.finding_id].status }}</span>
+                        {% else %}
+                            <span class="decision-status pending">pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="review-buttons">
+                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="accepted" title="Aceitar">✓</button>
+                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="false_positive" title="False Positive">FP</button>
+                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="ignored_temporarily" title="Ignorar temporariamente">↷</button>
+                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="needs_remediation" title="Requer correção">⚡</button>
+                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="needs_more_evidence" title="Precisa de evidência">?</button>
+                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="blocked" title="Bloquear">⊗</button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="8">Nenhum achado localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+    <div style="margin-top: 1em; padding: 1em; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+        <h3>Avaliar Elegibilidade para Rascunho de Correção</h3>
+        <button type="button" class="btn btn-primary btn-small" id="eligibility-btn">Avaliar elegibilidade</button>
+        {% if job.remediation_draft_eligibility %}
+        <div style="margin-top: 1em;">
+            <p><strong>Status:</strong> <code>{{ job.remediation_draft_eligibility.decision }}</code></p>
+            {% if job.remediation_draft_eligibility_markdown %}
+            <pre class="pre-wrap">{{ job.remediation_draft_eligibility_markdown }}</pre>
+            {% else %}
+            <pre class="pre-wrap">{{ job.remediation_draft_eligibility | tojson(indent=2) }}</pre>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <p>Executar comparação com políticas para habilitar revisão.</p>
+    {% endif %}
+</div>
+
+<div class="alert alert-info">
+    <strong>Aviso:</strong> Nenhuma conexão com equipamento foi iniciada.
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const button = document.getElementById("prepare-start-gate-btn");
+    const collectionButton = document.getElementById("prepare-collection-btn");
+    if (!button) {
+        return;
+    }
+    button.addEventListener("click", async function() {
+        button.disabled = true;
+        try {
+            const response = await fetch("/compliance/jobs/{{ job.job_id }}/collection/start-gate", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({"operator": "Keslley", "confirm": true})
+            });
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                alert(data.error || "Falha ao preparar start gate");
+                return;
+            }
+            window.location.reload();
+        } catch (error) {
+            alert("Falha ao preparar start gate");
+        } finally {
+            button.disabled = false;
+        }
+    });
+    if (collectionButton) {
+        collectionButton.addEventListener("click", async function() {
+            collectionButton.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/collection/execute", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({"operator": "Keslley", "confirm_read_only": true})
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.error || "Falha ao preparar coleta read-only");
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Falha ao preparar coleta read-only");
+            } finally {
+                collectionButton.disabled = false;
+            }
+        });
+    }
+    const sshPreflightButton = document.getElementById("ssh-preflight-btn");
+    const sshExecuteButton = document.getElementById("ssh-execute-btn");
+    if (sshPreflightButton) {
+        sshPreflightButton.addEventListener("click", async function() {
+            sshPreflightButton.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/collection/ssh-preflight", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({"operator": "Keslley", "confirm_read_only": true})
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.error || "Falha ao validar pré-requisitos SSH");
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Falha ao validar pré-requisitos SSH");
+            } finally {
+                sshPreflightButton.disabled = false;
+            }
+        });
+    }
+    if (sshExecuteButton) {
+        sshExecuteButton.addEventListener("click", async function() {
+            sshExecuteButton.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/collection/ssh-execute", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({"operator": "Keslley", "confirm_execute_read_only": true})
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.error || "Falha ao executar coleta SSH read-only");
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Falha ao executar coleta SSH read-only");
+            } finally {
+                sshExecuteButton.disabled = false;
+            }
+        });
+    }
+    const parseButton = document.getElementById("parse-btn");
+    const parseValidationButton = document.getElementById("parse-validation-btn");
+    if (parseButton) {
+        parseButton.addEventListener("click", async function() {
+            parseButton.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/parse", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({"operator": "Keslley", "confirm_local_parse": true})
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.error || "Falha ao executar parser local");
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Falha ao executar parser local");
+            } finally {
+                parseButton.disabled = false;
+            }
+        });
+    }
+    if (parseValidationButton) {
+        parseValidationButton.addEventListener("click", async function() {
+            parseValidationButton.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/parse/validation", {
+                    method: "GET",
+                    headers: {"Accept": "application/json"}
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.error || "Falha ao validar parser");
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Falha ao validar parser");
+            } finally {
+                parseValidationButton.disabled = false;
+            }
+        });
+    }
+    const compareButton = document.getElementById("compare-btn");
+    if (compareButton) {
+        compareButton.addEventListener("click", async function() {
+            compareButton.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/compare", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({"operator": "Keslley", "confirm_local_compare": true})
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.error || "Falha ao comparar com políticas");
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Falha ao comparar com políticas");
+            } finally {
+                compareButton.disabled = false;
+            }
+        });
+    }
+    document.querySelectorAll(".review-btn").forEach(btn => {
+        btn.addEventListener("click", async function(event) {
+            event.preventDefault();
+            const findingId = this.dataset.findingId;
+            const decision = this.dataset.decision;
+            const reviewer = prompt("Seu nome (revisor):");
+            if (!reviewer) return;
+            const reason = prompt("Motivo da decisão:");
+            if (!reason) return;
+            const payload = {
+                reviewer: reviewer,
+                reason: reason,
+                decision: decision
+            };
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/findings/" + findingId + "/decision", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert("Erro ao registrar decisão: " + (data.error || "Falha desconhecida"));
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Erro ao registrar decisão: " + error.message);
+            }
+        });
+    });
+    const eligibilityBtn = document.getElementById("eligibility-btn");
+    if (eligibilityBtn) {
+        eligibilityBtn.addEventListener("click", async function() {
+            eligibilityBtn.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/remediation/draft-eligibility", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({confirm_review_complete: true})
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert("Erro ao avaliar elegibilidade: " + (data.error || "Falha desconhecida"));
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Erro ao avaliar elegibilidade: " + error.message);
+            } finally {
+                eligibilityBtn.disabled = false;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

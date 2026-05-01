@@ -1,4 +1,4 @@
-# Current State — 2026-05-01 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.93, 2.32, CANDIDATES-001–027 Complete, COMPLIANCE-COMPARE-001–004 Complete)
+# Current State — 2026-05-01 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.93, 2.32, CANDIDATES-001–027 Complete, COMPLIANCE-COMPARE-001–004 Complete, COMPLIANCE-REVIEW-001–004 Complete)
 
 ## Operational Status
 
@@ -50,6 +50,18 @@ FASE 4.1: Cycle template generation functional. First cycle can be created via t
 - `POST /compliance/jobs/{job_id}/collection/start-gate` validates the explicit gate and writes local start-gate artifacts only.
 - `POST /compliance/jobs/{job_id}/collection/plan` builds a read-only plan per device and never starts collection.
 - New artifacts live in `reports/compliance/jobs/<job_id>/` and remain local-only.
+
+**COMPLIANCE-REVIEW-001-004 COMPLETE** — Findings Review Workflow + Decision Audit Trail + Remediation Draft Eligibility Gate
+
+- Findings review service at `webui/services/compliance_findings_review.py` with 6 functions: load_findings, load_review_decisions, validate_finding_decision, save_finding_decision, summarize_review, evaluate_remediation_draft_eligibility.
+- Decision validation: 6 allowed decisions (accepted, false_positive, ignored_temporarily, needs_remediation, needs_more_evidence, blocked) mapped to logical statuses.
+- Audit trail: immutable JSON files per decision under `review/audit/{finding_id}-{ISO-timestamp}.json` for full traceability.
+- HTTP endpoints: `POST /compliance/jobs/{job_id}/findings/{finding_id}/decision` (record decision), `GET /compliance/jobs/{job_id}/findings/review-summary` (aggregated counts), `POST /compliance/jobs/{job_id}/remediation/draft-eligibility` (eligibility gate).
+- Eligibility gate: 4 independent checks (has_findings, critical_reviewed, no_blocked_findings, has_remediation_candidates) → REMEDIATION_DRAFT_ELIGIBLE, ELIGIBLE_WITH_WARNINGS, or BLOCKED.
+- Job detail UI shows "Revisão dos Achados" section with review summary cards, per-finding decision buttons, decision status display, and eligibility evaluation button.
+- All review operations are local: no NetBox writes, no device connections, no ApprovalRecord or ApplyPlan creation.
+- Artifacts: `review/finding-decisions.json`, `review/FINDING-DECISIONS.md`, `review/remediation-draft-eligibility.json`, `review/REMEDIATION-DRAFT-ELIGIBILITY.md`, audit trail files.
+- 40 tests covering decision validation, persistence, audit trails, eligibility gate evaluation, safety blocks — all passing.
 
 **COMPLIANCE-COMPARE-001-004 COMPLETE** — Policy Registry Loader + Compare Engine + Findings Artifacts + Findings UI
 

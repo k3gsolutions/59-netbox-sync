@@ -65,6 +65,22 @@ from .services.compliance_candidates import (
     list_compliance_candidates,
     is_compliance_candidate,
 )
+from .services.compliance_jobs import (
+    create_collection_plan,
+    create_collection_start_gate,
+    create_compliance_job,
+    get_compliance_job_safety,
+    list_compliance_jobs,
+    load_collection_artifacts,
+    load_compliance_job,
+)
+from .services.compliance_compare import compare_job
+from .services.compliance_huawei_ne8000_parser import parse_job_collection
+from .services.compliance_parser_validation import validate_parser_outputs
+from .services.compliance_collection import execute_collection_job
+from .services.compliance_raw_validation import validate_raw_collection_outputs
+from .services.compliance_ssh_collection import execute_ssh_readonly_collection
+from .services.compliance_ssh_preflight import run_ssh_preflight
 
 
 # Setup
@@ -2627,6 +2643,333 @@ async def get_compliance_candidates(
         )
 
 
+@app.get("/compliance/jobs", response_class=HTMLResponse)
+async def compliance_jobs_list(request: Request):
+    """List prepared compliance jobs."""
+    jobs = list_compliance_jobs()
+    context = {
+        "request": request,
+        "title": "Compliance Jobs",
+        "jobs": jobs,
+    }
+    return templates.TemplateResponse("compliance_jobs.html", context)
+
+
+@app.get("/compliance/jobs/{job_id}", response_class=HTMLResponse)
+async def compliance_job_detail(request: Request, job_id: str):
+    """Show one compliance job detail page."""
+    try:
+        job = load_compliance_job(job_id)
+    except KeyError:
+        return HTMLResponse("<h1>Job not found</h1>", status_code=404)
+
+    context = {
+        "request": request,
+        "title": f"Compliance Job: {job_id}",
+        "job": job,
+    }
+    return templates.TemplateResponse("compliance_job_detail.html", context)
+
+
+@app.post("/compliance/jobs/{job_id}/collection/start-gate", response_class=JSONResponse)
+async def compliance_job_collection_start_gate(job_id: str, request: Request):
+    """Prepare the read-only collection start gate."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm = bool(payload.get("confirm"))
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm is not True:
+        return JSONResponse({"success": False, "error": "confirm deve ser true"}, status_code=400)
+
+    try:
+        result = create_collection_start_gate(job_id, operator, confirm)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    status_code = 200 if result["decision"] == "COLLECTION_START_GATE_READY" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/collection/plan", response_class=JSONResponse)
+async def compliance_job_collection_plan(job_id: str):
+    """Create the local read-only collection plan."""
+    try:
+        result = create_collection_plan(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    status_code = 200 if result["decision"] == "COLLECTION_PLAN_PREPARED" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/collection/execute", response_class=JSONResponse)
+async def compliance_job_collection_execute(job_id: str, request: Request):
+    """Prepare the local read-only collection simulation."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_read_only = bool(payload.get("confirm_read_only"))
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_read_only is not True:
+        return JSONResponse({"success": False, "error": "confirm_read_only deve ser true"}, status_code=400)
+
+    try:
+        result = execute_collection_job(job_id, operator, simulation_only=True)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if result["decision"] == "COLLECTION_SAFETY_VALID" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.get("/compliance/jobs/{job_id}/collection/validation", response_class=JSONResponse)
+async def compliance_job_collection_validation(job_id: str):
+    """Return the local safety validation artifact."""
+    try:
+        result = load_collection_artifacts(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    if not result.get("safety_validation"):
+        return JSONResponse({"success": False, "error": "Validation not found"}, status_code=404)
+
+    return JSONResponse({"success": True, **result})
+
+
+@app.post("/compliance/jobs/{job_id}/collection/ssh-preflight", response_class=JSONResponse)
+async def compliance_job_collection_ssh_preflight(job_id: str, request: Request):
+    """Validate SSH preflight for read-only collection."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_read_only = bool(payload.get("confirm_read_only"))
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_read_only is not True:
+        return JSONResponse({"success": False, "error": "confirm_read_only deve ser true"}, status_code=400)
+
+    try:
+        result = run_ssh_preflight(job_id, operator, confirm_read_only)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    status_code = 200 if result["decision"] != "SSH_PREFLIGHT_BLOCKED" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/collection/ssh-execute", response_class=JSONResponse)
+async def compliance_job_collection_ssh_execute(job_id: str, request: Request):
+    """Execute controlled SSH read-only collection."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_execute_read_only = bool(payload.get("confirm_execute_read_only"))
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_execute_read_only is not True:
+        return JSONResponse({"success": False, "error": "confirm_execute_read_only deve ser true"}, status_code=400)
+
+    try:
+        result = execute_ssh_readonly_collection(job_id, operator, confirm_execute_read_only)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+    except RuntimeError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=503)
+
+    validation = {}
+    if result.get("decision") in {"SSH_COLLECTION_COMPLETED", "SSH_COLLECTION_COMPLETED_WITH_ERRORS"}:
+        try:
+            validation = validate_raw_collection_outputs(job_id)
+        except KeyError:
+            validation = {}
+
+    status_code = 200 if result["decision"] in {"SSH_COLLECTION_COMPLETED", "SSH_COLLECTION_COMPLETED_WITH_ERRORS"} else 409
+    return JSONResponse({"success": True, "raw_validation": validation, **result}, status_code=status_code)
+
+
+@app.get("/compliance/jobs/{job_id}/collection/raw-validation", response_class=JSONResponse)
+async def compliance_job_collection_raw_validation(job_id: str):
+    """Return the raw output safety validation artifact."""
+    try:
+        load_compliance_job(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    try:
+        result = validate_raw_collection_outputs(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    return JSONResponse({"success": True, **result})
+
+
+@app.post("/compliance/jobs/{job_id}/parse", response_class=JSONResponse)
+async def compliance_job_parse(job_id: str, request: Request):
+    """Run the local Huawei NE8000 parser baseline."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_local_parse = bool(payload.get("confirm_local_parse"))
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_local_parse is not True:
+        return JSONResponse({"success": False, "error": "confirm_local_parse deve ser true"}, status_code=400)
+
+    try:
+        job = load_compliance_job(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    parser_manifest = job.get("parser_manifest") or {}
+    raw_validation = job.get("raw_output_safety_validation") or {}
+    if not parser_manifest:
+        return JSONResponse({"success": False, "error": "parser manifest ausente"}, status_code=409)
+    if raw_validation.get("decision") == "RAW_OUTPUT_SAFETY_INVALID":
+        return JSONResponse({"success": False, "error": "raw output safety validation inválida"}, status_code=409)
+
+    try:
+        result = parse_job_collection(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    status_code = 200 if result["decision"] in {"PARSER_COMPLETED", "PARSER_COMPLETED_WITH_WARNINGS"} else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.get("/compliance/jobs/{job_id}/parse/validation", response_class=JSONResponse)
+async def compliance_job_parse_validation(job_id: str):
+    """Return parser safety validation artifact."""
+    try:
+        load_compliance_job(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    try:
+        result = validate_parser_outputs(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    status_code = 200 if result["decision"] != "PARSER_SAFETY_INVALID" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/compare", response_class=JSONResponse)
+async def compliance_job_compare(job_id: str, request: Request):
+    """Compare parsed inventory to compliance policies locally."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_local_compare = bool(payload.get("confirm_local_compare"))
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_local_compare is not True:
+        return JSONResponse({"success": False, "error": "confirm_local_compare deve ser true"}, status_code=400)
+
+    try:
+        job = load_compliance_job(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    parser_result = job.get("parser_result") or {}
+    parser_validation = job.get("parser_safety_validation") or {}
+    if not parser_result:
+        return JSONResponse({"success": False, "error": "parser-result.json ausente"}, status_code=409)
+    if parser_validation.get("decision") == "PARSER_SAFETY_INVALID":
+        return JSONResponse({"success": False, "error": "parser safety validation inválida"}, status_code=409)
+
+    try:
+        result = compare_job(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    status_code = 200 if result["decision"] != "COMPLIANCE_COMPARE_BLOCKED" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/findings/{finding_id}/decision", response_class=JSONResponse)
+async def compliance_finding_decision(job_id: str, finding_id: str, request: Request):
+    """Record decision for a single finding."""
+    try:
+        payload = await request.json()
+    except Exception as e:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {e}"}, status_code=400)
+
+    from .services.compliance_findings_review import save_finding_decision
+
+    try:
+        result = save_finding_decision(job_id, finding_id, payload)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    if not result.get("success"):
+        return JSONResponse(result, status_code=400)
+
+    return JSONResponse(result, status_code=200)
+
+
+@app.get("/compliance/jobs/{job_id}/findings/review-summary", response_class=JSONResponse)
+async def compliance_findings_review_summary(job_id: str, request: Request):
+    """Get review summary for a job."""
+    from .services.compliance_findings_review import summarize_review
+
+    try:
+        result = summarize_review(job_id)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.post("/compliance/jobs/{job_id}/remediation/draft-eligibility", response_class=JSONResponse)
+async def compliance_remediation_draft_eligibility(job_id: str, request: Request):
+    """Evaluate eligibility for remediation draft creation."""
+    try:
+        payload = await request.json()
+    except Exception as e:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {e}"}, status_code=400)
+
+    confirm = payload.get("confirm_review_complete")
+    if confirm is not True:
+        return JSONResponse({"success": False, "error": "confirm_review_complete deve ser true"}, status_code=400)
+
+    from .services.compliance_findings_review import evaluate_remediation_draft_eligibility
+
+    try:
+        result = evaluate_remediation_draft_eligibility(job_id)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    status_code = 200 if result["decision"] == "REMEDIATION_DRAFT_ELIGIBLE" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
 @app.post("/compliance/analyze", response_class=JSONResponse)
 async def analyze_compliance(request: Request):
     """Manual compliance start guard — re-validates eligibility, creates job artifact."""
@@ -2699,8 +3042,6 @@ async def analyze_compliance(request: Request):
 
     # Create local job artifact
     try:
-        from services.compliance_jobs import create_compliance_job
-
         job = create_compliance_job(device_ids, candidates, triggered_by, mode)
     except Exception as e:
         return JSONResponse(
@@ -2716,13 +3057,7 @@ async def analyze_compliance(request: Request):
             "confirmed_eligible": confirmed_eligible,
             "ineligible": [],
             "message": "Job local de Compliance criado para revisão. Nenhuma coleta foi iniciada.",
-            "safety": {
-                "read_only": True,
-                "netbox_write": False,
-                "device_connection": False,
-                "auto_compliance_started": False,
-                "job_only": True,
-            },
+            "safety": {**get_compliance_job_safety(), "read_only": True, "auto_compliance_started": False, "job_only": True},
         }
     )
 
