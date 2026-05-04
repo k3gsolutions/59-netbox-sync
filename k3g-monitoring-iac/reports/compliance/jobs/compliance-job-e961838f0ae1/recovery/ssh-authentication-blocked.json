@@ -1,0 +1,95 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "status": "SSH_AUTHENTICATION_BLOCKED",
+  "blocked_at": "2026-05-04T18:40:00Z",
+  "reason": "SSH authentication failed on attempted connection",
+  "device": {
+    "device_id": 1890,
+    "name": "4WNET-MNS-KTG-RX",
+    "target_ip": "104.234.244.255",
+    "target_port": 51212
+  },
+  "connection": {
+    "source": "connection_override",
+    "override_applied": true,
+    "override_file": "reports/compliance/jobs/compliance-job-e961838f0ae1/connection-override.json"
+  },
+  "checks": {
+    "collection_start_gate_ready": true,
+    "collection_plan_prepared": true,
+    "collection_safety_valid": true,
+    "ssh_preflight_ready": true,
+    "tcp_connectivity": "OPEN",
+    "ssh_authentication": "FAILED",
+    "ssh_error": "Authentication failed."
+  },
+  "collection_state": {
+    "commands_executed": 0,
+    "raw_files_collected": false,
+    "redacted_files_created": false,
+    "raw_output_bytes": 0,
+    "parser_can_run": false,
+    "compare_can_run": false
+  },
+  "blocking_chain": [
+    "SSH auth failed → no raw data collected",
+    "No raw data → parser cannot run",
+    "Parser not run → no parsed-inventory.json",
+    "No parsed data → compare cannot run",
+    "No findings → review cannot proceed",
+    "No remediation → no applyplan items",
+    "No items → cycle-004 package stays empty",
+    "Empty package → real-write execution blocked"
+  ],
+  "next_actions_required": [
+    {
+      "action": 1,
+      "title": "Validate Credentials",
+      "checks": [
+        "COMPLIANCE_SSH_USERNAME is correct",
+        "COMPLIANCE_SSH_PASSWORD is correct",
+        "No special character encoding issues",
+        "Credentials valid for port 51212"
+      ]
+    },
+    {
+      "action": 2,
+      "title": "Validate SSH Configuration",
+      "checks": [
+        "Port 51212 uses password auth (not key-only)",
+        "SSH protocol version supported",
+        "No unusual SSH config on device"
+      ]
+    },
+    {
+      "action": 3,
+      "title": "Validate Network Path",
+      "checks": [
+        "104.234.244.255:51212 is correct SSH endpoint",
+        "No JumpServer/bastion required",
+        "Firewall/ACL allows access"
+      ]
+    },
+    {
+      "action": 4,
+      "title": "Manual SSH Test",
+      "command": "ssh -p 51212 <username>@104.234.244.255"
+    }
+  ],
+  "recovery_blocked_until": "SSH authentication succeeds on 104.234.244.255:51212",
+  "safety": {
+    "no_write_attempted": true,
+    "no_commands_executed": true,
+    "no_raw_output_saved": true,
+    "no_parser_run": true,
+    "no_data_change": true,
+    "connection_override_logged": true
+  },
+  "do_not": [
+    "Skip authentication validation and use fixtures",
+    "Force parser on empty raw data",
+    "Proceed to compare/review without real findings",
+    "Rebuild cycle-004 without real applyplan items",
+    "Execute cycle-004 real-write with empty package"
+  ]
+}

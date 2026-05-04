@@ -64,6 +64,8 @@ from .services.netbox_client import (
 from .services.compliance_candidates import (
     list_compliance_candidates,
     is_compliance_candidate,
+    enrich_tenant_group_if_missing,
+    normalize_compliance_candidate,
 )
 from .services.compliance_jobs import (
     create_collection_plan,
