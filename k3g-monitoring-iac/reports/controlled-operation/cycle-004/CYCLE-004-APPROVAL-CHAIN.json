@@ -1,0 +1,15 @@
+{
+  "cycle_id": "cycle-004",
+  "source_job_id": "compliance-job-fbdda0de527c",
+  "device_id": 1890,
+  "status": "APPROVAL_CHAIN_BUILT",
+  "built_at": "2026-05-04T17:35:12.571318Z",
+  "approval_records": [],
+  "applyplan_items": [],
+  "item_count": 0,
+  "safety": {
+    "no_netbox_write": true,
+    "no_device_connection": true,
+    "validation_only": true
+  }
+}

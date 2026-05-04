@@ -1,0 +1,13 @@
+{
+  "cycle_id": "cycle-004",
+  "status": "DRYRUN_EXECUTION_COMPLETED",
+  "executed_at": "2026-05-04T17:35:12.571868Z",
+  "items_simulated": 0,
+  "success_count": 0,
+  "failed_count": 0,
+  "safety": {
+    "netbox_write": false,
+    "device_connection": false,
+    "dryrun_only": true
+  }
+}

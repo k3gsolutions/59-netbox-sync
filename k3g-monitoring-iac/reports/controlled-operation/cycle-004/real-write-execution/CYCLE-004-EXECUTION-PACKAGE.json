@@ -1,0 +1,21 @@
+{
+  "cycle_id": "cycle-004",
+  "status": "REALWRITE_CHAIN_PREPARED",
+  "prepared_at": "2026-05-04T17:35:12.572297Z",
+  "authorization_id": "6EF720EC",
+  "execution_id": "EC4AD22E",
+  "required_authorization_phrase": "AUTORIZO_PRE_FLIGHT_ESCRITA_REAL_cycle-004_6EF720EC",
+  "required_execution_phrase": "EXECUTAR_ESCRITA_REAL_cycle-004_EC4AD22E",
+  "execution_allowed": false,
+  "token_required_in_next_phase": true,
+  "one_shot_execution": true,
+  "items": [],
+  "item_count": 0,
+  "safety": {
+    "netbox_write": false,
+    "device_connection": false,
+    "execution_allowed_locked": true,
+    "no_automatic_retry": true,
+    "no_automatic_rollback": true
+  }
+}
