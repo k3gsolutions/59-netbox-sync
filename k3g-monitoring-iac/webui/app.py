@@ -3576,6 +3576,20 @@ async def compliance_closure_package(job_id: str, request: Request):
     return JSONResponse({"success": True, **result}, status_code=status_code)
 
 
+@app.get("/compliance/jobs/{job_id}/ops/readiness", response_class=JSONResponse)
+async def compliance_ops_readiness(job_id: str, request: Request):
+    """COMPLIANCE-OPS-001: Check job readiness for real-write execution."""
+    from .services.compliance_ops_readiness import validate_compliance_job_realwrite_readiness
+
+    try:
+        result = validate_compliance_job_realwrite_readiness(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if result.get("blocker_count", 0) == 0 else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
 @app.post("/compliance/analyze", response_class=JSONResponse)
 async def analyze_compliance(request: Request):
     """Manual compliance start guard — re-validates eligibility, creates job artifact."""
