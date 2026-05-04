@@ -3248,6 +3248,50 @@ async def compliance_applyplan_candidate_gate(job_id: str, request: Request):
     return JSONResponse({"success": True, **gate_result}, status_code=status_code)
 
 
+@app.post("/compliance/jobs/{job_id}/applyplan/candidate", response_class=JSONResponse)
+async def compliance_build_applyplan_candidate(job_id: str, request: Request):
+    """Build ApplyPlan candidate from proposed ApprovalRecords."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_build_applyplan_candidate = payload.get("confirm_build_applyplan_candidate")
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_build_applyplan_candidate is not True:
+        return JSONResponse(
+            {"success": False, "error": "confirm_build_applyplan_candidate deve ser true"},
+            status_code=400,
+        )
+
+    from .services.compliance_applyplan_candidates import build_applyplan_candidate
+
+    try:
+        result = build_applyplan_candidate(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.get("/compliance/jobs/{job_id}/applyplan/candidate/validation", response_class=JSONResponse)
+async def compliance_validate_applyplan_candidate(job_id: str, request: Request):
+    """Validate ApplyPlan candidate."""
+    from .services.compliance_applyplan_validation import validate_applyplan_candidate
+
+    try:
+        result = validate_applyplan_candidate(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if result["decision"] != "APPLYPLAN_CANDIDATE_INVALID" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
 @app.post("/compliance/analyze", response_class=JSONResponse)
 async def analyze_compliance(request: Request):
     """Manual compliance start guard — re-validates eligibility, creates job artifact."""
