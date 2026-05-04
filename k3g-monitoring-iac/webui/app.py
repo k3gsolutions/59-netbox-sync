@@ -3504,6 +3504,78 @@ async def compliance_realwrite_freeze(job_id: str, request: Request):
     return JSONResponse({"success": True, **result}, status_code=200)
 
 
+@app.post("/compliance/jobs/{job_id}/real-write/post-verification", response_class=JSONResponse)
+async def compliance_post_verification(job_id: str, request: Request):
+    """REALWRITE-008: Post-write verification — validate created objects."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm = payload.get("confirm_post_verification")
+    if not operator or confirm is not True:
+        return JSONResponse({"success": False, "error": "operator e confirm obrigatórios"}, status_code=400)
+
+    from .services.compliance_realwrite_postwrite import evaluate_postwrite_verification
+
+    try:
+        result = evaluate_postwrite_verification(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if "NOT_APPLICABLE" in result.get("decision", "") or result.get("decision") == "POSTWRITE_VERIFICATION_PASSED" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/real-write/compliance-rerun", response_class=JSONResponse)
+async def compliance_post_compliance_rerun(job_id: str, request: Request):
+    """REALWRITE-009: Post-write compliance re-run — local comparison only."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm = payload.get("confirm_compliance_rerun")
+    if not operator or confirm is not True:
+        return JSONResponse({"success": False, "error": "operator e confirm obrigatórios"}, status_code=400)
+
+    from .services.compliance_realwrite_postwrite import evaluate_postwrite_compliance_rerun
+
+    try:
+        result = evaluate_postwrite_compliance_rerun(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if "NOT_APPLICABLE" in result.get("decision", "") or result.get("decision") == "COMPLIANCE_RERUN_PASSED" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/real-write/closure", response_class=JSONResponse)
+async def compliance_closure_package(job_id: str, request: Request):
+    """REALWRITE-010: Build closure package and close job."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm = payload.get("confirm_closure")
+    if not operator or confirm is not True:
+        return JSONResponse({"success": False, "error": "operator e confirm obrigatórios"}, status_code=400)
+
+    from .services.compliance_realwrite_closure import build_realwrite_closure_package
+
+    try:
+        result = build_realwrite_closure_package(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
 @app.post("/compliance/analyze", response_class=JSONResponse)
 async def analyze_compliance(request: Request):
     """Manual compliance start guard — re-validates eligibility, creates job artifact."""

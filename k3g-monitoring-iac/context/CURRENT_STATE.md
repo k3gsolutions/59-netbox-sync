@@ -104,6 +104,33 @@ FASE 4.1: Cycle template generation functional. First cycle can be created via t
 - Artifacts: `review/finding-decisions.json`, `review/FINDING-DECISIONS.md`, `review/remediation-draft-eligibility.json`, `review/REMEDIATION-DRAFT-ELIGIBILITY.md`, audit trail files.
 - 40 tests covering decision validation, persistence, audit trails, eligibility gate evaluation, safety blocks — all passing.
 
+**COMPLIANCE-REALWRITE-001–010 COMPLETE** — Full Real-Write Lifecycle: Authorization → Execution → Verification → Closure
+
+Pre-Execution (REALWRITE-001–006):
+- REALWRITE-001: Readiness gate (validates dry-run passed)
+- REALWRITE-002: Authorization package (generates required_phrase: AUTORIZO_PRE_FLIGHT_ESCRITA_REAL_{job_id}_{auth_id})
+- REALWRITE-003: Final preflight (validates authorization_phrase exact match, case-sensitive)
+- REALWRITE-004: Execution package (builds execution_phrase: EXECUTAR_ESCRITA_REAL_{job_id}_{exec_id}, sets execution_allowed=false lock)
+- REALWRITE-005: Package validation (validates execution_allowed=false, token_required=true, no_retry=true, no_rollback=true)
+- REALWRITE-006: Final freeze (final gate before execution token provided)
+
+Execution (REALWRITE-007):
+- REALWRITE-007: Real-write execution (CLI tool: compliance_execute_realwrite_once.py)
+  - One-shot execution, no retries
+  - Token from NETBOX_WRITE_TOKEN env var (never logged/printed)
+  - Executes per-item with fail-fast on first error
+  - Result written to real-write-execution-result.json (no token stored)
+
+Post-Execution (REALWRITE-008–010):
+- REALWRITE-008: Post-write verification (validates objects created, checks response_id per item)
+- REALWRITE-009: Compliance re-run (local policy comparison, no SSH/SNMP/NETCONF)
+- REALWRITE-010: Closure package (consolidates evidence, generates final decision: SUCCESS / WITH_WARNINGS / NOT_APPLICABLE / ACTION_REQUIRED)
+
+Services: compliance_realwrite_execution.py, compliance_realwrite_postwrite.py, compliance_realwrite_closure.py
+HTTP endpoints: 9 total (6 authorization, 3 post-write)
+Tests: 51 total (12 post-write verification, 9 closure, + 30 from earlier phases)
+All REALWRITE phases: local artifacts only, no NetBox writes until execution, token environment-only, one-shot, no automatic rollback.
+
 **COMPLIANCE-COMPARE-001-004 COMPLETE** — Policy Registry Loader + Compare Engine + Findings Artifacts + Findings UI
 
 - Policy registry loader at `webui/services/compliance_policy_loader.py` loads 13 required YAML compliance policies (no silent fallback).
