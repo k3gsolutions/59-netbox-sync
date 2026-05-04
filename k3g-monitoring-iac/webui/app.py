@@ -3374,6 +3374,136 @@ async def compliance_validate_dryrun_execution(job_id: str, request: Request):
     return JSONResponse({"success": True, **result}, status_code=status_code)
 
 
+@app.post("/compliance/jobs/{job_id}/real-write/readiness-gate", response_class=JSONResponse)
+async def compliance_realwrite_readiness_gate(job_id: str, request: Request):
+    """REALWRITE-001: Evaluate real-write readiness."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm = payload.get("confirm_ready_for_real_write_gate")
+    if not operator or confirm is not True:
+        return JSONResponse({"success": False, "error": "operator e confirm obrigatórios"}, status_code=400)
+
+    from .services.compliance_realwrite_execution import evaluate_realwrite_readiness_gate
+
+    try:
+        result = evaluate_realwrite_readiness_gate(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.post("/compliance/jobs/{job_id}/real-write/authorization-package", response_class=JSONResponse)
+async def compliance_build_authorization_package(job_id: str, request: Request):
+    """REALWRITE-002: Build authorization package with required phrase."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm = payload.get("confirm_build_authorization_package")
+    if not operator or confirm is not True:
+        return JSONResponse({"success": False, "error": "operator e confirm obrigatórios"}, status_code=400)
+
+    from .services.compliance_realwrite_execution import build_realwrite_authorization_package
+
+    try:
+        result = build_realwrite_authorization_package(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.post("/compliance/jobs/{job_id}/real-write/final-preflight", response_class=JSONResponse)
+async def compliance_final_preflight_gate(job_id: str, request: Request):
+    """REALWRITE-003: Final Preflight Gate with phrase validation."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    authorization_phrase = str(payload.get("authorization_phrase") or "").strip()
+    confirm = payload.get("confirm_final_preflight")
+    if not operator or not authorization_phrase or confirm is not True:
+        return JSONResponse({"success": False, "error": "operator, authorization_phrase, confirm obrigatórios"}, status_code=400)
+
+    from .services.compliance_realwrite_execution import validate_realwrite_authorization
+
+    try:
+        result = validate_realwrite_authorization(job_id, operator, authorization_phrase)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.post("/compliance/jobs/{job_id}/real-write/execution-package", response_class=JSONResponse)
+async def compliance_build_execution_package(job_id: str, request: Request):
+    """REALWRITE-004: Build execution package (execution_allowed locked)."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm = payload.get("confirm_build_execution_package")
+    if not operator or confirm is not True:
+        return JSONResponse({"success": False, "error": "operator e confirm obrigatórios"}, status_code=400)
+
+    from .services.compliance_realwrite_execution import build_realwrite_execution_package
+
+    try:
+        result = build_realwrite_execution_package(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.get("/compliance/jobs/{job_id}/real-write/execution-package/validation", response_class=JSONResponse)
+async def compliance_validate_execution_package(job_id: str, request: Request):
+    """REALWRITE-005: Validate execution package."""
+    from .services.compliance_realwrite_execution import validate_realwrite_execution_package
+
+    try:
+        result = validate_realwrite_execution_package(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if result["decision"] == "EXECUTION_PACKAGE_VALID" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/real-write/freeze", response_class=JSONResponse)
+async def compliance_realwrite_freeze(job_id: str, request: Request):
+    """REALWRITE-006: Final no-write freeze before execution."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm = payload.get("confirm_no_write_freeze")
+    if not operator or confirm is not True:
+        return JSONResponse({"success": False, "error": "operator e confirm obrigatórios"}, status_code=400)
+
+    from .services.compliance_realwrite_execution import evaluate_realwrite_freeze
+
+    try:
+        result = evaluate_realwrite_freeze(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
 @app.post("/compliance/analyze", response_class=JSONResponse)
 async def analyze_compliance(request: Request):
     """Manual compliance start guard — re-validates eligibility, creates job artifact."""
