@@ -1,4 +1,4 @@
-# Current State — 2026-05-04 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.93, 2.32, CANDIDATES-001–027 Complete, COMPLIANCE-COMPARE-001–004 Complete, COMPLIANCE-REVIEW-001–004 Complete, COMPLIANCE-REMEDIATION-001–004 Complete, COMPLIANCE-APPROVAL-001–004 Complete)
+# Current State — 2026-05-04 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.93, 2.32, CANDIDATES-001–027 Complete, COMPLIANCE-COMPARE-001–004 Complete, COMPLIANCE-REVIEW-001–004 Complete, COMPLIANCE-REMEDIATION-001–004 Complete, COMPLIANCE-APPROVAL-001–004 Complete, COMPLIANCE-APPROVALRECORD-001–003 Complete, COMPLIANCE-APPLYPLAN-001–004 Complete)
 
 ## Operational Status
 
@@ -13,6 +13,27 @@ FASE 2.60: Baseline generated with scope definition (1 device/cycle, 3 objects, 
 FASE 4.1: Cycle template generation functional. First cycle can be created via template.
 
 ## Latest Status
+
+**COMPLIANCE-APPLYPLAN-001–004 COMPLETE** — ApplyPlan Candidate Builder + Validation + Dry-Run ApplyPlan
+
+- ApplyPlan candidate builder converts proposed ApprovalRecords into items with write_allowed=false, execution_allowed=false.
+- Validation blocks unsafe candidates: write_allowed!=false, execution_allowed!=false, secret keywords, /sync.
+- Dry-run ApplyPlan builder creates mode=dry_run ApplyPlan with execution_allowed=false, can_execute_real_write=false.
+- Dry-run validation checks mode=dry_run, execution_allowed=false, requires_next_gate=true.
+- HTTP endpoints: POST /applyplan/candidate, GET /applyplan/candidate/validation, POST /applyplan/dry-run, GET /applyplan/dry-run/validation.
+- All candidates and plans remain local: no NetBox writes, no SSH/SNMP/NETCONF, no execution.
+- Artifacts: applyplan-candidate.json, applyplan-candidate-validation.json, dry-run-applyplan.json, dry-run-applyplan-validation.json.
+- 16 tests covering building, validation, safety blocks.
+
+**COMPLIANCE-APPROVALRECORD-001–003 COMPLETE** — Proposed ApprovalRecords + Validation + ApplyPlan Gate
+
+- Proposed ApprovalRecord builder converts approval candidates into records with status=proposed, approved=false.
+- Validation blocks: approved!=false, write_allowed!=false, execution_allowed!=false, secret keywords.
+- ApplyPlan candidate gate evaluates readiness to proceed to ApplyPlan building.
+- HTTP endpoints: POST /approval-records/proposed, GET /approval-records/proposed/validation, POST /approval-records/applyplan-candidate-gate.
+- All records remain proposed only: no NetBox writes, no actual ApprovalRecord creation.
+- Artifacts: proposed-approval-records.json, proposed-approval-record-validation.json, applyplan-candidate-gate.json.
+- 14 tests covering record building, validation, gating.
 
 **COMPLIANCE-APPROVAL-001–004 COMPLETE** — Approval Candidates + Validation + Proposal Gate
 
