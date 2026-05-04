@@ -2,6 +2,26 @@
 
 ## [Unreleased]
 
+### Added — COMPLIANCE-APPROVAL-001–004: Approval Candidates, Validation, Proposal Gate
+
+- Approval candidate builder converts safe remediation drafts into approval candidates with unique IDs.
+- Service functions: load_remediation_promotion_gate, load_safe_remediation_drafts, build_approval_candidates, load_approval_candidates, summarize_approval_candidates.
+- HTTP endpoints: `POST /compliance/jobs/{job_id}/approval-candidates` (build), `GET /compliance/jobs/{job_id}/approval-candidates` (load), `POST /compliance/jobs/{job_id}/approval-candidates/proposal-gate` (validate + gate).
+- Approval candidate validation blocks unsafe candidates: write_allowed=true, execution_allowed=true, forbidden commands, secret keywords, safety flags =true.
+- ApprovalRecord proposal gate validates candidates and signals readiness for next phase (READY, READY_WITH_WARNINGS, BLOCKED).
+- All approval artifacts stored locally under `reports/compliance/jobs/<job_id>/approval-candidates/`.
+- No NetBox writes, no SSH/SNMP/NETCONF, no ApprovalRecord creation (gate only signals readiness).
+- Added 30+ tests for candidate building, validation, gate evaluation, and safety blocks.
+
+### Added — COMPLIANCE-REMEDIATION-001–004: Local Drafts, Draft UI, Safety Validation, Promotion Gate
+
+- Local remediation draft generator added for reviewed findings.
+- Job detail UI now shows a remediation draft section with local generation and read-only draft summary.
+- Draft safety validation blocks write-capable or secret-bearing draft payloads.
+- Promotion gate only evaluates readiness for the next flow; it does not create candidates or apply anything.
+- All remediation artifacts remain local under `reports/compliance/jobs/<job_id>/remediation/drafts/`.
+- Added tests for generation, validation, promotion gate, and UI visibility.
+
 ### Added — COMPLIANCE-PARSE-001–004: Huawei Parser Baseline, Parsed Inventory, Safety Validation, UI Summary
 
 - Huawei NE8000 parser baseline added for local redacted outputs.

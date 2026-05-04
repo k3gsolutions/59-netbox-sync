@@ -2970,6 +2970,182 @@ async def compliance_remediation_draft_eligibility(job_id: str, request: Request
     return JSONResponse({"success": True, **result}, status_code=status_code)
 
 
+@app.get("/compliance/jobs/{job_id}/remediation/drafts", response_class=JSONResponse)
+async def compliance_remediation_drafts(job_id: str, request: Request):
+    """Load local remediation draft artifacts for a job."""
+    from .services.compliance_remediation_drafts import load_remediation_drafts
+
+    try:
+        result = load_remediation_drafts(job_id)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.post("/compliance/jobs/{job_id}/remediation/drafts", response_class=JSONResponse)
+async def compliance_generate_remediation_drafts(job_id: str, request: Request):
+    """Generate local remediation drafts only."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_generate_drafts = payload.get("confirm_generate_drafts")
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_generate_drafts is not True:
+        return JSONResponse({"success": False, "error": "confirm_generate_drafts deve ser true"}, status_code=400)
+
+    from .services.compliance_remediation_drafts import generate_remediation_drafts
+
+    try:
+        result = generate_remediation_drafts(job_id, operator)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    if not result.get("success"):
+        return JSONResponse(result, status_code=409)
+
+    return JSONResponse(result, status_code=200)
+
+
+@app.get("/compliance/jobs/{job_id}/remediation/drafts/validation", response_class=JSONResponse)
+async def compliance_validate_remediation_drafts(job_id: str, request: Request):
+    """Validate local remediation drafts for safety."""
+    from .services.compliance_remediation_validation import validate_remediation_drafts
+
+    try:
+        result = validate_remediation_drafts(job_id)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    status_code = 200 if result["decision"] != "REMEDIATION_DRAFTS_UNSAFE" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/remediation/promotion-gate", response_class=JSONResponse)
+async def compliance_remediation_promotion_gate(job_id: str, request: Request):
+    """Gate remediation drafts for the next approval-candidate flow."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_human_reviewed_drafts = payload.get("confirm_human_reviewed_drafts")
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_human_reviewed_drafts is not True:
+        return JSONResponse(
+            {"success": False, "error": "confirm_human_reviewed_drafts deve ser true"},
+            status_code=400,
+        )
+
+    from .services.compliance_remediation_drafts import evaluate_remediation_promotion_gate
+
+    try:
+        result = evaluate_remediation_promotion_gate(job_id, operator, True)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    status_code = 200 if result["decision"] != "REMEDIATION_PROMOTION_BLOCKED" else 409
+    return JSONResponse(result, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/approval-candidates", response_class=JSONResponse)
+async def compliance_build_approval_candidates(job_id: str, request: Request):
+    """Build approval candidates from safe remediation drafts."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_build_candidates = payload.get("confirm_build_candidates")
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_build_candidates is not True:
+        return JSONResponse(
+            {"success": False, "error": "confirm_build_candidates deve ser true"},
+            status_code=400,
+        )
+
+    from .services.compliance_approval_candidates import build_approval_candidates
+
+    try:
+        result = build_approval_candidates(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.get("/compliance/jobs/{job_id}/approval-candidates", response_class=JSONResponse)
+async def compliance_get_approval_candidates(job_id: str, request: Request):
+    """Get existing approval candidates."""
+    from .services.compliance_approval_candidates import load_approval_candidates
+
+    try:
+        candidates = load_approval_candidates(job_id)
+        if not candidates:
+            return JSONResponse(
+                {"success": True, "candidates": [], "candidate_count": 0},
+                status_code=200
+            )
+        return JSONResponse({"success": True, **candidates}, status_code=200)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+
+@app.post("/compliance/jobs/{job_id}/approval-candidates/proposal-gate", response_class=JSONResponse)
+async def compliance_approval_proposal_gate(job_id: str, request: Request):
+    """Validate candidates and gate to ApprovalRecord proposal."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_human_reviewed_candidates = payload.get("confirm_human_reviewed_candidates")
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_human_reviewed_candidates is not True:
+        return JSONResponse(
+            {"success": False, "error": "confirm_human_reviewed_candidates deve ser true"},
+            status_code=400,
+        )
+
+    from .services.compliance_approval_validation import validate_approval_candidates
+    from .services.compliance_approvalrecord_proposal_gate import evaluate_approvalrecord_proposal_gate
+
+    try:
+        validation_result = validate_approval_candidates(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    # Block if unsafe
+    if validation_result.get("decision") == "APPROVAL_CANDIDATES_UNSAFE":
+        return JSONResponse(
+            {"success": False, "validation_decision": validation_result.get("decision"), **validation_result},
+            status_code=409
+        )
+
+    # Evaluate proposal gate
+    try:
+        gate_result = evaluate_approvalrecord_proposal_gate(job_id, operator, confirm_human_reviewed_candidates)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if gate_result.get("decision") in ("APPROVALRECORD_PROPOSAL_READY", "APPROVALRECORD_PROPOSAL_READY_WITH_WARNINGS") else 409
+    return JSONResponse({"success": True, **gate_result}, status_code=status_code)
+
+
 @app.post("/compliance/analyze", response_class=JSONResponse)
 async def analyze_compliance(request: Request):
     """Manual compliance start guard — re-validates eligibility, creates job artifact."""

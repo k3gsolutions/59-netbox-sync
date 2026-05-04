@@ -300,3 +300,7 @@ BLOCKED → Fix issues, re-click button
 - ✓ Gate is idempotent (re-evaluation doesn't change prior decisions)
 - ✓ Result is read-only assessment (no state change before draft creation)
 - ✓ Eligible result does NOT auto-create remediation (manual next step)
+
+## Next Step
+
+When the gate is eligible, the local remediation draft generator may create artifacts under `reports/compliance/jobs/<job_id>/remediation/drafts/`.

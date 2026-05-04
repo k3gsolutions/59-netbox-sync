@@ -10,3 +10,10 @@ reports/pilot-device-compliance/*raw*.json
 # Local real-write secrets
 .env.realwrite.local
 .env*.local
+
+# Local secrets
+.env
+.env.*
+!.env.example
+!.env.webui.example
+!.env.realwrite.example

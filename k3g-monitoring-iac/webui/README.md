@@ -84,6 +84,19 @@ Then open: **http://127.0.0.1:8890**
 - Cycle-002 Week 1 and Week 2 review flow
 - Real-write execution/readiness/verification/compliance/closure pages are read-only views of local artifacts
 
+### Compliance Jobs
+- Job review dashboard for prepared local jobs
+- Job detail page with selected devices, safety block, and markdown gate artifacts
+- Explicit collection start gate, still local-only
+- Read-only collection plan per device
+- Read-only collection simulation and safety validation
+- SSH read-only policy, SSH preflight, controlled SSH execution, and raw output safety validation
+- Vendor collection profiles, redaction, and parser staging
+- Huawei NE8000 local parser baseline, parsed inventory artifacts, and parser safety validation
+- Findings review, remediation draft generation, draft safety validation, and promotion gate
+- Draft artifacts live under `reports/compliance/jobs/<job_id>/remediation/drafts/`
+- No automatic collection, no SSH/SNMP/NETCONF, no NetBox writes
+
 ### Approvals
 - List approval records by status (pending, approved, rejected, applied)
 - View single approval (formatted JSON)
@@ -151,6 +164,7 @@ Then open: **http://127.0.0.1:8890**
 - ✅ No NetBox API calls
 - ✅ No write tokens needed
 - ✅ Secret terms blocked in pending-item forms
+- ✅ Remediation drafts stay local and never create ApprovalRecord or ApplyPlan
 
 ### Safe File Access
 - Paths validated against `reports/` directory only
@@ -176,6 +190,8 @@ webui/
     index.html          # Dashboard
     devices.html        # Device list
     device.html         # Device detail
+    compliance_jobs.html # Compliance job dashboard
+    compliance_job_detail.html # Compliance job detail
     approvals.html      # Approval list
     approval_view.html  # Approval detail
     apply_plans.html    # Apply plan list

@@ -45,6 +45,24 @@ reports/compliance/jobs/<job_id>/
 └── COMPLIANCE-JOB-START-GATE.md         # Human-readable summary
 ```
 
+### FASES COMPLIANCE-JOB-001-003
+
+Depois da preparação inicial, o fluxo segue somente por revisão local:
+
+- `GET /compliance/jobs` lista jobs preparados.
+- `GET /compliance/jobs/{job_id}` abre o detalhe do job.
+- `POST /compliance/jobs/{job_id}/collection/start-gate` valida o gate explícito.
+- `POST /compliance/jobs/{job_id}/collection/plan` gera o plano read-only.
+
+Novos artefatos locais:
+
+- `collection-start-gate.json`
+- `COLLECTION-START-GATE.md`
+- `collection-plan.json`
+- `COLLECTION-PLAN.md`
+
+Nenhuma coleta, SSH, SNMP, NETCONF, NetBox write, ApprovalRecord, ApplyPlan ou `/sync` é executada nesta fase.
+
 ---
 
 ## Job ID Format

@@ -1,4 +1,16 @@
-# Next Actions — 2026-05-01 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2-4.93, COMPLIANCE-COMPARE-001–004 Complete, COMPLIANCE-REVIEW-001–004 Complete)
+# Next Actions — 2026-05-04 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2-4.93, COMPLIANCE-COMPARE-001–004 Complete, COMPLIANCE-REVIEW-001–004 Complete, COMPLIANCE-REMEDIATION-001–004 Complete, COMPLIANCE-APPROVAL-001–004 Complete)
+
+## Current Focus (COMPLIANCE-APPROVAL-001-004)
+
+- Approval candidate builder, validation, and proposal gate are complete.
+- Next operator action is build candidates from safe remediation drafts, validate for security, and evaluate readiness gate.
+- Keep guardrails: no NetBox writes, no `/sync`, no SSH/SNMP/NETCONF, no ApprovalRecord creation (gate only), no ApplyPlan.
+
+## Current Focus (COMPLIANCE-REMEDIATION-001-004)
+
+- Local remediation drafts, validation, and promotion gate are complete.
+- Promotion gate signals readiness for approval-candidate flow.
+- Keep guardrails: no NetBox writes, no `/sync`, no SSH/SNMP/NETCONF, no ApprovalRecord, no ApplyPlan.
 
 ## Current Focus (FASES 4.51-4.58)
 

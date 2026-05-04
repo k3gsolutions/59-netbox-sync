@@ -1,0 +1,31 @@
+profile_id: default-readonly
+vendor: generic
+platform: generic
+allowed_commands:
+  - show version
+  - show interfaces
+forbidden_patterns:
+  - configure
+  - system-view
+  - commit
+  - save
+  - delete
+  - undo
+  - shutdown
+  - reboot
+  - reset
+  - patch
+  - sync
+sensitive_patterns:
+  - password
+  - cipher
+  - simple
+  - authentication
+  - community
+  - snmp-agent community
+  - local-user
+  - ssh user
+  - radius
+  - tacacs
+  - key-chain
+  - private-key

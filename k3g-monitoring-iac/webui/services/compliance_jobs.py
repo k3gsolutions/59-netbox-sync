@@ -388,6 +388,12 @@ def load_compliance_job(job_id: str, jobs_base: Optional[Path] = None) -> dict:
     remediation_draft_eligibility = _load_json(job_dir / "review" / "remediation-draft-eligibility.json")
     finding_decisions_markdown = _load_text(job_dir / "review" / "FINDING-DECISIONS.md")
     remediation_draft_eligibility_markdown = _load_text(job_dir / "review" / "REMEDIATION-DRAFT-ELIGIBILITY.md")
+    remediation_drafts = _load_json(job_dir / "remediation" / "drafts" / "remediation-drafts.json")
+    remediation_drafts_markdown = _load_text(job_dir / "remediation" / "drafts" / "REMEDIATION-DRAFTS.md")
+    remediation_draft_validation = _load_json(job_dir / "remediation" / "drafts" / "remediation-draft-validation.json")
+    remediation_draft_validation_markdown = _load_text(job_dir / "remediation" / "drafts" / "REMEDIATION-DRAFT-VALIDATION.md")
+    remediation_promotion_gate = _load_json(job_dir / "remediation" / "drafts" / "remediation-promotion-gate.json")
+    remediation_promotion_gate_markdown = _load_text(job_dir / "remediation" / "drafts" / "REMEDIATION-PROMOTION-GATE.md")
 
     return {
         "job_id": job_id,
@@ -420,6 +426,12 @@ def load_compliance_job(job_id: str, jobs_base: Optional[Path] = None) -> dict:
         "comparison_result_markdown": comparison_result_markdown,
         "review_decisions": review_decisions,
         "remediation_draft_eligibility": remediation_draft_eligibility,
+        "remediation_drafts": remediation_drafts,
+        "remediation_drafts_markdown": remediation_drafts_markdown,
+        "remediation_draft_validation": remediation_draft_validation,
+        "remediation_draft_validation_markdown": remediation_draft_validation_markdown,
+        "remediation_promotion_gate": remediation_promotion_gate,
+        "remediation_promotion_gate_markdown": remediation_promotion_gate_markdown,
         "finding_decisions_markdown": finding_decisions_markdown,
         "remediation_draft_eligibility_markdown": remediation_draft_eligibility_markdown,
         "files": {
@@ -450,6 +462,12 @@ def load_compliance_job(job_id: str, jobs_base: Optional[Path] = None) -> dict:
             "finding_decisions_markdown": str(job_dir / "review" / "FINDING-DECISIONS.md"),
             "remediation_draft_eligibility": str(job_dir / "review" / "remediation-draft-eligibility.json"),
             "remediation_draft_eligibility_markdown": str(job_dir / "review" / "REMEDIATION-DRAFT-ELIGIBILITY.md"),
+            "remediation_drafts": str(job_dir / "remediation" / "drafts" / "remediation-drafts.json"),
+            "remediation_drafts_markdown": str(job_dir / "remediation" / "drafts" / "REMEDIATION-DRAFTS.md"),
+            "remediation_draft_validation": str(job_dir / "remediation" / "drafts" / "remediation-draft-validation.json"),
+            "remediation_draft_validation_markdown": str(job_dir / "remediation" / "drafts" / "REMEDIATION-DRAFT-VALIDATION.md"),
+            "remediation_promotion_gate": str(job_dir / "remediation" / "drafts" / "remediation-promotion-gate.json"),
+            "remediation_promotion_gate_markdown": str(job_dir / "remediation" / "drafts" / "REMEDIATION-PROMOTION-GATE.md"),
         },
     }
 

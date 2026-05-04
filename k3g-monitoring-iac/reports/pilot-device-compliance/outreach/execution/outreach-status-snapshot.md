@@ -1,6 +1,6 @@
 # Week 1 Outreach Status Snapshot — 4WNET-MNS-KTG-RX
 
-**Generated:** 2026-04-30T04:02:39.642637+00:00
+**Generated:** 2026-05-04T15:57:39.213486+00:00
 **Device:** 4WNET-MNS-KTG-RX (device_id: 1890)
 **Deadline:** 2026-05-08
 **Reminder Date:** 2026-05-06

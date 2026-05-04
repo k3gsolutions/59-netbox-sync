@@ -1,4 +1,4 @@
-# Current State — 2026-05-01 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.93, 2.32, CANDIDATES-001–027 Complete, COMPLIANCE-COMPARE-001–004 Complete, COMPLIANCE-REVIEW-001–004 Complete)
+# Current State — 2026-05-04 (FASES 2.47-3.19, 2.38, 2.39, 3.16.1, 2.33, 3.16, 3.14, 2.29, 2.28, 3.13, 2.26, 2.27, 3.12, 3.10.2, 3.10.1, 3.10, 2.60, 4.1, 3.20, 4.2-4.93, 2.32, CANDIDATES-001–027 Complete, COMPLIANCE-COMPARE-001–004 Complete, COMPLIANCE-REVIEW-001–004 Complete, COMPLIANCE-REMEDIATION-001–004 Complete, COMPLIANCE-APPROVAL-001–004 Complete)
 
 ## Operational Status
 
@@ -13,6 +13,26 @@ FASE 2.60: Baseline generated with scope definition (1 device/cycle, 3 objects, 
 FASE 4.1: Cycle template generation functional. First cycle can be created via template.
 
 ## Latest Status
+
+**COMPLIANCE-APPROVAL-001–004 COMPLETE** — Approval Candidates + Validation + Proposal Gate
+
+- Approval candidate builder converts safe remediation drafts into candidates with unique candidate IDs.
+- Service functions: build_approval_candidates, validate_approval_candidates, evaluate_approvalrecord_proposal_gate.
+- HTTP endpoints: `POST /compliance/jobs/{job_id}/approval-candidates` (build), `GET /compliance/jobs/{job_id}/approval-candidates` (load), `POST /compliance/jobs/{job_id}/approval-candidates/proposal-gate` (validate + gate).
+- Validation blocks unsafe candidates: write_allowed=true, execution_allowed=true, forbidden commands (system-view, configure, commit, save, delete, undo, shutdown, reboot, reset, patch, sync), secret keywords (token, password, secret, cipher, private_key, api_key, access_key).
+- Proposal gate evaluates readiness and signals decision: READY, READY_WITH_WARNINGS, or BLOCKED.
+- All candidates and validation results stored locally under `reports/compliance/jobs/<job_id>/approval-candidates/`.
+- No NetBox writes, no `/sync`, no SSH/SNMP/NETCONF, no ApprovalRecord creation (gate only), no ApplyPlan.
+- Artifacts: approval-candidates.json, APPROVAL-CANDIDATES.md, approval-candidate-validation.json, APPROVAL-CANDIDATE-VALIDATION.md, approvalrecord-proposal-gate.json, APPROVALRECORD-PROPOSAL-GATE.md.
+- 30+ tests covering candidate building, validation, gate evaluation, safety blocks.
+
+**COMPLIANCE-REMEDIATION-001-004 COMPLETE** — Local Remediation Drafts + Draft Safety Validation + Promotion Gate
+
+- Local draft generator turns reviewed findings into draft artifacts only.
+- Drafts live under `reports/compliance/jobs/<job_id>/remediation/drafts/`.
+- Safety validation blocks write- or execution-capable drafts and scans for forbidden command text and secrets.
+- Promotion gate only marks drafts as ready for the next flow; it does not promote anything.
+- No NetBox writes, no `/sync`, no SSH/SNMP/NETCONF, no ApprovalRecord, no ApplyPlan.
 
 **COMPLIANCE-PARSE-001-004 COMPLETE** — Huawei NE8000 Parser Baseline + Parsed Inventory + Parser Safety Validation + UI Summary
 

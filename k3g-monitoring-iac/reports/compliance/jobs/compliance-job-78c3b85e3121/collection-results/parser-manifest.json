@@ -1,0 +1,21 @@
+{
+  "job_id": "compliance-job-78c3b85e3121",
+  "generated_at": "2026-04-30T21:36:01.886789+00:00",
+  "devices": [
+    {
+      "device_id": 1890,
+      "name": "4WNET-MNS-KTG-RX",
+      "profile": "default-readonly",
+      "raw_files": [],
+      "redacted_files": [],
+      "parsed_files": [],
+      "parsed_dir": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-78c3b85e3121/collection-results/devices/1890/parsed",
+      "ready_for_parsing": false
+    }
+  ],
+  "safety": {
+    "raw_not_displayed_in_ui": true,
+    "redaction_available": true,
+    "netbox_write": false
+  }
+}

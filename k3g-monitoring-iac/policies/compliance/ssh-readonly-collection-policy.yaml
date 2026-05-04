@@ -1,0 +1,31 @@
+allowed_protocol: ssh
+allowed_auth:
+  - env_vars
+required_env_vars:
+  - COMPLIANCE_SSH_USERNAME
+  - COMPLIANCE_SSH_PASSWORD
+optional_env_vars:
+  - COMPLIANCE_SSH_PORT
+  - COMPLIANCE_SSH_TIMEOUT
+  - COMPLIANCE_SSH_PREFLIGHT_TCP_CHECK
+forbidden:
+  - NETBOX_WRITE_TOKEN
+  - device config commands
+  - enable/configure/system-view
+allowed_command_prefixes:
+  - display
+  - show
+forbidden_command_patterns:
+  - system-view
+  - configure
+  - commit
+  - save
+  - delete
+  - undo
+  - shutdown
+  - reboot
+  - reset
+  - patch
+  - sync
+output_storage:
+  - reports/compliance/jobs/<job_id>/collection-results/devices/<device_id>/raw/

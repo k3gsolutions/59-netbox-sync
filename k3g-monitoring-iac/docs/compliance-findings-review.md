@@ -1,4 +1,4 @@
-# Compliance Findings Review Workflow (FASES REVIEW-001–002)
+# Compliance Findings Review Workflow (FASES REVIEW-001–004)
 
 ## Overview
 
@@ -243,3 +243,9 @@ curl -X POST /compliance/jobs/job-123/findings/CMP-0001/decision \
 - ✓ Decisions stored locally only
 - ✓ Audit trail immutable (no update/delete of audit files)
 - ✓ All operations read-only on state outside review/
+
+## Next Local Steps
+
+- `POST /compliance/jobs/{job_id}/remediation/drafts` creates draft artifacts after eligibility exists.
+- `GET /compliance/jobs/{job_id}/remediation/drafts/validation` validates draft safety only.
+- `POST /compliance/jobs/{job_id}/remediation/promotion-gate` evaluates readiness for the next flow and does not promote anything.

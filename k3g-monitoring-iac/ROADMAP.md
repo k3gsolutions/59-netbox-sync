@@ -6,6 +6,32 @@ Automated, read-only compliance analysis for network devices. Local report histo
 
 ## Current UI Milestones (Completed)
 
+- COMPLIANCE-COLLECT-001: read-only collection executor ✅
+- COMPLIANCE-COLLECT-002: collection result artifact ✅
+- COMPLIANCE-COLLECT-003: collection safety validation ✅
+- COMPLIANCE-COLLECT-004: SSH read-only policy ✅
+- COMPLIANCE-COLLECT-005: SSH connectivity preflight ✅
+- COMPLIANCE-COLLECT-006: controlled SSH read-only collection ✅
+- COMPLIANCE-COLLECT-007: raw output safety validation ✅
+- COMPLIANCE-COLLECT-008: vendor command profiles ✅
+- COMPLIANCE-COLLECT-009: Huawei NE8000 safe command set ✅
+- COMPLIANCE-COLLECT-010: raw output redaction ✅
+- COMPLIANCE-COLLECT-011: parser staging area ✅
+- COMPLIANCE-PARSE-001: Huawei NE8000 parser baseline ✅
+- COMPLIANCE-PARSE-002: parsed inventory artifact ✅
+- COMPLIANCE-PARSE-003: parser safety validation ✅
+- COMPLIANCE-PARSE-004: UI parsed summary ✅
+- COMPLIANCE-JOB-001: job review dashboard ✅
+- COMPLIANCE-JOB-002: collection start gate ✅
+- COMPLIANCE-JOB-003: read-only collection plan ✅
+- COMPLIANCE-REVIEW-001: findings review workflow ✅
+- COMPLIANCE-REVIEW-002: finding decision audit trail ✅
+- COMPLIANCE-REVIEW-003: remediation draft eligibility gate ✅
+- COMPLIANCE-REVIEW-004: review UI and local-only flow ✅
+- COMPLIANCE-REMEDIATION-001: local remediation draft generator ✅
+- COMPLIANCE-REMEDIATION-002: remediation draft review UI ✅
+- COMPLIANCE-REMEDIATION-003: remediation draft safety validation ✅
+- COMPLIANCE-REMEDIATION-004: promotion gate to approval candidate ✅
 - FASE 3.10.2: modal save/save-and-close + safe local pipeline ✅
 - FASE 3.12: response validation dashboard + UAT audit view ✅
 - FASE 2.25: UAT cleanup and Week 1 real-readiness guardrails ✅

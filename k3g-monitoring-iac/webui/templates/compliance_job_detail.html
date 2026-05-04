@@ -517,6 +517,102 @@
     {% endif %}
 </div>
 
+<div class="card">
+    <div class="card-header">Rascunhos de Remediação</div>
+    <p>Artefatos locais apenas. Nenhuma escrita em NetBox, nenhum sync, nenhum ApplyPlan.</p>
+    <div style="margin-bottom: 1em;">
+        <button type="button" class="btn btn-primary btn-small" id="generate-drafts-btn">Gerar rascunhos locais</button>
+        <button type="button" class="btn btn-small" id="validate-drafts-btn">Validar segurança local</button>
+        <button type="button" class="btn btn-small" id="promotion-gate-btn">Abrir gate de promoção</button>
+    </div>
+    {% if job.remediation_drafts %}
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">Total de drafts</div>
+            <div class="summary-value">{{ job.remediation_drafts.drafts|length if job.remediation_drafts.drafts else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Status</div>
+            <div class="summary-value">
+                <code>{{ job.remediation_drafts.status or "missing" }}</code>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Gerado por</div>
+            <div class="summary-value">{{ job.remediation_drafts.generated_by or "-" }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Última geração</div>
+            <div class="summary-value">{{ job.remediation_drafts.generated_at or "-" }}</div>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Draft</th>
+                <th>Finding</th>
+                <th>Objeto</th>
+                <th>Ação</th>
+                <th>Risco</th>
+                <th>Status</th>
+                <th>Proposta</th>
+                <th>Safety</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if job.remediation_drafts.drafts %}
+            {% for draft in job.remediation_drafts.drafts %}
+            <tr>
+                <td><code>{{ draft.draft_id }}</code></td>
+                <td><code>{{ draft.finding_id }}</code></td>
+                <td>
+                    <div>{{ draft.object_name }}</div>
+                    <div><small>{{ draft.object_type }} / {{ draft.scope }}</small></div>
+                </td>
+                <td>{{ draft.proposed_action_type }}</td>
+                <td><code>{{ draft.risk_level }}</code></td>
+                <td><code>{{ draft.status }}</code></td>
+                <td>
+                    <div><small>{{ draft.proposed_change.target }} :: {{ draft.proposed_change.field }}</small></div>
+                    <div>{{ draft.proposed_change.current_value }}</div>
+                    <div><strong>{{ draft.proposed_change.proposed_value }}</strong></div>
+                </td>
+                <td>
+                    <div><small>netbox_write={{ draft.safety.netbox_write }}</small></div>
+                    <div><small>device_write={{ draft.safety.device_write }}</small></div>
+                    <div><small>sync_called={{ draft.safety.sync_called }}</small></div>
+                    <div><small>approval_record_created={{ draft.safety.approval_record_created }}</small></div>
+                    <div><small>apply_plan_created={{ draft.safety.apply_plan_created }}</small></div>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="8">Nenhum rascunho localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+    {% if job.remediation_drafts_markdown %}
+    <pre class="pre-wrap">{{ job.remediation_drafts_markdown }}</pre>
+    {% endif %}
+    {% if job.remediation_draft_validation %}
+    <div style="margin-top: 1em;">
+        <p><strong>Validação:</strong> <code>{{ job.remediation_draft_validation.decision }}</code></p>
+        {% if job.remediation_draft_validation_markdown %}
+        <pre class="pre-wrap">{{ job.remediation_draft_validation_markdown }}</pre>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% if job.remediation_promotion_gate %}
+    <div style="margin-top: 1em;">
+        <p><strong>Gate de promoção:</strong> <code>{{ job.remediation_promotion_gate.decision }}</code></p>
+        {% if job.remediation_promotion_gate_markdown %}
+        <pre class="pre-wrap">{{ job.remediation_promotion_gate_markdown }}</pre>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+
 <div class="alert alert-info">
     <strong>Aviso:</strong> Nenhuma conexão com equipamento foi iniciada.
 </div>
@@ -735,6 +831,74 @@ document.addEventListener("DOMContentLoaded", function() {
                 alert("Erro ao avaliar elegibilidade: " + error.message);
             } finally {
                 eligibilityBtn.disabled = false;
+            }
+        });
+    }
+    const generateDraftsBtn = document.getElementById("generate-drafts-btn");
+    if (generateDraftsBtn) {
+        generateDraftsBtn.addEventListener("click", async function() {
+            generateDraftsBtn.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/remediation/drafts", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({"operator": "Keslley", "confirm_generate_drafts": true})
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert("Erro ao gerar rascunhos: " + (data.error || "Falha desconhecida"));
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Erro ao gerar rascunhos: " + error.message);
+            } finally {
+                generateDraftsBtn.disabled = false;
+            }
+        });
+    }
+    const validateDraftsBtn = document.getElementById("validate-drafts-btn");
+    if (validateDraftsBtn) {
+        validateDraftsBtn.addEventListener("click", async function() {
+            validateDraftsBtn.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/remediation/drafts/validation", {
+                    method: "GET",
+                    headers: {"Accept": "application/json"}
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert("Erro ao validar rascunhos: " + (data.error || "Falha desconhecida"));
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Erro ao validar rascunhos: " + error.message);
+            } finally {
+                validateDraftsBtn.disabled = false;
+            }
+        });
+    }
+    const promotionGateBtn = document.getElementById("promotion-gate-btn");
+    if (promotionGateBtn) {
+        promotionGateBtn.addEventListener("click", async function() {
+            promotionGateBtn.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/remediation/promotion-gate", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({"operator": "Keslley", "confirm_human_reviewed_drafts": true})
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert("Erro ao abrir gate de promoção: " + (data.error || "Falha desconhecida"));
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Erro ao abrir gate de promoção: " + error.message);
+            } finally {
+                promotionGateBtn.disabled = false;
             }
         });
     }
