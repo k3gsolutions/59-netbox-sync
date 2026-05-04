@@ -3292,6 +3292,43 @@ async def compliance_validate_applyplan_candidate(job_id: str, request: Request)
     return JSONResponse({"success": True, **result}, status_code=status_code)
 
 
+@app.post("/compliance/jobs/{job_id}/applyplan/dry-run", response_class=JSONResponse)
+async def compliance_build_dryrun_applyplan(job_id: str, request: Request):
+    """Build dry-run ApplyPlan."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_build_dry_run = payload.get("confirm_build_dry_run")
+    if not operator or confirm_build_dry_run is not True:
+        return JSONResponse({"success": False, "error": "operator e confirm_build_dry_run obrigatórios"}, status_code=400)
+
+    from .services.compliance_dryrun_applyplan import build_dryrun_applyplan
+
+    try:
+        result = build_dryrun_applyplan(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.get("/compliance/jobs/{job_id}/applyplan/dry-run/validation", response_class=JSONResponse)
+async def compliance_validate_dryrun_applyplan(job_id: str, request: Request):
+    """Validate dry-run ApplyPlan."""
+    from .services.compliance_dryrun_applyplan import validate_dryrun_applyplan
+
+    try:
+        result = validate_dryrun_applyplan(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if result["decision"] != "DRY_RUN_APPLYPLAN_INVALID" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
 @app.post("/compliance/analyze", response_class=JSONResponse)
 async def analyze_compliance(request: Request):
     """Manual compliance start guard — re-validates eligibility, creates job artifact."""
