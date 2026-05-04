@@ -1,0 +1,28 @@
+{
+  "cycle_id": "cycle-004",
+  "status": "CYCLE_004_BLOCKED_EMPTY_PACKAGE",
+  "decision": "ACTION_REQUIRED",
+  "reason": "Execution package has zero items (item_count=0). Source compliance job fbdda0de527c incomplete.",
+  "blocked_at": "2026-05-04T18:15:00Z",
+  "blocker": "EMPTY_EXECUTION_PACKAGE",
+  "details": {
+    "execution_package_path": "reports/controlled-operation/cycle-004/real-write-execution/CYCLE-004-EXECUTION-PACKAGE.json",
+    "item_count": 0,
+    "items": [],
+    "source_job": "compliance-job-fbdda0de527c",
+    "source_job_status": "COMPLIANCE_JOB_INCOMPLETE",
+    "missing": [
+      "remediation-drafts.json",
+      "approval-candidates.json",
+      "proposed-approval-records.json",
+      "applyplan-candidate.json",
+      "dry-run-applyplan.json"
+    ]
+  },
+  "action_required": "Select complete compliance job or complete fbdda0de527c workflow, then rebuild cycle-004",
+  "safety": {
+    "no_execution_allowed": true,
+    "one_shot_not_consumable": true,
+    "no_write_possible": true
+  }
+}
