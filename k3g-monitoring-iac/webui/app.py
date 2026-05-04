@@ -33,7 +33,7 @@ from pathlib import Path
 import json
 import mimetypes
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .services.artifact_scanner import (
     list_reports, list_devices, list_approvals, list_apply_plans,
@@ -3143,6 +3143,108 @@ async def compliance_approval_proposal_gate(job_id: str, request: Request):
         return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
 
     status_code = 200 if gate_result.get("decision") in ("APPROVALRECORD_PROPOSAL_READY", "APPROVALRECORD_PROPOSAL_READY_WITH_WARNINGS") else 409
+    return JSONResponse({"success": True, **gate_result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/approval-records/proposed", response_class=JSONResponse)
+async def compliance_build_proposed_approval_records(job_id: str, request: Request):
+    """Build proposed ApprovalRecords from approval candidates."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_create_proposed_records = payload.get("confirm_create_proposed_records")
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_create_proposed_records is not True:
+        return JSONResponse(
+            {"success": False, "error": "confirm_create_proposed_records deve ser true"},
+            status_code=400,
+        )
+
+    from .services.compliance_approval_records import build_proposed_approval_records
+
+    try:
+        result = build_proposed_approval_records(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+    except KeyError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.get("/compliance/jobs/{job_id}/approval-records/proposed/validation", response_class=JSONResponse)
+async def compliance_validate_proposed_approval_records(job_id: str, request: Request):
+    """Validate proposed ApprovalRecords."""
+    from .services.compliance_approval_record_validation import validate_proposed_approval_records
+
+    try:
+        result = validate_proposed_approval_records(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if result["decision"] != "PROPOSED_APPROVAL_RECORDS_UNSAFE" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/approval-records/applyplan-candidate-gate", response_class=JSONResponse)
+async def compliance_applyplan_candidate_gate(job_id: str, request: Request):
+    """Gate proposed records to ApplyPlan candidate builder."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_human_reviewed_proposed_records = payload.get("confirm_human_reviewed_proposed_records")
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_human_reviewed_proposed_records is not True:
+        return JSONResponse(
+            {"success": False, "error": "confirm_human_reviewed_proposed_records deve ser true"},
+            status_code=400,
+        )
+
+    from .services.compliance_approval_record_validation import validate_proposed_approval_records
+    from .services.compliance_approval_records import load_proposed_approval_records
+
+    try:
+        validation = validate_proposed_approval_records(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    if validation.get("decision") == "PROPOSED_APPROVAL_RECORDS_UNSAFE":
+        return JSONResponse(
+            {"success": False, "validation_decision": validation.get("decision"), **validation},
+            status_code=409
+        )
+
+    # Determine gate decision
+    if validation.get("decision") == "PROPOSED_APPROVAL_RECORDS_SAFE":
+        gate_decision = "APPLYPLAN_CANDIDATE_READY"
+    else:
+        gate_decision = "APPLYPLAN_CANDIDATE_READY_WITH_WARNINGS"
+
+    gate_result = {
+        "job_id": job_id,
+        "status": "gate_evaluated",
+        "decision": gate_decision,
+        "evaluated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "evaluated_by": operator,
+        "validation_decision": validation.get("decision"),
+        "safety": {
+            "netbox_write": False,
+            "device_write": False,
+            "sync_called": False,
+            "approval_record_created": False,
+            "apply_plan_created": False
+        }
+    }
+
+    status_code = 200 if gate_decision in ("APPLYPLAN_CANDIDATE_READY", "APPLYPLAN_CANDIDATE_READY_WITH_WARNINGS") else 409
     return JSONResponse({"success": True, **gate_result}, status_code=status_code)
 
 
