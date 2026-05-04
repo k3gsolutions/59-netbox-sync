@@ -3329,6 +3329,51 @@ async def compliance_validate_dryrun_applyplan(job_id: str, request: Request):
     return JSONResponse({"success": True, **result}, status_code=status_code)
 
 
+@app.post("/compliance/jobs/{job_id}/applyplan/dry-run/execute", response_class=JSONResponse)
+async def compliance_execute_dryrun(job_id: str, request: Request):
+    """Execute dry-run simulation."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_dry_run_execution = payload.get("confirm_dry_run_execution")
+    if not operator or confirm_dry_run_execution is not True:
+        return JSONResponse({"success": False, "error": "operator e confirm_dry_run_execution obrigatórios"}, status_code=400)
+
+    from .services.compliance_dryrun_execution import evaluate_dryrun_execution_gate, execute_dryrun_simulation
+
+    try:
+        gate = evaluate_dryrun_execution_gate(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    if gate.get("decision") != "DRY_RUN_EXECUTION_GATE_READY":
+        return JSONResponse({"success": False, "error": "Dry-run execution gate not ready"}, status_code=409)
+
+    try:
+        result = execute_dryrun_simulation(job_id, operator)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.get("/compliance/jobs/{job_id}/applyplan/dry-run/execution-validation", response_class=JSONResponse)
+async def compliance_validate_dryrun_execution(job_id: str, request: Request):
+    """Validate dry-run execution result."""
+    from .services.compliance_dryrun_execution import validate_dryrun_execution_result
+
+    try:
+        result = validate_dryrun_execution_result(job_id)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    status_code = 200 if result["decision"] == "DRY_RUN_VALIDATION_PASSED" else 409
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
 @app.post("/compliance/analyze", response_class=JSONResponse)
 async def analyze_compliance(request: Request):
     """Manual compliance start guard — re-validates eligibility, creates job artifact."""
