@@ -3027,10 +3027,6 @@ async def compliance_findings_batch_decisions(job_id: str, request: Request):
     """Save multiple finding decisions in batch (humanized UI)."""
     from .services.compliance_findings_review import batch_save_decisions
 
-    # Validate job_id
-    if not JOB_ID_RE.match(job_id):
-        return JSONResponse({"success": False, "error": "job_id inválido"}, status_code=400)
-
     try:
         payload = await request.json()
     except Exception as e:
