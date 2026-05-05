@@ -1,0 +1,134 @@
+# Interface Description Standards
+# Customer/Service interface naming convention
+
+standards:
+  customer_interface:
+    preferred_format: bracket_key_value
+    description: "Customer/Service interface naming with key=value pairs in brackets"
+    pattern: "[SVC=CUST][ID=10492][NAME=EMPRESA-ABC][ROLE=INET][LOC=MNS-DC01][CAP=500M]"
+    schema:
+      - key: SVC
+        required: true
+        values: [CUST, IX, MPLS, MGMT]
+        description: Service type
+      - key: ID
+        required: true
+        type: integer
+        description: Customer ID or service ID
+      - key: NAME
+        required: true
+        type: string
+        max_length: 20
+        description: Customer or service name (uppercase, alphanumeric)
+      - key: ROLE
+        required: true
+        values: [INET, MPLS, IX, MGMT]
+        description: Interface role/purpose
+      - key: LOC
+        required: false
+        type: string
+        description: Location code (e.g., MNS-DC01)
+      - key: CAP
+        required: false
+        type: string
+        description: Capacity/bandwidth (e.g., 500M, 1G, 10G)
+    validation:
+      - NAME must be uppercase alphanumeric
+      - ID must be numeric
+      - ROLE must match known service types
+    example: "[SVC=CUST][ID=10492][NAME=EMPRESA-ABC][ROLE=INET][LOC=MNS-DC01][CAP=500M]"
+
+  customer_interface_legacy:
+    preferred_format: legacy_compact
+    legacy_supported: true
+    preferred: false
+    description: "Legacy compact format (pipe-separated)"
+    pattern: "CUST|10492|EMPRESA-ABC|INET|MNS-DC01|500M"
+    schema:
+      - position: 0
+        key: SVC
+        values: [CUST, IX, MPLS, MGMT]
+      - position: 1
+        key: ID
+        type: integer
+      - position: 2
+        key: NAME
+        type: string
+      - position: 3
+        key: ROLE
+        values: [INET, MPLS, IX, MGMT]
+      - position: 4
+        key: LOC
+        type: string
+      - position: 5
+        key: CAP
+        type: string
+    deprecation_notice: "Legacy format. Use bracket key=value format for new interfaces."
+    example: "CUST|10492|EMPRESA-ABC|INET|MNS-DC01|500M"
+
+  technical_interface:
+    description: "Technical/system interfaces (no customer naming)"
+    interfaces:
+      - Virtual-Ethernet
+      - Eth-Trunk
+      - LoopBack
+      - NULL
+      - MEth
+      - Tunnel
+      - Vlanif
+    policy: technical_interface
+    requires_contextual_review: true
+    error_if_customer_naming: false
+    warning_if_no_description: true
+    note: "Technical interfaces do not require customer naming. Classify per device context."
+
+  logical_interface:
+    description: "Logical/subinterface (e.g., Vlanif, tunnel encapsulation)"
+    interfaces:
+      - Vlanif
+      - Tunnel
+      - Virtual-Ethernet_subinterface
+    policy: logical_interface
+    state_validation: warning_only
+    description_required: false
+    note: "Logical interfaces may not have matching hardware state. Use contextual review."
+
+validation_rules:
+  - name: interface_description_required
+    applies_to: [customer_interface]
+    error_if_missing: true
+    severity: error
+
+  - name: technical_interface_naming
+    applies_to: [technical_interface]
+    error_if_customer_naming: false
+    warning_if_undescribed: true
+    severity: warning
+
+  - name: logical_interface_state_mismatch
+    applies_to: [logical_interface]
+    rule: "Logical interface state may not match hardware state"
+    error_if_state_mismatch: false
+    severity: warning
+
+noise_reduction:
+  - finding_type: interface_state_mismatch
+    applies_to: logical_interface
+    action: classify_as_warning
+    reason: "Logical interfaces often have state independent of physical port"
+
+  - finding_type: interface_state_mismatch
+    applies_to: technical_interface
+    action: classify_as_warning
+    reason: "Technical interfaces (NULL, Loop, Tunnel) have special state semantics"
+
+  - finding_type: interface_naming_invalid
+    applies_to: technical_interface
+    action: classify_as_policy_too_strict
+    reason: "Technical interfaces do not require customer naming convention"
+
+  - finding_type: interface_description_missing
+    applies_to: technical_interface
+    action: classify_as_warning
+    severity: warning
+    reason: "Technical interfaces may not require customer-level description"

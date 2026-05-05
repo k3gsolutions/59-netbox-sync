@@ -1,0 +1,110 @@
+# BGP Configuration Standards
+
+standards:
+  bgp_peer:
+    description: "BGP peer configuration requirements"
+    requirements:
+      - name: peer_description
+        required: true
+        type: string
+        max_length: 80
+        pattern: "[AS|PEER-ID]: [Description]"
+        example: "AS65001: Customer-ABC-INET"
+
+      - name: peer_remote_as
+        required: true
+        type: integer
+        range: [1, 4294967295]
+
+      - name: peer_password
+        required: true
+        type: string
+        description: "MD5 or other peer authentication"
+        note: "Must not be displayed in findings or reports"
+
+      - name: peer_address_family
+        required: true
+        values: [IPv4, IPv6, VPNv4, VPNv6]
+
+      - name: peer_state
+        required: true
+        expected: ESTABLISHED
+        acceptable_transitions: [IDLE, CONNECT, ACTIVE, OPENSENT, OPENCONFIRM]
+        warning_if_not_established: true
+        error_if_down_long: true
+
+  bgp_route_policy:
+    description: "BGP route policy requirements"
+    requirements:
+      - name: policy_name
+        required: true
+        type: string
+        pattern: "[CUST|IX|MPLS]_[DIRECTION]_[PEER-ROLE]"
+        example: "CUST_IN_PEER"
+
+      - name: policy_import_export
+        required: true
+        direction: [in, out]
+
+      - name: policy_rules
+        required: true
+        min_rules: 1
+        description: "At least one policy rule must be defined"
+
+      - name: policy_description
+        required: true
+        type: string
+
+  bgp_prefix_list:
+    description: "BGP prefix list policy"
+    requirements:
+      - name: prefix_list_name
+        required: true
+        pattern: "[CUST|REGION]_[DIRECTION]"
+        example: "CUST_IN"
+
+      - name: prefix_list_rules
+        required: true
+        min_rules: 1
+
+errors:
+  - code: BGP_PEER_NO_DESCRIPTION
+    severity: error
+    action: needs_human_review
+    rule: "BGP peers must have description"
+
+  - code: BGP_PEER_NOT_ESTABLISHED
+    severity: warning
+    action: needs_human_review
+    rule: "BGP peer state should be ESTABLISHED"
+    note: "May be temporary (maintenance, convergence). Human review required."
+
+  - code: BGP_PEER_MISSING_PASSWORD
+    severity: error
+    action: needs_human_review
+    rule: "BGP peer authentication required"
+
+  - code: BGP_POLICY_MISSING
+    severity: warning
+    action: needs_human_review
+    rule: "BGP route policy not defined for peer"
+
+warnings:
+  - code: BGP_PEER_OPTIONAL_ATTR
+    severity: warning
+    description: "BGP peer missing optional attribute"
+    action: warning_only
+
+noise_reduction:
+  - finding_type: bgp_peer_state_not_established
+    action: classify_as_needs_human_review
+    reason: "BGP peer state depends on network conditions, peer availability, routing convergence"
+
+  - finding_type: bgp_peer_description_missing
+    action: classify_as_needs_human_review
+    severity: error
+    reason: "Documentation gap. Requires human review to add description"
+
+  - finding_type: bgp_policy_missing
+    action: classify_as_needs_human_review
+    reason: "Policy definition requires understanding of customer intent and traffic patterns"
