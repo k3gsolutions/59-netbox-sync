@@ -28,12 +28,43 @@ except ImportError:
 from starlette.requests import Request
 import csv
 import hashlib
+import os
 import re
 from pathlib import Path
 import json
 import mimetypes
 from typing import Optional
 from datetime import datetime, timezone
+
+
+def _load_local_env_file(path: Path) -> None:
+    """Load a local dotenv-style file without overriding existing env vars."""
+    if not path.exists():
+        return
+    try:
+        for raw_line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("export "):
+                line = line[len("export ") :].strip()
+            if "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            if not key or key in os.environ:
+                continue
+            value = value.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+                value = value[1:-1]
+            os.environ[key] = value
+    except Exception:
+        pass
+
+
+ROOT = Path(__file__).parent.parent
+_load_local_env_file(ROOT / ".env.webui.local")
+_load_local_env_file(ROOT / ".env.compliance-ssh.local")
 
 from .services.artifact_scanner import (
     list_reports, list_devices, list_approvals, list_apply_plans,
@@ -67,6 +98,10 @@ from .services.compliance_candidates import (
     enrich_tenant_group_if_missing,
     normalize_compliance_candidate,
 )
+from .services.sync_candidates import (
+    discover_sync_candidates,
+    save_sync_candidates,
+)
 from .services.compliance_jobs import (
     create_collection_plan,
     create_collection_start_gate,
@@ -77,6 +112,7 @@ from .services.compliance_jobs import (
     load_compliance_job,
 )
 from .services.compliance_compare import compare_job
+from .services.compliance_findings_triage import summarize_triage, triage_findings
 from .services.compliance_huawei_ne8000_parser import parse_job_collection
 from .services.compliance_parser_validation import validate_parser_outputs
 from .services.compliance_collection import execute_collection_job
@@ -84,9 +120,7 @@ from .services.compliance_raw_validation import validate_raw_collection_outputs
 from .services.compliance_ssh_collection import execute_ssh_readonly_collection
 from .services.compliance_ssh_preflight import run_ssh_preflight
 
-
 # Setup
-ROOT = Path(__file__).parent.parent
 REPORTS_DIR = ROOT / "reports"
 
 app = FastAPI(title="k3g Compliance & Governance", version="3.0")
@@ -207,6 +241,8 @@ def status_label(status: str) -> str:
         "start_ready": "Pronto para iniciar",
         "start_blocked": "Bloqueado para início",
         "action_required": "Ação obrigatória",
+        "triage_completed": "Triagem concluída",
+        "triage_missing": "Triagem ausente",
     }
     value = (status or "").strip()
     return labels.get(value, value.replace("_", " ").title() if value else "N/A")
@@ -2915,6 +2951,41 @@ async def compliance_job_compare(job_id: str, request: Request):
     return JSONResponse({"success": True, **result}, status_code=status_code)
 
 
+@app.get("/compliance/jobs/{job_id}/triage", response_class=JSONResponse)
+async def compliance_job_triage(job_id: str):
+    """Return local findings triage artifacts if available."""
+    try:
+        load_compliance_job(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    result = summarize_triage(job_id)
+    status_code = 200 if result.get("decision") != "TRIAGE_MISSING" else 404
+    return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/triage", response_class=JSONResponse)
+async def compliance_job_triage_generate(job_id: str, request: Request):
+    """Generate local findings triage artifacts only."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+
+    try:
+        result = triage_findings(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc)}, status_code=409)
+
+    return JSONResponse({"success": True, **result}, status_code=200)
+
+
 @app.post("/compliance/jobs/{job_id}/findings/{finding_id}/decision", response_class=JSONResponse)
 async def compliance_finding_decision(job_id: str, finding_id: str, request: Request):
     """Record decision for a single finding."""
@@ -3682,6 +3753,15 @@ async def analyze_compliance(request: Request):
             "safety": {**get_compliance_job_safety(), "read_only": True, "auto_compliance_started": False, "job_only": True},
         }
     )
+
+
+@app.get("/sync/candidates", response_class=JSONResponse)
+async def sync_candidates_endpoint():
+    """Discover devices eligible for synchronization (read-only)."""
+    result = discover_sync_candidates(operator="operator")
+    if result.get("success"):
+        save_sync_candidates(result)
+    return JSONResponse(result)
 
 
 @app.get("/health")
