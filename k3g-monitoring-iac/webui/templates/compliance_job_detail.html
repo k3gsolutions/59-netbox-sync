@@ -524,119 +524,182 @@
     {% endif %}
 </div>
 
-<div class="card">
-    <div class="card-header">Revisão dos Achados</div>
-    <p>Registro local de decisões sobre achados. Nenhuma escrita em NetBox.</p>
+<div class="card" id="validation-section">
+    <div class="card-header">Validação das Pendências</div>
+
+    <!-- Aviso de segurança -->
+    <div style="margin-bottom: 1em; padding: 0.75em; border: 1px solid #ffc107; border-radius: 4px; background-color: #fff3cd;">
+        <strong>⚠️ Segurança:</strong> Esta validação não altera o NetBox e não acessa o equipamento. Ela apenas salva sua avaliação para a próxima etapa.
+    </div>
+
     {% if job.comparison_result %}
+
+    <!-- Reviewer global -->
+    <div style="margin-bottom: 1em;">
+        <label><strong>Seu nome:</strong>
+            <input type="text" id="reviewer-name" placeholder="Ex: Keslley" value="Keslley" style="padding: 0.5em; border: 1px solid #ddd; border-radius: 4px;">
+        </label>
+    </div>
+
+    <!-- Resumo com progresso -->
+    <div style="margin-bottom: 1em;">
+        <div style="margin-bottom: 0.5em;">
+            <div style="background: #eee; height: 20px; border-radius: 4px; overflow: hidden;">
+                <div id="progress-fill" style="background: #28a745; height: 100%; width: 0%; transition: width 0.3s;"></div>
+            </div>
+            <div id="progress-label" style="margin-top: 0.25em; font-size: 0.9em; color: #666;">0 de 0 pendências validadas</div>
+        </div>
+    </div>
+
     <div class="summary-grid">
         <div class="summary-card">
-            <div class="summary-label">Total de achados</div>
-            <div class="summary-value">
-                {% if job.remediation_draft_eligibility and job.remediation_draft_eligibility.summary %}
-                    {{ job.remediation_draft_eligibility.summary.total_findings }}
-                {% elif job.comparison_result and job.comparison_result.summary %}
-                    {{ job.comparison_result.summary.blockers + job.comparison_result.summary.errors + job.comparison_result.summary.warnings + job.comparison_result.summary.info }}
-                {% else %}
-                    0
-                {% endif %}
-            </div>
+            <div class="summary-label">Total</div>
+            <div class="summary-value" id="count-total">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Validadas</div>
+            <div class="summary-value" id="count-validated">0</div>
         </div>
         <div class="summary-card">
             <div class="summary-label">Pendentes</div>
-            <div class="summary-value">
-                {% if job.remediation_draft_eligibility and job.remediation_draft_eligibility.summary %}
-                    {{ job.remediation_draft_eligibility.summary.pending }}
-                {% else %}
-                    -
-                {% endif %}
-            </div>
+            <div class="summary-value" id="count-pending">0</div>
         </div>
         <div class="summary-card">
-            <div class="summary-label">Requer correção</div>
-            <div class="summary-value">
-                {% if job.remediation_draft_eligibility and job.remediation_draft_eligibility.summary %}
-                    {{ job.remediation_draft_eligibility.summary.needs_remediation }}
-                {% else %}
-                    -
-                {% endif %}
-            </div>
+            <div class="summary-label">Precisam corrigir</div>
+            <div class="summary-value" id="count-remediate">0</div>
         </div>
         <div class="summary-card">
-            <div class="summary-label">Bloqueados</div>
-            <div class="summary-value">
-                {% if job.remediation_draft_eligibility and job.remediation_draft_eligibility.summary %}
-                    {{ job.remediation_draft_eligibility.summary.blocked }}
-                {% else %}
-                    -
-                {% endif %}
-            </div>
+            <div class="summary-label">Precisam investigar</div>
+            <div class="summary-value" id="count-investigate">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Falsos positivos</div>
+            <div class="summary-value" id="count-fp">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Bloqueadas</div>
+            <div class="summary-value" id="count-blocked">0</div>
         </div>
     </div>
-    <table>
+
+    <!-- Aviso: só precisa corrigir segue -->
+    <div style="margin-bottom: 1em; padding: 0.75em; border: 1px solid #17a2b8; border-radius: 4px; background-color: #d1ecf1;">
+        <strong>ℹ️ Próxima etapa:</strong> Somente itens marcados como "Precisa corrigir" seguem para a próxima fase.
+    </div>
+
+    <!-- Presets (recolhidos) -->
+    <details style="margin-bottom: 1em;">
+        <summary style="cursor: pointer; user-select: none;"><strong>⚙️ Ações rápidas (presets)</strong></summary>
+        <div style="margin-top: 0.75em; padding: 0.75em; background: #f9f9f9; border-radius: 4px;">
+            <button class="btn btn-small preset-btn" data-preset="bgp_state_down" style="margin-right: 0.5em; margin-bottom: 0.5em;">Marcar "BGP fora do ar" como Precisa investigar</button>
+            <button class="btn btn-small preset-btn" data-preset="bgp_no_description" style="margin-right: 0.5em; margin-bottom: 0.5em;">Marcar "Peer sem descrição" como Precisa corrigir</button>
+            <button class="btn btn-small preset-btn" data-preset="parser_noise" style="margin-right: 0.5em; margin-bottom: 0.5em;">Marcar "Erro de leitura" como Falso positivo</button>
+            <button class="btn btn-small preset-btn" data-preset="policy_strict" style="margin-bottom: 0.5em;">Marcar "Regra rígida" como Ignorar por enquanto</button>
+            <div style="margin-top: 0.75em; font-size: 0.85em; color: #666;">Os presets apenas preenchem as decisões na tela. Você ainda precisa salvar.</div>
+        </div>
+    </details>
+
+    <!-- Filtros -->
+    <div style="margin-bottom: 1em;">
+        <button class="filter-btn active" data-filter="all" style="margin-right: 0.25em;">Todas</button>
+        <button class="filter-btn" data-filter="critical" style="margin-right: 0.25em;">Mais importantes</button>
+        <button class="filter-btn" data-filter="bgp" style="margin-right: 0.25em;">BGP</button>
+        <button class="filter-btn" data-filter="interface" style="margin-right: 0.25em;">Interfaces</button>
+        <button class="filter-btn" data-filter="false_pos">Pode ser falso positivo</button>
+    </div>
+
+    <!-- Tabela humanizada -->
+    <table style="width: 100%; border-collapse: collapse;">
         <thead>
-            <tr>
-                <th>Severity</th>
-                <th>Scope</th>
-                <th>Object</th>
-                <th>Rule</th>
-                <th>Title</th>
-                <th>Recommendation</th>
-                <th>Decisão</th>
-                <th>Ações</th>
+            <tr style="background: #f9f9f9; border-bottom: 2px solid #ddd;">
+                <th style="padding: 0.75em; text-align: left; border: 1px solid #ddd;">Importância</th>
+                <th style="padding: 0.75em; text-align: left; border: 1px solid #ddd;">Equipamento</th>
+                <th style="padding: 0.75em; text-align: left; border: 1px solid #ddd;">Objeto afetado</th>
+                <th style="padding: 0.75em; text-align: left; border: 1px solid #ddd;">Tipo</th>
+                <th style="padding: 0.75em; text-align: left; border: 1px solid #ddd;">Pendência</th>
+                <th style="padding: 0.75em; text-align: left; border: 1px solid #ddd;">Explicação</th>
+                <th style="padding: 0.75em; text-align: left; border: 1px solid #ddd;">Decisão</th>
+                <th style="padding: 0.75em; text-align: left; border: 1px solid #ddd;">Observação</th>
+                <th style="padding: 0.75em; text-align: left; border: 1px solid #ddd;">Técnico</th>
             </tr>
         </thead>
         <tbody>
         {% if job.comparison_result and job.comparison_result.devices %}
             {% for device in job.comparison_result.devices %}
                 {% for finding in device.findings %}
-                <tr class="finding-row" data-finding-id="{{ finding.finding_id }}">
-                    <td><code>{{ finding.severity }}</code></td>
-                    <td>{{ finding.scope }}</td>
-                    <td>{{ finding.object_name }}</td>
-                    <td><code>{{ finding.rule_id }}</code></td>
-                    <td>{{ finding.title }}</td>
-                    <td>{{ finding.recommendation }}</td>
-                    <td class="decision-cell">
-                        {% if job.review_decisions and job.review_decisions.decisions and finding.finding_id in job.review_decisions.decisions %}
-                            <span class="decision-status">{{ job.review_decisions.decisions[finding.finding_id].status }}</span>
-                        {% else %}
-                            <span class="decision-status pending">pending</span>
-                        {% endif %}
+                <tr class="finding-row"
+                    data-finding-id="{{ finding.finding_id }}"
+                    data-severity="{{ finding.severity }}"
+                    data-scope="{{ finding.scope }}"
+                    data-rule-id="{{ finding.rule_id }}"
+                    data-triage-bucket="{{ finding.triage_bucket or '' }}"
+                    style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 0.75em; border: 1px solid #ddd;">
+                        <span class="severity-badge" style="padding: 0.25em 0.5em; border-radius: 3px; font-size: 0.85em; background: {% if finding.severity == 'blocker' %}#dc3545{% elif finding.severity == 'error' %}#fd7e14{% elif finding.severity == 'warning' %}#ffc107{% else %}#6c757d{% endif %}; color: white;">
+                            {% if finding.severity == 'blocker' %}Bloqueador{% elif finding.severity == 'error' %}Crítico{% elif finding.severity == 'warning' %}Atenção{% else %}Informativo{% endif %}
+                        </span>
                     </td>
-                    <td>
-                        <div class="review-buttons">
-                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="accepted" title="Aceitar">✓</button>
-                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="false_positive" title="False Positive">FP</button>
-                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="ignored_temporarily" title="Ignorar temporariamente">↷</button>
-                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="needs_remediation" title="Requer correção">⚡</button>
-                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="needs_more_evidence" title="Precisa de evidência">?</button>
-                            <button class="review-btn btn-small" data-finding-id="{{ finding.finding_id }}" data-decision="blocked" title="Bloquear">⊗</button>
-                        </div>
+                    <td style="padding: 0.75em; border: 1px solid #ddd;">{{ device.name }}</td>
+                    <td style="padding: 0.75em; border: 1px solid #ddd;">{{ finding.object_name }}</td>
+                    <td style="padding: 0.75em; border: 1px solid #ddd;">{{ finding.scope }}</td>
+                    <td style="padding: 0.75em; border: 1px solid #ddd;">
+                        {% set rule_titles = {
+                            "bgp.peer.state.not_established": "Sessão BGP fora do ar",
+                            "bgp.peer.description.required": "Peer BGP sem descrição",
+                            "bgp.route_policy.missing": "Política BGP não encontrada",
+                            "interface.description.invalid": "Interface com padrão fora do esperado",
+                            "interface.state.mismatch": "Estado de interface inesperado",
+                            "interface.naming.invalid": "Nome de interface fora do padrão",
+                        } %}
+                        {{ rule_titles.get(finding.rule_id, finding.title) }}
+                    </td>
+                    <td style="padding: 0.75em; border: 1px solid #ddd;">{{ finding.recommendation }}</td>
+                    <td style="padding: 0.75em; border: 1px solid #ddd;">
+                        {% set existing_decision = job.review_decisions.decisions.get(finding.finding_id, {}).get('decision') if job.review_decisions and job.review_decisions.decisions else None %}
+                        <select class="decision-select" data-finding-id="{{ finding.finding_id }}" style="padding: 0.5em; border: 1px solid #ddd; border-radius: 3px; width: 100%;">
+                            <option value="">-- Escolha --</option>
+                            <option value="accepted" {% if existing_decision == 'accepted' %}selected{% endif %}>Aceito / Correto</option>
+                            <option value="false_positive" {% if existing_decision == 'false_positive' %}selected{% endif %}>É falso positivo</option>
+                            <option value="ignored_temporarily" {% if existing_decision == 'ignored_temporarily' %}selected{% endif %}>Ignorar por enquanto</option>
+                            <option value="needs_remediation" {% if existing_decision == 'needs_remediation' %}selected{% endif %}>Precisa corrigir</option>
+                            <option value="needs_more_evidence" {% if existing_decision == 'needs_more_evidence' %}selected{% endif %}>Precisa investigar melhor</option>
+                            <option value="blocked" {% if existing_decision == 'blocked' %}selected{% endif %}>Bloquear avanço</option>
+                        </select>
+                    </td>
+                    <td style="padding: 0.75em; border: 1px solid #ddd;">
+                        {% set existing_reason = job.review_decisions.decisions.get(finding.finding_id, {}).get('reason', '') if job.review_decisions and job.review_decisions.decisions else '' %}
+                        <textarea class="reason-input" data-finding-id="{{ finding.finding_id }}" rows="2" placeholder="Observação..." style="padding: 0.5em; border: 1px solid #ddd; border-radius: 3px; width: 100%; font-family: inherit;">{{ existing_reason }}</textarea>
+                    </td>
+                    <td style="padding: 0.75em; border: 1px solid #ddd;">
+                        <details style="font-size: 0.85em;">
+                            <summary style="cursor: pointer; user-select: none;">Detalhes</summary>
+                            <div style="margin-top: 0.5em; padding-top: 0.5em; border-top: 1px solid #ddd;">
+                                <div><small>Código: <code>{{ finding.finding_id }}</code></small></div>
+                                <div><small>Regra: <code>{{ finding.rule_id }}</code></small></div>
+                                {% if finding.evidence %}
+                                <div><small>Evidência: {{ finding.evidence }}</small></div>
+                                {% endif %}
+                            </div>
+                        </details>
                     </td>
                 </tr>
                 {% endfor %}
             {% endfor %}
         {% else %}
-            <tr><td colspan="8">Nenhum achado localizado.</td></tr>
+            <tr><td colspan="9" style="padding: 1em; text-align: center;">Nenhum achado localizado.</td></tr>
         {% endif %}
         </tbody>
     </table>
-    <div style="margin-top: 1em; padding: 1em; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
-        <h3>Avaliar Elegibilidade para Rascunho de Correção</h3>
-        <button type="button" class="btn btn-primary btn-small" id="eligibility-btn">Avaliar elegibilidade</button>
-        {% if job.remediation_draft_eligibility %}
-        <div style="margin-top: 1em;">
-            <p><strong>Status:</strong> <code>{{ job.remediation_draft_eligibility.decision }}</code></p>
-            {% if job.remediation_draft_eligibility_markdown %}
-            <pre class="pre-wrap">{{ job.remediation_draft_eligibility_markdown }}</pre>
-            {% else %}
-            <pre class="pre-wrap">{{ job.remediation_draft_eligibility | tojson(indent=2) }}</pre>
-            {% endif %}
-        </div>
-        {% endif %}
+
+    <!-- Botões batch -->
+    <div style="margin-top: 1em; display: flex; gap: 0.5em;">
+        <button type="button" class="btn btn-primary" id="save-all-btn">Salvar todas as validações</button>
+        <button type="button" class="btn btn-small" id="clear-all-btn">Limpar alterações</button>
+        <span id="batch-status" style="margin-left: 1em; line-height: 2.5em;"></span>
     </div>
+
     {% else %}
-    <p>Executar comparação com políticas para habilitar revisão.</p>
+    <p>Execute a comparação com políticas para habilitar a validação.</p>
     {% endif %}
 </div>
 
@@ -1048,6 +1111,151 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+
+    // === Humanized Validation UI ===
+    function updateValidationCounts() {
+        const rows = Array.from(document.querySelectorAll(".finding-row"));
+        const totalRows = rows.length;
+        const selectSelects = document.querySelectorAll(".decision-select");
+        const validated = Array.from(selectSelects).filter(s => s.value).length;
+        const pending = totalRows - validated;
+
+        document.getElementById("count-total").textContent = totalRows;
+        document.getElementById("count-validated").textContent = validated;
+        document.getElementById("count-pending").textContent = pending;
+
+        // Count by decision type
+        let remediate = 0, investigate = 0, fp = 0, blocked = 0;
+        selectSelects.forEach(sel => {
+            if (sel.value === "needs_remediation") remediate++;
+            else if (sel.value === "needs_more_evidence") investigate++;
+            else if (sel.value === "false_positive") fp++;
+            else if (sel.value === "blocked") blocked++;
+        });
+        document.getElementById("count-remediate").textContent = remediate;
+        document.getElementById("count-investigate").textContent = investigate;
+        document.getElementById("count-fp").textContent = fp;
+        document.getElementById("count-blocked").textContent = blocked;
+
+        // Update progress bar
+        const pct = totalRows > 0 ? Math.round((validated / totalRows) * 100) : 0;
+        document.getElementById("progress-fill").style.width = pct + "%";
+        document.getElementById("progress-label").textContent = validated + " de " + totalRows + " pendências validadas";
+    }
+
+    // Filter buttons
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const filter = this.dataset.filter;
+            document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+
+            const severities = { critical: ["blocker", "error"] };
+            const scopes = { bgp: "bgp", interface: "interface" };
+
+            document.querySelectorAll(".finding-row").forEach(row => {
+                let shouldShow = true;
+                if (filter === "all") shouldShow = true;
+                else if (filter === "critical") shouldShow = severities.critical.includes(row.dataset.severity);
+                else if (filter === "bgp") shouldShow = row.dataset.scope === scopes.bgp;
+                else if (filter === "interface") shouldShow = row.dataset.scope === scopes.interface;
+                else if (filter === "false_pos") shouldShow = ["likely_parser_noise", "likely_policy_too_strict"].includes(row.dataset.triageBucket);
+                row.style.display = shouldShow ? "" : "none";
+            });
+        });
+    });
+
+    // Preset buttons
+    document.querySelectorAll(".preset-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const preset = this.dataset.preset;
+            const confirmed = confirm("Isso apenas preenche as decisões na tela. Você ainda precisa salvar. Continuar?");
+            if (!confirmed) return;
+
+            const presets = {
+                bgp_state_down: { ruleId: "bgp.peer.state.not_established", decision: "needs_more_evidence", reason: "Sessão BGP em transição. Verificar estado real." },
+                bgp_no_description: { ruleId: "bgp.peer.description.required", decision: "needs_remediation", reason: "Peer confirmado sem descrição. Deve ser padronizado." },
+                parser_noise: { triageBucket: "likely_parser_noise", decision: "false_positive", reason: "Possível erro de leitura do parser." },
+                policy_strict: { triageBucket: "likely_policy_too_strict", decision: "ignored_temporarily", reason: "Regra pode estar rígida demais para este contexto." },
+            };
+
+            const p = presets[preset];
+            if (!p) return;
+
+            document.querySelectorAll(".finding-row").forEach(row => {
+                const matches = (p.ruleId && row.dataset.ruleId === p.ruleId) ||
+                               (p.triageBucket && row.dataset.triageBucket === p.triageBucket);
+                if (matches) {
+                    row.querySelector(".decision-select").value = p.decision;
+                    row.querySelector(".reason-input").value = p.reason;
+                }
+            });
+            updateValidationCounts();
+        });
+    });
+
+    // Track decision/reason changes
+    document.querySelectorAll(".decision-select, .reason-input").forEach(el => {
+        el.addEventListener("change", updateValidationCounts);
+        el.addEventListener("input", updateValidationCounts);
+    });
+
+    // Save all button
+    document.getElementById("save-all-btn").addEventListener("click", async function() {
+        const reviewer = document.getElementById("reviewer-name").value.trim();
+        if (!reviewer) {
+            alert("Informe seu nome antes de salvar.");
+            return;
+        }
+
+        const decisions = [];
+        document.querySelectorAll(".decision-select").forEach(sel => {
+            const decision = sel.value;
+            if (!decision) return;
+            const findingId = sel.dataset.findingId;
+            const reasonEl = document.querySelector(`.reason-input[data-finding-id="${findingId}"]`);
+            const reason = reasonEl ? reasonEl.value.trim() : "";
+            if (!reason) return;
+            decisions.push({finding_id: findingId, decision, reason});
+        });
+
+        if (decisions.length === 0) {
+            alert("Nenhuma validação com decisão e observação para salvar.");
+            return;
+        }
+
+        this.disabled = true;
+        try {
+            const response = await fetch("/compliance/jobs/{{ job.job_id }}/findings/decisions/batch", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({reviewer, decisions})
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                document.getElementById("batch-status").textContent = "✓ " + data.message;
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                alert("Erro: " + (data.error || "falha desconhecida"));
+            }
+        } catch (error) {
+            alert("Erro ao salvar: " + error.message);
+        } finally {
+            this.disabled = false;
+        }
+    });
+
+    // Clear all button
+    document.getElementById("clear-all-btn").addEventListener("click", function() {
+        if (!confirm("Limpar todas as alterações?")) return;
+        document.querySelectorAll(".decision-select").forEach(sel => sel.value = "");
+        document.querySelectorAll(".reason-input").forEach(ta => ta.value = "");
+        updateValidationCounts();
+    });
+
+    // Initial count update
+    updateValidationCounts();
 });
 </script>
 {% endblock %}

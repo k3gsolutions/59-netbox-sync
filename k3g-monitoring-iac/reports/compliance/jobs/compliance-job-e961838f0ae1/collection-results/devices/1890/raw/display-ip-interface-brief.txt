@@ -1,0 +1,73 @@
+display ip interface brief
+*down: administratively down
+!down: FIB overload down
+^down: standby
+(l): loopback
+(s): spoofing
+(d): Dampening Suppressed
+(E): E-Trunk down
+(td): transceiver unmatch down
+The number of interface that is UP in Physical is 44
+The number of interface that is DOWN in Physical is 12
+The number of interface that is UP in Protocol is 33
+The number of interface that is DOWN in Protocol is 23
+
+Interface                         IP Address/Mask      Physical   Protocol VPN 
+Eth-Trunk0                        unassigned           up         down     --  
+Eth-Trunk0.10                     172.28.1.25/30       up         up       --  
+Eth-Trunk0.40                     10.21.1.1/30         up         up       --  
+Eth-Trunk0.41                     10.21.1.5/30         up         up       --  
+Eth-Trunk0.43                     10.20.0.13/30        up         up       --  
+Eth-Trunk0.50                     104.234.244.41/30    up         up       --  
+Eth-Trunk0.51                     104.234.244.9/29     up         up       --  
+Eth-Trunk0.78                     172.28.0.18/30       up         up       --  
+Eth-Trunk0.147                    172.28.0.21/30       up         up       --  
+Eth-Trunk0.228                    172.28.1.29/30       up         up       --  
+Eth-Trunk0.612                    10.20.255.5/30       up         up       --  
+Eth-Trunk0.652                    10.20.1.5/30         up         up       --  
+Eth-Trunk0.801                    172.28.1.9/30        up         up       --  
+Eth-Trunk0.803                    172.28.1.21/30       up         up       --  
+Eth-Trunk0.805                    172.28.1.33/30       up         up       --  
+Eth-Trunk0.810                    172.28.1.17/30       up         up       --  
+Eth-Trunk0.811                    172.28.1.45/30       up         up       --  
+Eth-Trunk0.812                    172.28.1.37/30       *down      down     --  
+Eth-Trunk0.817                    172.28.1.77/30       up         up       --  
+Eth-Trunk0.819                    172.28.1.85/30       up         up       --  
+Eth-Trunk0.827                    172.28.1.89/30       up         up       --  
+Eth-Trunk0.828                    172.28.1.93/30       *down      down     --  
+Eth-Trunk0.895                    172.28.1.53/30       up         up       --  
+Eth-Trunk0.1580                   172.28.15.2/30       *down      down     --  
+Eth-Trunk0.1589                   104.234.244.25/30    up         up       --  
+Eth-Trunk0.1606                   unassigned           up         down     --  
+Eth-Trunk0.2033                   unassigned           up         down     --  
+Eth-Trunk0.2650                   45.68.75.137/21      up         up       --  
+Eth-Trunk0.2651                   unassigned           up         down     --  
+Eth-Trunk0.2748                   104.234.244.29/30    up         up       --  
+Eth-Trunk0.2749                   unassigned           up         down     --  
+Eth-Trunk0.3044                   172.28.1.65/30       up         up       --  
+Eth-Trunk0.3065                   172.28.1.14/30       up         up       --  
+Eth-Trunk0.3800                   200.242.78.58/30     up         up       --  
+Eth-Trunk0.3801                   189.2.240.170/30     up         up       --  
+Eth-Trunk0.3901                   187.16.198.13/24     up         up       --  
+Eth-Trunk0.3902                   unassigned           up         down     --  
+Eth-Trunk0.3967                   172.28.1.5/30        *down      down     --  
+Eth-Trunk0.4005                   unassigned           up         down     --  
+Eth-Trunk1                        unassigned           *down      down     --  
+Ethernet0/0/0                     192.168.0.1/24       down       down     l3vpn
+GigabitEthernet0/5/6(10G)         unassigned           *down      down     --  
+GigabitEthernet0/5/7(10G)         unassigned           *down      down     --  
+GigabitEthernet0/5/8(10G)         unassigned           *down      down     --  
+GigabitEthernet0/5/9(10G)         unassigned           *down      down     --  
+LoopBack0                         10.200.1.255/32      up         up(s)    --  
+LoopBack1                         104.234.244.255/32   up         up(s)    --  
+NULL0                             unassigned           up         up(s)    --  
+Tunnel0                           10.92.1.2/30         *down      down     --  
+Tunnel1                           10.92.1.6/30         *down      down     --  
+Virtual-Ethernet0/2/100           unassigned           up         down     --  
+Virtual-Ethernet0/2/101           unassigned           up         down     --  
+Virtual-Ethernet0/2/101.100       10.20.255.9/30       up         up       --  
+Virtual-Ethernet0/2/200           unassigned           up         down     --  
+Virtual-Ethernet0/2/201           unassigned           up         down     --  
+Virtual-Template0                 unassigned           up         up(s)    --  
+
+<4WNET-MNS-KTG-RX_NE8000>

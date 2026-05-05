@@ -1,0 +1,13 @@
+display device
+NetEngine 8000 M8's Device status:
+-------------------------------------------------------------------------------
+Slot #   Type    Online     Register     Status     Role   LsId   Primary      
+-------------------------------------------------------------------------------
+5        PIC     Present    Registered   Normal     OTHER  0      NA           
+9        IPU     Present    Registered   Normal     MMB    0      Master       
+11       PWR     Present    Registered   Abnormal   OTHER  0      NA           
+12       PWR     Present    Registered   Normal     OTHER  0      NA           
+13       FAN     Present    Registered   Normal     OTHER  0      NA           
+14       CLK     Present    Registered   Normal     OTHER  0      Master       
+-------------------------------------------------------------------------------
+<4WNET-MNS-KTG-RX_NE8000>

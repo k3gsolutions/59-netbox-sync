@@ -1,0 +1,11 @@
+{
+  "command": "display bgp vpnv6 all peer",
+  "device_id": 1890,
+  "host": "104.234.244.255",
+  "executed_at": "2026-05-04T23:36:54.348423+00:00",
+  "stdout_bytes": 53,
+  "stderr_bytes": 0,
+  "redaction_applied": true,
+  "sensitive_findings_count": 0,
+  "redacted_file": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/collection-results/devices/1890/redacted/display-bgp-vpnv6-all-peer.txt"
+}

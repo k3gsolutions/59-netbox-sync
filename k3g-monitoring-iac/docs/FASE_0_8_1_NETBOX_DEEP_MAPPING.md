@@ -1,4 +1,4 @@
-no ntetops# FASE 0.8.1 — NetBoxInventory Deep Mapping
+no ntetops_netbox_sync tem # FASE 0.8.1 — NetBoxInventory Deep Mapping
 
 ## Objetivo
 Aprofundar a coleta read-only do NetBox para alimentar o diff e relatórios de compliance sem depender do plugin BGP. O inventário agora retorna campos ricos de dispositivo, interfaces, IPs, VRFs, VLANs, circuitos e objetos opcionais do plugin BGP.

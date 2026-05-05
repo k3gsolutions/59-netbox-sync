@@ -1,0 +1,28 @@
+display bgp peer
+ 
+ BGP local router ID : 140.99.104.255
+ Local AS number : 270966
+ Total number of peers : 19                 Peers in established state : 12
+
+  Peer                             V          AS  MsgRcvd  MsgSent  OutQ  Up/Down       State  PrefRcv
+  10.20.0.14                       4      270966   662130   710278     0 9543h32m Established      733
+  10.20.1.2                        4      268707        0       32     0 4487h46m        Idle        0
+  10.20.1.6                        4      268707    18811    18854     0 0267h11m Established       11
+  10.20.255.6                      4      268707        0        0     0 9543h36m      Active        0
+  10.20.255.10                     4      270966   796141   789696     0 ****h33m Established        0
+  104.234.244.30                   4      268843        0        0     0 4348h25m      Active        0
+  172.28.1.6                       4      268248        0        0     0 5310h02m        Idle        0
+  172.28.1.13                      4      269608    31543    34058     0 0244h50m Established       14
+  172.28.1.18                      4      272460   155935 23482460     0 2229h12m Established        2
+  172.28.1.34                      4      263934 27913787   180824     0 2551h41m Established  1039603
+  172.28.1.54                      4      269485    14647  2340990     0 0213h31m Established        1
+  172.28.1.66                      4      266396    52033    51781     0 0244h49m Established        7
+  172.28.1.74                      4      272748        0        0     0 4040h10m        Idle        0
+  172.28.1.78                      4      271532        0        0     0 5501h23m      Active        0
+  172.28.1.86                      4       61674   267942 38709219     0 3830h56m Established        4
+  172.28.1.90                      4      263450    23794  4152675     0 0341h14m Established       10
+  172.28.1.94                      4      263450        0        0     0 2646h26m        Idle        0
+  189.2.240.169                    4        4230  4048141    43620     0 0309h46m Established  1037868
+  200.242.78.57                    4        4230 12772878   137204     0 0987h42m Established  1037863
+<4WNET-MNS-KTG-RX_NE8000>display bgp vpnv4 all peer
+<4WNET-MNS-KTG-RX_NE8000>

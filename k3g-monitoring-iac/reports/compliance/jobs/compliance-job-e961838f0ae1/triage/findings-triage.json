@@ -2947,7 +2947,7 @@
   "virtual_ethernet_review": {
     "job_id": null,
     "status": "VIRTUAL_ETHERNET_REVIEW_COMPLETED",
-    "evaluated_at": "2026-05-05T13:20:05.200582+00:00",
+    "evaluated_at": "2026-05-05T14:16:27.167930+00:00",
     "findings_total": 3,
     "reviewed_findings": [
       {
@@ -3003,7 +3003,7 @@
   },
   "comparison_result_present": true,
   "comparison_result_decision": "COMPLIANCE_COMPARE_COMPLETED_WITH_FINDINGS",
-  "triaged_at": "2026-05-05T13:20:05.200651+00:00",
+  "triaged_at": "2026-05-05T14:16:27.167949+00:00",
   "files": {
     "findings_triage": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/triage/findings-triage.json",
     "findings_triage_markdown": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/triage/FINDINGS-TRIAGE.md",

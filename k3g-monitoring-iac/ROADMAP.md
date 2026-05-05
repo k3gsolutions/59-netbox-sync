@@ -32,6 +32,7 @@ Automated, read-only compliance analysis for network devices. Local report histo
 - COMPLIANCE-REMEDIATION-002: remediation draft review UI ✅
 - COMPLIANCE-REMEDIATION-003: remediation draft safety validation ✅
 - COMPLIANCE-REMEDIATION-004: promotion gate to approval candidate ✅
+- COMPLIANCE-TRIAGE-001: findings triage and top-10 review ✅
 - FASE 3.10.2: modal save/save-and-close + safe local pipeline ✅
 - FASE 3.12: response validation dashboard + UAT audit view ✅
 - FASE 2.25: UAT cleanup and Week 1 real-readiness guardrails ✅

@@ -7,6 +7,7 @@ No writes, no tokens. NetBox API: GET-only /api/dcim/devices/.
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 try:
     from fastapi.templating import Jinja2Templates
 except ImportError:
@@ -124,6 +125,7 @@ from .services.compliance_ssh_preflight import run_ssh_preflight
 REPORTS_DIR = ROOT / "reports"
 
 app = FastAPI(title="k3g Compliance & Governance", version="3.0")
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 # Static files
 static_dir = Path(__file__).parent / "static"
@@ -3018,6 +3020,40 @@ async def compliance_findings_review_summary(job_id: str, request: Request):
         return JSONResponse({"success": False, "error": str(exc)}, status_code=404)
 
     return JSONResponse({"success": True, **result}, status_code=200)
+
+
+@app.post("/compliance/jobs/{job_id}/findings/decisions/batch", response_class=JSONResponse)
+async def compliance_findings_batch_decisions(job_id: str, request: Request):
+    """Save multiple finding decisions in batch (humanized UI)."""
+    from .services.compliance_findings_review import batch_save_decisions
+
+    # Validate job_id
+    if not JOB_ID_RE.match(job_id):
+        return JSONResponse({"success": False, "error": "job_id inválido"}, status_code=400)
+
+    try:
+        payload = await request.json()
+    except Exception as e:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {e}"}, status_code=400)
+
+    reviewer = payload.get("reviewer", "").strip()
+    decisions_list = payload.get("decisions", [])
+
+    if not reviewer:
+        return JSONResponse({"success": False, "error": "reviewer obrigatório"}, status_code=400)
+
+    if not decisions_list:
+        return JSONResponse({"success": False, "error": "decisions obrigatório"}, status_code=400)
+
+    try:
+        result = batch_save_decisions(job_id, reviewer, decisions_list)
+    except Exception as e:
+        return JSONResponse({"success": False, "error": f"Erro ao salvar: {str(e)}"}, status_code=500)
+
+    if not result.get("success"):
+        return JSONResponse(result, status_code=400)
+
+    return JSONResponse(result, status_code=200)
 
 
 @app.post("/compliance/jobs/{job_id}/remediation/draft-eligibility", response_class=JSONResponse)

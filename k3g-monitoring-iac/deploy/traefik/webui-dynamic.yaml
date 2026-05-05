@@ -1,0 +1,29 @@
+http:
+  routers:
+    bgpsync-webui-http:
+      rule: Host(`bgpsync.devops.k3gsolutions.com.br`)
+      entryPoints:
+        - web
+      middlewares:
+        - bgpsync-webui-https-redirect
+      service: bgpsync-webui
+    bgpsync-webui:
+      rule: Host(`bgpsync.devops.k3gsolutions.com.br`)
+      entryPoints:
+        - websecure
+      tls: {}
+      service: bgpsync-webui
+
+  middlewares:
+    bgpsync-webui-https-redirect:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+  services:
+    bgpsync-webui:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: http://127.0.0.1:8890
+

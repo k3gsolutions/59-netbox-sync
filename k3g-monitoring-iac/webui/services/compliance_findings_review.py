@@ -351,3 +351,235 @@ def evaluate_remediation_draft_eligibility(job_id: str, jobs_base: Optional[Path
     md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     return result
+
+
+def batch_save_decisions(
+    job_id: str,
+    reviewer: str,
+    decisions_list: list[dict[str, Any]],
+    jobs_base: Optional[Path] = None,
+) -> dict[str, Any]:
+    """Save multiple finding decisions in batch."""
+    reviewer = str(reviewer).strip()
+    if not reviewer:
+        return {"success": False, "error": "reviewer obrigatório"}
+
+    if not decisions_list:
+        return {"success": False, "error": "decisions obrigatório"}
+
+    saved_count = 0
+    failed_count = 0
+    errors: list[str] = []
+
+    for item in decisions_list:
+        finding_id = str(item.get("finding_id", "")).strip()
+        decision = str(item.get("decision", "")).strip()
+        reason = str(item.get("reason", "")).strip()
+
+        if not finding_id or not decision or not reason:
+            failed_count += 1
+            errors.append(f"{finding_id or '?'}: missing finding_id/decision/reason")
+            continue
+
+        payload = {
+            "reviewer": reviewer,
+            "reason": reason,
+            "decision": decision,
+        }
+        result = save_finding_decision(job_id, finding_id, payload, jobs_base)
+        if result.get("success"):
+            saved_count += 1
+        else:
+            failed_count += 1
+            errors.append(f"{finding_id}: {result.get('error', 'unknown error')}")
+
+    # Generate next verification input
+    next_input_result = generate_next_verification_input(job_id, jobs_base)
+    next_phase_allowed = next_input_result.get("next_phase_allowed", False)
+    next_phase = next_input_result.get("next_phase")
+
+    # Build humanized summary
+    summary = summarize_review(job_id, jobs_base)
+    decisions_data = load_review_decisions(job_id, jobs_base)
+    decisions_dict = decisions_data.get("decisions") or {}
+
+    summary_humanized = {
+        "total_findings": summary.get("total_findings", 0),
+        "validadas": summary.get("reviewed", 0),
+        "pendentes": summary.get("pending", 0),
+        "aceitos": sum(
+            1 for d in decisions_dict.values() if d.get("decision") == "accepted"
+        ),
+        "falsos_positivos": sum(
+            1 for d in decisions_dict.values() if d.get("decision") == "false_positive"
+        ),
+        "ignoradas": sum(
+            1 for d in decisions_dict.values() if d.get("decision") == "ignored_temporarily"
+        ),
+        "precisa_corrigir": sum(
+            1 for d in decisions_dict.values() if d.get("decision") == "needs_remediation"
+        ),
+        "precisa_investigar": sum(
+            1 for d in decisions_dict.values() if d.get("decision") == "needs_more_evidence"
+        ),
+        "bloqueadas": sum(
+            1 for d in decisions_dict.values() if d.get("decision") == "blocked"
+        ),
+    }
+
+    return {
+        "success": True,
+        "message": "Validações salvas com sucesso.",
+        "saved_count": saved_count,
+        "failed_count": failed_count,
+        "errors": errors if errors else None,
+        "next_phase_allowed": next_phase_allowed,
+        "next_phase": next_phase,
+        "summary": summary_humanized,
+        "safety": {
+            "netbox_write": False,
+            "device_connection": False,
+            "sync_called": False,
+            "approval_record_created": False,
+            "apply_plan_created": False,
+        },
+    }
+
+
+def generate_next_verification_input(
+    job_id: str,
+    jobs_base: Optional[Path] = None,
+) -> dict[str, Any]:
+    """Generate next-verification-input.json artifact."""
+    job_dir = _safe_job_dir(job_id, jobs_base)
+    review_dir = job_dir / "review"
+    review_dir.mkdir(parents=True, exist_ok=True)
+
+    findings = load_findings(job_id, jobs_base)
+    decisions_data = load_review_decisions(job_id, jobs_base)
+    decisions_dict = decisions_data.get("decisions") or {}
+
+    # Count by decision type
+    total_findings = len(findings)
+    validated_count = len(decisions_dict)
+    pending_count = total_findings - validated_count
+
+    accepted_count = sum(
+        1 for d in decisions_dict.values() if d.get("decision") == "accepted"
+    )
+    false_positive_count = sum(
+        1 for d in decisions_dict.values() if d.get("decision") == "false_positive"
+    )
+    ignored_count = sum(
+        1 for d in decisions_dict.values() if d.get("decision") == "ignored_temporarily"
+    )
+    needs_remediation_count = sum(
+        1 for d in decisions_dict.values() if d.get("decision") == "needs_remediation"
+    )
+    needs_evidence_count = sum(
+        1 for d in decisions_dict.values() if d.get("decision") == "needs_more_evidence"
+    )
+    blocked_count = sum(
+        1 for d in decisions_dict.values() if d.get("decision") == "blocked"
+    )
+
+    # Check next phase gates
+    # Blocked items prevent progress
+    has_blocked = blocked_count > 0
+    # Need at least 1 remediation candidate
+    has_remediation_candidates = needs_remediation_count > 0
+    # All error/blocker findings must have decision
+    findings_by_id = {f.get("finding_id"): f for f in findings}
+    critical_errors = [f for f in findings if f.get("severity") in {"error", "blocker"}]
+    all_critical_reviewed = all(f.get("finding_id") in decisions_dict for f in critical_errors)
+
+    next_phase_allowed = (
+        not has_blocked and has_remediation_candidates and all_critical_reviewed
+    )
+
+    # Populate item lists
+    items_for_next_phase = [
+        d.get("finding_id")
+        for d in decisions_dict.values()
+        if d.get("decision") == "needs_remediation"
+    ]
+    blocked_items = [
+        d.get("finding_id") for d in decisions_dict.values() if d.get("decision") == "blocked"
+    ]
+    pending_items = [
+        d.get("finding_id")
+        for d in decisions_dict.values()
+        if d.get("decision") == "needs_more_evidence"
+    ]
+
+    result = {
+        "job_id": job_id,
+        "status": "USER_VALIDATION_APPLIED",
+        "validated_by": "operator",
+        "validated_at": _now(),
+        "summary": {
+            "total_findings": total_findings,
+            "validated": validated_count,
+            "pending": pending_count,
+            "accepted": accepted_count,
+            "false_positive": false_positive_count,
+            "ignored_temporarily": ignored_count,
+            "needs_remediation": needs_remediation_count,
+            "needs_more_evidence": needs_evidence_count,
+            "blocked": blocked_count,
+        },
+        "next_phase_allowed": next_phase_allowed,
+        "next_phase": "remediation_draft_eligibility" if next_phase_allowed else None,
+        "items_for_next_phase": items_for_next_phase,
+        "blocked_items": blocked_items,
+        "pending_items": pending_items,
+        "safety": {
+            "netbox_write": False,
+            "device_write": False,
+            "sync_called": False,
+            "approval_record_created": False,
+            "apply_plan_created": False,
+        },
+    }
+
+    # Write JSON artifact
+    input_json_path = review_dir / "next-verification-input.json"
+    input_json_path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    # Write markdown
+    lines = [
+        "# NEXT-VERIFICATION-INPUT",
+        "",
+        f"## Job ID\n`{job_id}`",
+        "",
+        f"## Status\n`{result['status']}`",
+        "",
+        f"## Validation Summary",
+        f"- Total findings: {result['summary']['total_findings']}",
+        f"- Validated: {result['summary']['validated']}",
+        f"- Pending: {result['summary']['pending']}",
+        f"- Accepted: {result['summary']['accepted']}",
+        f"- False Positive: {result['summary']['false_positive']}",
+        f"- Ignored Temporarily: {result['summary']['ignored_temporarily']}",
+        f"- Needs Remediation: {result['summary']['needs_remediation']}",
+        f"- Needs Evidence: {result['summary']['needs_more_evidence']}",
+        f"- Blocked: {result['summary']['blocked']}",
+        "",
+        f"## Next Phase",
+        f"- Allowed: {result['next_phase_allowed']}",
+        f"- Phase: {result['next_phase'] or 'none'}",
+        f"- Items for next phase: {len(result['items_for_next_phase'])}",
+        f"- Blocked items: {len(result['blocked_items'])}",
+        f"- Pending items: {len(result['pending_items'])}",
+        "",
+        "## Safety",
+        "- netbox_write=false",
+        "- device_write=false",
+        "- sync_called=false",
+        "- approval_record_created=false",
+        "- apply_plan_created=false",
+    ]
+    input_md_path = review_dir / "NEXT-VERIFICATION-INPUT.md"
+    input_md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    return result

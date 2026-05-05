@@ -1,0 +1,59 @@
+{
+  "cycle_id": "cycle-004",
+  "status": "CYCLE_004_BLOCKED_NO_COLLECTION_DATA",
+  "blocked_at": "2026-05-04T18:30:00Z",
+  "blocker_category": "MISSING_SOURCE_DATA",
+  "reason": "Source compliance job fbdda0de527c has no real collection data (raw/redacted/parsed files)",
+  "source_job": "compliance-job-fbdda0de527c",
+  "source_job_status": {
+    "collection_data_present": false,
+    "raw_files_count": 0,
+    "redacted_files_count": 0,
+    "parsed_files_count": 0,
+    "ready_for_parsing": false
+  },
+  "execution_package_state": {
+    "path": "reports/controlled-operation/cycle-004/real-write-execution/CYCLE-004-EXECUTION-PACKAGE.json",
+    "item_count": 0,
+    "items": [],
+    "cannot_execute": true
+  },
+  "blocking_chain": [
+    "applyplan items missing (because remediation missing)",
+    "remediation candidates missing (because findings missing)",
+    "findings missing (because parser not run)",
+    "parser blocked (because raw collection data missing)"
+  ],
+  "cannot_recover_with": [
+    "fixture_fake_data",
+    "synthetic_findings",
+    "pre_built_remediation",
+    "direct_applyplan_creation"
+  ],
+  "recovery_options": [
+    {
+      "option": 1,
+      "name": "Re-execute collection for job fbdda0de527c",
+      "requires": [
+        "COMPLIANCE_SSH_USERNAME",
+        "COMPLIANCE_SSH_PASSWORD",
+        "Device 4WNET-MNS-KTG-RX reachable",
+        "SSH read-only profile authorized"
+      ],
+      "path": "FASE RECOVERY-002 → RECOVERY-008"
+    },
+    {
+      "option": 2,
+      "name": "Use alternate job with complete collection",
+      "requires": "Find job with parser-result.json and compliance-findings.json",
+      "note": "Checked all 15 jobs—none have data past collection stage"
+    }
+  ],
+  "safety": {
+    "execution_allowed": false,
+    "one_shot_consumable": false,
+    "netbox_write_blocked": true,
+    "sync_blocked": true,
+    "real_write_blocked": true
+  }
+}

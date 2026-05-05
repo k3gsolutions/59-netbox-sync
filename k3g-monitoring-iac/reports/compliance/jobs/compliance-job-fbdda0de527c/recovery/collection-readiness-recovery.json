@@ -1,0 +1,103 @@
+{
+  "job_id": "compliance-job-fbdda0de527c",
+  "evaluated_at": "2026-05-04T18:35:00Z",
+  "status": "COLLECTION_RECOVERY_BLOCKED_INCOMPLETE_JOB",
+  "decision": "Cannot recover this job directly—too incomplete",
+  "missing_artifacts": {
+    "metadata": [
+      "job-request.json",
+      "selected-devices.json",
+      "eligibility-recheck.json",
+      "COMPLIANCE-JOB-START-GATE.md"
+    ],
+    "planning": [
+      "collection-plan.json",
+      "COLLECTION-PLAN.md",
+      "collection-start-gate.json",
+      "COLLECTION-START-GATE.md"
+    ],
+    "preflight": [
+      "ssh-preflight.json",
+      "SSH-PREFLIGHT.md"
+    ]
+  },
+  "device_info_available": {
+    "from_parser_manifest": {
+      "device_id": 1890,
+      "name": "4WNET-MNS-KTG-RX",
+      "profile": "default-readonly",
+      "raw_files": 0,
+      "redacted_files": 0,
+      "parsed_files": 0,
+      "ready_for_parsing": false
+    },
+    "from_selected_devices": null,
+    "from_eligibility_check": null
+  },
+  "ssh_credentials": {
+    "COMPLIANCE_SSH_USERNAME": {
+      "status": "missing",
+      "required": true
+    },
+    "COMPLIANCE_SSH_PASSWORD": {
+      "status": "missing",
+      "required": true
+    },
+    "COMPLIANCE_SSH_PORT": {
+      "status": "not_set",
+      "required": false,
+      "default": 22
+    },
+    "COMPLIANCE_SSH_TIMEOUT": {
+      "status": "not_set",
+      "required": false,
+      "default": 30
+    }
+  },
+  "recovery_options": [
+    {
+      "option": "A",
+      "name": "Create new clean compliance job",
+      "requires": [
+        "COMPLIANCE_SSH_USERNAME",
+        "COMPLIANCE_SSH_PASSWORD",
+        "Device 4WNET-MNS-KTG-RX reachable",
+        "SSH read-only profile authorized"
+      ],
+      "steps": [
+        "Query NetBox device 1890",
+        "Create new job with full metadata",
+        "Execute SSH collection",
+        "Run parser → compare → review",
+        "Rebuild cycle-004 with new job items"
+      ],
+      "pros": "Full audit trail, clean metadata, reproducible",
+      "cons": "Takes time, requires network access"
+    },
+    {
+      "option": "B",
+      "name": "Use test data (tests only)",
+      "requires": [],
+      "limitations": "Cannot be used for operations or cycle-004 real-write",
+      "status": "BLOCKED_FOR_OPERATIONS"
+    },
+    {
+      "option": "C",
+      "name": "Import existing raw output",
+      "requires": "Raw SSH output file from elsewhere",
+      "steps": [
+        "Save raw output to collection-results/devices/1890/raw/",
+        "Restart from FASE RECOVERY-006 (parser staging)"
+      ],
+      "pros": "Faster if data already available",
+      "cons": "Need to source raw output separately"
+    }
+  ],
+  "recommendation": "Option A (new job)",
+  "reason": "Current job too incomplete for recovery path",
+  "safety": {
+    "no_write": true,
+    "no_fake_data": true,
+    "no_execution": true
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "command": "display interface brief",
+  "device_id": 1890,
+  "host": "104.234.244.255",
+  "executed_at": "2026-05-04T23:36:50.820849+00:00",
+  "redaction_applied": true,
+  "sensitive_findings_count": 0,
+  "raw_file": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/collection-results/devices/1890/raw/display-interface-brief.txt"
+}

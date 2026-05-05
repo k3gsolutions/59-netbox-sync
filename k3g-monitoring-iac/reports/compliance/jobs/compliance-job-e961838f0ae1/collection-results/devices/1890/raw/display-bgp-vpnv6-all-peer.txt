@@ -1,0 +1,2 @@
+display bgp vpnv6 all peer
+<4WNET-MNS-KTG-RX_NE8000>

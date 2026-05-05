@@ -1,0 +1,84 @@
+display interface brief
+PHY: Physical
+*down: administratively down
+^down: standby
+(l): loopback
+(s): spoofing
+(E): E-Trunk down
+(b): BFD down
+(B): Bit-error-detection down
+(e): ETHOAM down
+(d): Dampening Suppressed
+(p): port alarm down
+(ld): loop-detect trigger down
+(td): transceiver unmatch down
+(mf): mac-flapping blocked
+(c): CFM down
+(sd): STP instance discarding
+InUti/OutUti: input utility/output utility
+Interface                   PHY   Protocol  InUti OutUti   inErrors  outErrors
+Eth-Trunk0                  up    down     47.49% 46.99%          8          0
+  GigabitEthernet0/5/0(10G) up    up       46.24% 48.36%          0          0
+  GigabitEthernet0/5/1(10G) up    up       47.70% 47.80%          0          0
+  GigabitEthernet0/5/2(10G) up    up       48.81% 47.81%          0          0
+  GigabitEthernet0/5/3(10G) up    up       49.19% 46.43%          0          0
+  GigabitEthernet0/5/4(10G) up    up       47.71% 45.54%          8          0
+  GigabitEthernet0/5/5(10G) up    up       45.29% 45.97%          0          0
+Eth-Trunk0.10               up    up           0%     0%          0          0
+Eth-Trunk0.40               up    up        0.01%  0.01%          0          0
+Eth-Trunk0.41               up    up           0%     0%          0          0
+Eth-Trunk0.43               up    up           0%     0%          0          0
+Eth-Trunk0.50               up    up           0%     0%          0          0
+Eth-Trunk0.51               up    up           0%     0%          0          0
+Eth-Trunk0.78               up    up        0.01%     0%          0          0
+Eth-Trunk0.147              up    up           0%     0%          0          0
+Eth-Trunk0.228              up    up           0%     0%          0          0
+Eth-Trunk0.612              up    up           0%     0%          0          0
+Eth-Trunk0.652              up    up        0.01%  6.18%          0          0
+Eth-Trunk0.801              up    up           0%     0%          0          0
+Eth-Trunk0.803              up    up           0%     0%          0          0
+Eth-Trunk0.805              up    up        6.97%  0.22%          0          0
+Eth-Trunk0.810              up    up        2.26% 13.82%          0          0
+Eth-Trunk0.811              up    up        0.01%  0.01%          0          0
+Eth-Trunk0.812              *down down         0%     0%          0          0
+Eth-Trunk0.817              up    up        0.01%     0%          0          0
+Eth-Trunk0.819              up    up        0.88%  9.41%          0          0
+Eth-Trunk0.827              up    up        0.03%  0.66%          0          0
+Eth-Trunk0.828              *down down         0%     0%          0          0
+Eth-Trunk0.895              up    up        0.07%  0.34%          0          0
+Eth-Trunk0.1580             *down down         0%     0%          0          0
+Eth-Trunk0.1589             up    up           0%     0%          0          0
+Eth-Trunk0.1606             up    down         0%     0%          0          0
+Eth-Trunk0.2033             up    down         0%     0%          0          0
+Eth-Trunk0.2650             up    up           0%     0%          0          0
+Eth-Trunk0.2651             up    down         0%     0%          0          0
+Eth-Trunk0.2748             up    up           0%     0%          0          0
+Eth-Trunk0.2749             up    down         0%     0%          0          0
+Eth-Trunk0.3044             up    up        0.08%  6.76%          0          0
+Eth-Trunk0.3065             up    up        0.01%  1.28%          0          0
+Eth-Trunk0.3800             up    up       12.82%  2.26%          0          0
+Eth-Trunk0.3801             up    up       11.07%  0.93%          0          0
+Eth-Trunk0.3901             up    up           0%     0%          0          0
+Eth-Trunk0.3902             up    down         0%     0%          0          0
+Eth-Trunk0.3967             *down down         0%     0%          0          0
+Eth-Trunk0.4005             up    down         0%     0%          0          0
+Eth-Trunk1                  *down down         0%     0%          0          0
+Ethernet0/0/0               down  down         0%     0%          0          0
+GigabitEthernet0/5/6(10G)   *down down         0%     0%          0          0
+GigabitEthernet0/5/7(10G)   *down down         0%     0%          0          0
+GigabitEthernet0/5/8(10G)   *down down         0%     0%          0          0
+GigabitEthernet0/5/9(10G)   *down down         0%     0%          0          0
+LoopBack0                   up    up(s)        0%     0%          0          0
+LoopBack1                   up    up(s)        0%     0%          0          0
+NULL0                       up    up(s)        0%     0%          0          0
+Tunnel0                     *down down         --     --          0          0
+Tunnel1                     *down down         --     --          0          0
+Virtual-Ethernet0/2/100     up    down         0%     0%          0          0
+Virtual-Ethernet0/2/100.100 up    up           0%     0%          0          0
+Virtual-Ethernet0/2/101     up    down         0%     0%          0          0
+Virtual-Ethernet0/2/101.100 up    up           0%     0%          0          0
+Virtual-Ethernet0/2/200     up    down         0%     0%          0          0
+Virtual-Ethernet0/2/200.100 up    up           0%     0%          0          0
+Virtual-Ethernet0/2/201     up    down         0%     0%          0          0
+Virtual-Template0           up    up(s)        0%     0%          0          0
+<4WNET-MNS-KTG-RX_NE8000>

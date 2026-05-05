@@ -57,6 +57,13 @@ python3 -m uvicorn webui.app:app --host 127.0.0.1 --port 8890 --reload
 
 Then open: **http://127.0.0.1:8890**
 
+### Behind Traefik
+
+- Hostname: `bgpsync.devops.k3gsolutions.com.br`
+- Dynamic config: `deploy/traefik/webui-dynamic.yaml`
+- Backend target: `http://127.0.0.1:8890`
+- `webui/app.py` is proxy-aware via `ProxyHeadersMiddleware`
+
 ---
 
 ## Features

@@ -17,3 +17,4 @@ reports/pilot-device-compliance/*raw*.json
 !.env.example
 !.env.webui.example
 !.env.realwrite.example
+.env.compliance-ssh.local

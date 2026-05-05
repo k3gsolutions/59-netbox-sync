@@ -1,0 +1,59 @@
+display ipv6 interface brief
+*down: administratively down
+!down: FIB overload down
+(l): loopback
+(s): spoofing
+Interface                    Physical              Protocol VPN
+Eth-Trunk0.10                up                    up       --      
+[IPv6 Address] 2804:5984:B400:1::11 
+Eth-Trunk0.41                up                    up       --      
+[IPv6 Address] 2804:5984:B400:1::45 
+Eth-Trunk0.43                up                    up       --      
+[IPv6 Address] 2804:5984:B400:1::D 
+Eth-Trunk0.51                up                    up       --      
+[IPv6 Address] 2804:5984:B401::1 
+Eth-Trunk0.228               up                    up       --      
+[IPv6 Address] 2804:5984:B400::15 
+Eth-Trunk0.801               up                    up       --      
+[IPv6 Address] 2804:5984:B400:1::9 
+Eth-Trunk0.803               up                    up       --      
+[IPv6 Address] 2804:5984:B400::11 
+Eth-Trunk0.805               up                    up       --      
+[IPv6 Address] 2804:5984:B400:1::41 
+Eth-Trunk0.810               up                    up       --      
+[IPv6 Address] 2804:5984:B400:1::39 
+Eth-Trunk0.811               up                    down     --      
+[IPv6 Address] Unassigned
+Eth-Trunk0.819               up                    up       --      
+[IPv6 Address] 2804:5984:B400:1::4D 
+Eth-Trunk0.827               up                    up       --      
+[IPv6 Address] 2804:5984:B000:1::4D 
+Eth-Trunk0.828               *down                 down     --      
+[IPv6 Address] 2804:5984:B000:1::51 [TENTATIVE] 
+Eth-Trunk0.895               up                    up       --      
+[IPv6 Address] 2804:5984:8F00::25 
+Eth-Trunk0.1580              *down                 down     --      
+[IPv6 Address] 2804:11B8:FDBF::2 [TENTATIVE] 
+Eth-Trunk0.2033              up                    down     --      
+[IPv6 Address] Unassigned
+Eth-Trunk0.2651              up                    up       --      
+[IPv6 Address] 2001:12F8:0:9::147:137 
+Eth-Trunk0.2748              up                    up       --      
+[IPv6 Address] 2804:5984:B400::19 
+Eth-Trunk0.3044              up                    up       --      
+[IPv6 Address] 2804:5984:B400:3::9 
+Eth-Trunk0.3065              up                    up       --      
+[IPv6 Address] 2804:5984:B400:1::3D 
+Eth-Trunk0.3800              up                    up       --      
+[IPv6 Address] 2804:A8:2:A8::2FE6 
+Eth-Trunk0.3801              up                    up       --      
+[IPv6 Address] 2804:A8:2:A8::48CA 
+Eth-Trunk0.3902              up                    up       --      
+[IPv6 Address] 2001:12F8:0:21::13 
+Eth-Trunk0.3967              *down                 down     --      
+[IPv6 Address] 2804:5984:B400::5 [TENTATIVE] 
+Eth-Trunk1                   *down                 down     --      
+[IPv6 Address] Unassigned
+Virtual-Ethernet0/2/101.100  up                    up       --      
+[IPv6 Address] 2804:5984:BF04::1 
+<4WNET-MNS-KTG-RX_NE8000>
