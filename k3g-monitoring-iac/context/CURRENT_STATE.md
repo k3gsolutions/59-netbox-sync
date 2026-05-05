@@ -16,6 +16,15 @@ FASE 4.1: Cycle template generation functional. First cycle can be created via t
 
 **COMPLIANCE-APPLYPLAN-001–004 COMPLETE** — ApplyPlan Candidate Builder + Validation + Dry-Run ApplyPlan
 
+**COMPLIANCE-TRIAGE-001–004 COMPLETE** — Findings Triage + Top 10 Review + Virtual-Ethernet Policy Review
+
+- Local triage classifies findings into parser noise, policy-too-strict, human review, remediation candidate, and blocked buckets.
+- Top 10 human review items are generated locally for operator review.
+- Virtual-Ethernet review captures Huawei logical-interface policy guidance without any device reconnect.
+- Trilha A usa o snapshot atual de comparison/finding (`findings_total = 105`); SSH auth só impacta nova recoleta.
+- All triage artifacts stay under `reports/compliance/jobs/<job_id>/triage/`.
+- No NetBox writes, no `/sync`, no ApprovalRecord, no ApplyPlan.
+
 - ApplyPlan candidate builder converts proposed ApprovalRecords into items with write_allowed=false, execution_allowed=false.
 - Validation blocks unsafe candidates: write_allowed!=false, execution_allowed!=false, secret keywords, /sync.
 - Dry-run ApplyPlan builder creates mode=dry_run ApplyPlan with execution_allowed=false, can_execute_real_write=false.

@@ -1,0 +1,120 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "generated_at": "2026-05-05T14:06:44Z",
+  "source_files": {
+    "triage": "reports/compliance/jobs/compliance-job-e961838f0ae1/triage/findings-triage.json",
+    "comparison": "reports/compliance/jobs/compliance-job-e961838f0ae1/comparison/devices/1890/compliance-findings.json"
+  },
+  "top_10": [
+    {
+      "rank": 1,
+      "finding_id": "CMP-140157A8F6",
+      "severity": "warning",
+      "scope": "bgp",
+      "object_name": "172.28.1.74",
+      "rule_id": "bgp.peer.state.not_established",
+      "title": "Peer BGP fora de Established",
+      "reason": "Sessão BGP fora de Established impacta troca de rotas.",
+      "suggested_human_action": "Validar sessão, política e descrição do peer com operador humano."
+    },
+    {
+      "rank": 2,
+      "finding_id": "CMP-1DB6A3E0E5",
+      "severity": "warning",
+      "scope": "bgp",
+      "object_name": "172.28.1.6",
+      "rule_id": "bgp.peer.state.not_established",
+      "title": "Peer BGP fora de Established",
+      "reason": "Sessão BGP fora de Established impacta troca de rotas.",
+      "suggested_human_action": "Validar sessão, política e descrição do peer com operador humano."
+    },
+    {
+      "rank": 3,
+      "finding_id": "CMP-209762428D",
+      "severity": "warning",
+      "scope": "bgp",
+      "object_name": "172.28.1.90",
+      "rule_id": "bgp.peer.state.not_established",
+      "title": "Peer BGP fora de Established",
+      "reason": "Sessão BGP fora de Established impacta troca de rotas.",
+      "suggested_human_action": "Validar sessão, política e descrição do peer com operador humano."
+    },
+    {
+      "rank": 4,
+      "finding_id": "CMP-0B3EDA7B4B",
+      "severity": "warning",
+      "scope": "bgp",
+      "object_name": "172.28.1.74",
+      "rule_id": "bgp.peer.policy.missing",
+      "title": "BGP peer sem política import/export",
+      "reason": "Sem import/export policy, a política de troca fica incompleta.",
+      "suggested_human_action": "Validar sessão, política e descrição do peer com operador humano."
+    },
+    {
+      "rank": 5,
+      "finding_id": "CMP-0D5569B392",
+      "severity": "warning",
+      "scope": "bgp",
+      "object_name": "172.28.1.6",
+      "rule_id": "bgp.peer.policy.missing",
+      "title": "BGP peer sem política import/export",
+      "reason": "Sem import/export policy, a política de troca fica incompleta.",
+      "suggested_human_action": "Validar sessão, política e descrição do peer com operador humano."
+    },
+    {
+      "rank": 6,
+      "finding_id": "CMP-0AB8A50C9B",
+      "severity": "warning",
+      "scope": "bgp",
+      "object_name": "10.20.0.14",
+      "rule_id": "bgp.peer.description.required",
+      "title": "BGP peer sem descrição",
+      "reason": "Peer sem descrição atrapalha revisão e governança.",
+      "suggested_human_action": "Validar sessão, política e descrição do peer com operador humano."
+    },
+    {
+      "rank": 7,
+      "finding_id": "CMP-154F7CEC68",
+      "severity": "warning",
+      "scope": "bgp",
+      "object_name": "172.28.1.18",
+      "rule_id": "bgp.peer.description.required",
+      "title": "BGP peer sem descrição",
+      "reason": "Peer sem descrição atrapalha revisão e governança.",
+      "suggested_human_action": "Validar sessão, política e descrição do peer com operador humano."
+    },
+    {
+      "rank": 8,
+      "finding_id": "CMP-41E723BA69",
+      "severity": "info",
+      "scope": "route_policy",
+      "object_name": "*",
+      "rule_id": "route_policy.missing",
+      "title": "Nenhuma route-policy parseada",
+      "reason": "Ausência de route-policy pode indicar documentação ou cadastro faltante.",
+      "suggested_human_action": "Conferir se ausência é esperada ou se falta cadastro/documentação."
+    },
+    {
+      "rank": 9,
+      "finding_id": "CMP-C55B546A7F",
+      "severity": "info",
+      "scope": "prefix_list",
+      "object_name": "*",
+      "rule_id": "prefix_list.missing",
+      "title": "Nenhum prefix-list parseado",
+      "reason": "Ausência de prefix-list pode esconder dependências de roteamento.",
+      "suggested_human_action": "Conferir se ausência é esperada ou se falta cadastro/documentação."
+    },
+    {
+      "rank": 10,
+      "finding_id": "CMP-349F823871",
+      "severity": "warning",
+      "scope": "bgp",
+      "object_name": "200.242.78.57",
+      "rule_id": "bgp.peer.state.not_established",
+      "title": "Peer BGP fora de Established",
+      "reason": "Sessão BGP fora de Established impacta troca de rotas.",
+      "suggested_human_action": "Validar sessão, política e descrição do peer com operador humano."
+    }
+  ]
+}

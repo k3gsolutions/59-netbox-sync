@@ -1,0 +1,37 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "status": "SSH_COLLECTION_COMPLETED",
+  "decision": "SSH_COLLECTION_COMPLETED",
+  "operator": "Keslley",
+  "simulation_only": false,
+  "device_connection_started": true,
+  "netbox_write": false,
+  "sync_called": false,
+  "approval_record_created": false,
+  "apply_plan_created": false,
+  "commands_executed_count": 19,
+  "forbidden_commands_executed": false,
+  "config_mode_entered": false,
+  "password_logged": false,
+  "password_saved": false,
+  "redaction_applied": true,
+  "devices": [
+    {
+      "device_id": 1890,
+      "name": "4WNET-MNS-KTG-RX",
+      "host": "104.234.244.255",
+      "port": 51212,
+      "connection_source": "connection_override",
+      "override_applied": true,
+      "status": "completed",
+      "commands_executed_count": 19,
+      "redaction_applied": true,
+      "sensitive_findings_count": 0,
+      "errors": [],
+      "password_logged": false,
+      "password_saved": false
+    }
+  ],
+  "checked_at": "2026-05-04T23:38:30.877197+00:00",
+  "issues": []
+}

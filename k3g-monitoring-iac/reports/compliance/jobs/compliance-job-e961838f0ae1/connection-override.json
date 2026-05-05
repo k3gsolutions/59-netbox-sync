@@ -1,0 +1,12 @@
+{
+  "device_id": 1890,
+  "connection_ip": "104.234.244.255",
+  "connection_port": 51212,
+  "reason": "Porta SSH correta confirmada pelo operador",
+  "operator": "Keslley",
+  "created_at": "2026-05-04T00:00:00Z",
+  "safety": {
+    "netbox_write": false,
+    "local_override_only": true
+  }
+}

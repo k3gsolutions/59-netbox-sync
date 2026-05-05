@@ -1,0 +1,71 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "status": "COLLECTION_SIMULATION_PREPARED",
+  "operator": "Keslley",
+  "simulation_only": true,
+  "device_connection_started": false,
+  "netbox_write": false,
+  "sync_called": false,
+  "approval_record_created": false,
+  "apply_plan_created": false,
+  "collection_started": false,
+  "command_count": 19,
+  "devices": [
+    {
+      "device_id": 1890,
+      "name": "4WNET-MNS-KTG-RX",
+      "primary_ip4": "104.234.244.255/32",
+      "platform": null,
+      "manufacturer": "Huawei",
+      "model": "NE8000 M8 DC",
+      "simulation_only": true,
+      "profile_id": "huawei-ne8000-readonly",
+      "profile_vendor": "Huawei",
+      "profile_platform": "NE8000",
+      "profile_valid": true,
+      "profile_issues": [],
+      "planned_commands": [
+        "display version",
+        "display device",
+        "display interface brief",
+        "display ip interface brief",
+        "display ipv6 interface brief",
+        "display bgp peer",
+        "display bgp vpnv4 all peer",
+        "display bgp vpnv6 all peer",
+        "display ip routing-table protocol bgp",
+        "display route-policy",
+        "display ip ip-prefix",
+        "display ipv6 prefix",
+        "display snmp-agent sys-info",
+        "display current-configuration | include sysname",
+        "display current-configuration | include snmp-agent",
+        "display current-configuration | include ntp-service",
+        "display current-configuration | include ssh",
+        "display current-configuration | include stelnet",
+        "display current-configuration | include local-user"
+      ],
+      "blocked_patterns": [
+        "commit",
+        "configure",
+        "delete",
+        "patch",
+        "reboot",
+        "reset",
+        "save",
+        "shutdown",
+        "sync",
+        "system-view",
+        "undo"
+      ]
+    }
+  ],
+  "checked_at": "2026-05-04T18:34:55.024649+00:00",
+  "safety": {
+    "netbox_write": false,
+    "device_connection_started": false,
+    "collection_started": false,
+    "approval_record_created": false,
+    "apply_plan_created": false
+  }
+}

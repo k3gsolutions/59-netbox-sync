@@ -1,0 +1,18 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "status": "prepared",
+  "mode": "read_only",
+  "triggered_by": "Keslley",
+  "created_at": "2026-05-04T18:34:46.801649+00:00",
+  "device_ids": [
+    1890
+  ],
+  "safety": {
+    "netbox_write": false,
+    "device_connection_started": false,
+    "collection_started": false,
+    "approval_record_created": false,
+    "apply_plan_created": false
+  },
+  "next_required_action": "manual_review_before_collection"
+}

@@ -6,6 +6,8 @@ Date: 2026-05-05
 Project: K3G Monitoring & IaC  
 Context: Huawei NE8000 router fleet  
 
+Note: Trilha A triage runs on the existing comparison snapshot. SSH auth is only relevant for a future recoleta, not for classifying the current findings set.
+
 ---
 
 ## Overview

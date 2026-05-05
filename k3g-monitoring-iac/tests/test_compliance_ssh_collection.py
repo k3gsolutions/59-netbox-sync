@@ -140,6 +140,39 @@ def _make_exec_result(output: str):
     return stdin, stdout, stderr
 
 
+class FakeShell:
+    def __init__(self, command_outputs: dict[str, str], prompt: str = "<4WNET-MNS-KTG-RX_NE8000>"):
+        self.command_outputs = command_outputs
+        self.prompt = prompt
+        self.sent_commands: list[str] = []
+        self.timeout = None
+        self.buffer = bytearray((prompt + "\n").encode("utf-8"))
+
+    def settimeout(self, timeout):
+        self.timeout = timeout
+
+    def send(self, data):
+        command = data.strip()
+        self.sent_commands.append(command)
+        output = self.command_outputs.get(command, "")
+        payload = [command]
+        if output:
+            payload.append(output)
+        payload.append(self.prompt)
+        self.buffer.extend(("\n".join(payload) + "\n").encode("utf-8"))
+
+    def recv_ready(self):
+        return bool(self.buffer)
+
+    def recv(self, size):
+        chunk = bytes(self.buffer[:size])
+        del self.buffer[:size]
+        return chunk
+
+    def close(self):
+        return None
+
+
 def _run_preflight(client: LocalHttpClient, jobs_base: Path, job_id: str):
     with patch("webui.services.compliance_jobs.JOBS_BASE", jobs_base), patch(
         "webui.services.compliance_ssh_preflight.JOBS_BASE", jobs_base
@@ -202,10 +235,9 @@ def test_execute_uses_primary_ip_without_mask(client, jobs_base, monkeypatch):
 
     plan = json.loads((jobs_base / job["job_id"] / "collection-plan.json").read_text(encoding="utf-8"))
     planned_commands = build_read_only_commands(plan["devices"][0])
-    exec_results = [_make_exec_result(f"output {index}") for index, _ in enumerate(planned_commands)]
-
+    shell = FakeShell({command: f"output for {command}" for command in planned_commands})
     ssh_client = MagicMock()
-    ssh_client.exec_command.side_effect = exec_results
+    ssh_client.invoke_shell.return_value = shell
     ssh_client_class = MagicMock(return_value=ssh_client)
 
     with patch("webui.services.compliance_jobs.JOBS_BASE", jobs_base), patch(
@@ -227,9 +259,12 @@ def test_execute_uses_primary_ip_without_mask(client, jobs_base, monkeypatch):
         username="readonly",
         password="VerySecret123!",
         timeout=12,
+        banner_timeout=12,
+        auth_timeout=12,
         look_for_keys=False,
         allow_agent=False,
     )
+    assert ssh_client.invoke_shell.call_count == 1
     result = response.json()["ssh_collection_result"]
     assert result["device_connection_started"] is True
     assert result["status"] in {"SSH_COLLECTION_COMPLETED", "SSH_COLLECTION_COMPLETED_WITH_ERRORS"}
@@ -243,8 +278,9 @@ def test_execute_saves_raw_and_meta(client, jobs_base, monkeypatch):
 
     plan = json.loads((jobs_base / job["job_id"] / "collection-plan.json").read_text(encoding="utf-8"))
     planned_commands = build_read_only_commands(plan["devices"][0])
+    shell = FakeShell({command: "ok" for command in planned_commands})
     ssh_client = MagicMock()
-    ssh_client.exec_command.side_effect = [_make_exec_result("ok") for _ in planned_commands]
+    ssh_client.invoke_shell.return_value = shell
     ssh_client_class = MagicMock(return_value=ssh_client)
 
     with patch("webui.services.compliance_jobs.JOBS_BASE", jobs_base), patch(
@@ -270,6 +306,7 @@ def test_execute_saves_raw_and_meta(client, jobs_base, monkeypatch):
     assert (redacted_dir / f"{expected_name}.txt").exists()
     assert (redacted_dir / f"{expected_name}.meta.json").exists()
     assert (jobs_base / job["job_id"] / "collection-results" / "parser-manifest.json").exists()
+    assert ssh_client.invoke_shell.call_count == 1
 
 
 def test_execute_does_not_retry_automatically(client, jobs_base, monkeypatch):

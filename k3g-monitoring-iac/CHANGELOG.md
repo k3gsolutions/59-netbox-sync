@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+### Fixed — COMPLIANCE-TRIAGE status clarity
+
+- Corrected the operational note so Trilha A triage is treated as local-only analysis over the existing comparison snapshot.
+- Clarified that SSH authentication only blocks future recoleta, not review of the already generated findings.
+- Updated the triage status notes and operator guidance to match the current `compliance-job-e961838f0ae1` snapshot.
+
+### Added — COMPLIANCE-TRIAGE-001–004: Findings Triage, Top 10 Review, Virtual-Ethernet Review, UI
+
+- Local triage service classifies findings into parser noise, policy-too-strict, human review, remediation candidate, and blocked buckets.
+- Top 10 human review items are generated locally with strong priority for BGP and missing policy/description findings.
+- Virtual-Ethernet review documents the Huawei logical-interface naming case and suggests policy/parser review only.
+- Job detail UI now shows triage summary, top review items, and report links, with no apply button.
+- All artifacts remain local under `reports/compliance/jobs/<job_id>/triage/`.
+- No NetBox writes, no `/sync`, no ApprovalRecord, no ApplyPlan, no new device connection.
+
 ### Added — COMPLIANCE-APPROVAL-001–004: Approval Candidates, Validation, Proposal Gate
 
 - Approval candidate builder converts safe remediation drafts into approval candidates with unique IDs.

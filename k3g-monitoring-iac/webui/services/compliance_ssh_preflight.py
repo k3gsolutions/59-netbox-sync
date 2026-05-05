@@ -16,6 +16,7 @@ from .compliance_ssh_policy import (
     validate_commands_allowed,
     validate_ssh_env,
 )
+from .compliance_connection_resolver import resolve_device_connection
 
 
 SSH_PREFLIGHT_READY_CONFIG_ONLY = "SSH_PREFLIGHT_READY_CONFIG_ONLY"
@@ -81,16 +82,24 @@ def run_ssh_preflight(job_id: str, operator: str, confirm_read_only: bool = True
         ok, issues = validate_commands_allowed(commands)
         if not ok:
             command_issues.extend(issues)
-        host = _extract_host(device.get("primary_ip4"))
+
+        # Resolve connection with priority: override > selected > primary_ip4 > env > 22
+        conn = resolve_device_connection(job_id, device, jobs_base)
+        host = conn.get("host")
+        port = conn.get("port", 22)
+
         if not host:
-            host_issues.append(f"missing primary_ip4 for device {device.get('device_id')}")
+            host_issues.append(f"missing connection info for device {device.get('device_id')}")
+
         planned_commands_per_device.append(
             {
                 "device_id": device.get("device_id"),
                 "name": device.get("name"),
                 "host": host,
-                "port": env.get("port", 22),
+                "port": port,
                 "timeout": env.get("timeout", 10),
+                "connection_source": conn.get("source", "default"),
+                "override_applied": conn.get("override_applied", False),
                 "planned_commands": commands,
                 "command_files": [sanitize_command_filename(command) for command in commands],
             }

@@ -402,6 +402,129 @@
 </div>
 
 <div class="card">
+    <div class="card-header">Triagem dos Achados</div>
+    <p>Classificação local para revisão humana. Nenhuma escrita, nenhum sync, nenhuma promoção automática.</p>
+    <div style="margin-bottom: 1em;">
+        <button type="button" class="btn btn-primary btn-small" id="triage-btn">Gerar triagem local</button>
+        {% if job.triage and job.triage.files and job.triage.files.findings_triage_report_path %}
+        <a href="/reports/download?path={{ job.triage.files.findings_triage_report_path }}" class="btn btn-small">FINDINGS-TRIAGE.md</a>
+        {% endif %}
+        {% if job.virtual_ethernet_review and job.virtual_ethernet_review.files and job.virtual_ethernet_review.files.virtual_ethernet_review_report_path %}
+        <a href="/reports/download?path={{ job.virtual_ethernet_review.files.virtual_ethernet_review_report_path }}" class="btn btn-small">VIRTUAL-ETHERNET-REVIEW.md</a>
+        {% endif %}
+    </div>
+    {% if job.triage %}
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">Total findings</div>
+            <div class="summary-value">{{ job.triage.findings_total or 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Parser noise</div>
+            <div class="summary-value">{{ job.triage.summary.likely_parser_noise if job.triage.summary else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Policy too strict</div>
+            <div class="summary-value">{{ job.triage.summary.likely_policy_too_strict if job.triage.summary else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Human review</div>
+            <div class="summary-value">{{ job.triage.summary.needs_human_review if job.triage.summary else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Remediation candidate</div>
+            <div class="summary-value">{{ job.triage.summary.remediation_candidate if job.triage.summary else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Blocked</div>
+            <div class="summary-value">{{ job.triage.summary.blocked_from_remediation if job.triage.summary else 0 }}</div>
+        </div>
+    </div>
+    <div class="card-subsection">
+        <h3>Top 10 para Revisão Humana</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Severity</th>
+                    <th>Scope</th>
+                    <th>Object</th>
+                    <th>Rule</th>
+                    <th>Evidence</th>
+                    <th>Suggested action</th>
+                    <th>Why this matters</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if job.triage.top_review_items %}
+                {% for item in job.triage.top_review_items %}
+                <tr>
+                    <td><code>#{{ item.rank }}</code></td>
+                    <td><code>{{ item.original_severity }}</code></td>
+                    <td>{{ item.scope }}</td>
+                    <td>{{ item.object_name }}</td>
+                    <td><code>{{ item.rule_id }}</code></td>
+                    <td><small class="pre-wrap">{{ item.evidence | tojson }}</small></td>
+                    <td>{{ item.suggested_human_action }}</td>
+                    <td>{{ item.why_this_matters }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="8">Nenhum item classificado.</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-label">Parser noise</div>
+            <div class="summary-value">{{ job.triage.parser_adjustment_candidates|length if job.triage.parser_adjustment_candidates else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Policy strict</div>
+            <div class="summary-value">{{ job.triage.policy_adjustment_candidates|length if job.triage.policy_adjustment_candidates else 0 }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Virtual-Ethernet review</div>
+            <div class="summary-value">{{ job.virtual_ethernet_review.reviewed_findings|length if job.virtual_ethernet_review and job.virtual_ethernet_review.reviewed_findings else 0 }}</div>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Bucket</th>
+                <th>Finding</th>
+                <th>Object</th>
+                <th>Reason</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if job.triage.findings %}
+            {% for item in job.triage.findings if item.triage_bucket in ['likely_parser_noise', 'likely_policy_too_strict', 'blocked_from_remediation'] %}
+            <tr>
+                <td><code>{{ item.triage_bucket }}</code></td>
+                <td><code>{{ item.finding_id }}</code></td>
+                <td>{{ item.object_name }}</td>
+                <td>{{ item.reason }}</td>
+                <td>{{ item.suggested_human_action }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="5">Nenhum bucket disponível.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+    {% if job.triage_markdown %}
+    <pre class="pre-wrap">{{ job.triage_markdown }}</pre>
+    {% endif %}
+    {% if job.virtual_ethernet_review_markdown %}
+    <pre class="pre-wrap">{{ job.virtual_ethernet_review_markdown }}</pre>
+    {% endif %}
+    {% endif %}
+</div>
+
+<div class="card">
     <div class="card-header">Revisão dos Achados</div>
     <p>Registro local de decisões sobre achados. Nenhuma escrita em NetBox.</p>
     {% if job.comparison_result %}
@@ -777,6 +900,29 @@ document.addEventListener("DOMContentLoaded", function() {
                 alert("Falha ao comparar com políticas");
             } finally {
                 compareButton.disabled = false;
+            }
+        });
+    }
+    const triageButton = document.getElementById("triage-btn");
+    if (triageButton) {
+        triageButton.addEventListener("click", async function() {
+            triageButton.disabled = true;
+            try {
+                const response = await fetch("/compliance/jobs/{{ job.job_id }}/triage", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({"operator": "Keslley"})
+                });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    alert("Erro ao gerar triagem: " + (data.error || "Falha desconhecida"));
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                alert("Erro ao gerar triagem: " + error.message);
+            } finally {
+                triageButton.disabled = false;
             }
         });
     }

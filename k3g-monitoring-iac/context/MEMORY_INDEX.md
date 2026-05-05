@@ -11,6 +11,7 @@ Gerado em: 2026-04-28 14:41:21 UTC
 | context/CURRENT_STATE.md | Current State — FASE 1.8 (Design Complete) |
 | context/GLOSSARY.md | GLOSSARY |
 | context/NEXT_ACTIONS.md | Next Actions — FASE 1.7+ |
+| context/PROJECT_HANDOFF.md | Project Handoff — 2026-05-05 |
 | context/OPEN_QUESTIONS.md | OPEN_QUESTIONS |
 | context/PHASE_1_ROADMAP.md | FASE 1 Roadmap — Report Tooling |
 | context/SYSTEM_MAP.md | SYSTEM_MAP |
@@ -126,6 +127,7 @@ Gerado em: 2026-04-28 14:41:21 UTC
 | context/FASE-2-7-READY-FOR-APPROVAL.md | FASE 2.7 — First Real Batch POST (Ready for Approval) | Current Situation; FASE 2.7 Readiness Checklist; Approval Requirements; Execution Command (Once Approved); Expected Outcome | 156 |
 | context/GLOSSARY.md | GLOSSARY | - | 12 |
 | context/NEXT_ACTIONS.md | Next Actions — 2026-04-29 (FASES 2.47-3.19, 2.38, 2.39, 2.60, 4.1, 3.20, 4.2-4.58 Complete) | Current Focus (FASES 4.51-4.58); Current Focus (FASE 4.59); Just Completed (FASES 4.22-4.29); Status; Current State | 559 |
+| context/PROJECT_HANDOFF.md | Project Handoff — 2026-05-05 | Snapshot; What Is Ready; What Is Pending; Current High-Value Findings; Non-Blocking Noise; Relevant Artifacts; Safe Constraints | 38 |
 | context/OPEN_QUESTIONS.md | OPEN_QUESTIONS | - | 20 |
 | context/PHASE_1_ROADMAP.md | FASE 1 Roadmap — Report Tooling | FASE 1.0 ✅ Core Analysis; FASE 1.1 ✅ Report History; FASE 1.2 ✅ Report Comparison & Cleanup; FASE 1.3 ✅ ImportPlan Read-Only; After FASE 1 | 110 |
 | context/SYSTEM_MAP.md | SYSTEM_MAP | - | 29 |

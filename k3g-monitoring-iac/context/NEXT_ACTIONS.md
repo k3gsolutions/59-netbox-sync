@@ -100,6 +100,15 @@
 - Next operator action is inspect `reports/compliance/jobs/<job_id>/comparison/` and review findings in UI
 - Keep guardrails: no automatic remediation, no NetBox writes, no SSH/SNMP/NETCONF, no ApprovalRecord, no ApplyPlan
 
+## Current Focus (COMPLIANCE-TRIAGE-001-004)
+
+- Local triage classifies findings into parser noise, policy-too-strict, human review, remediation candidate, and blocked buckets
+- Trilha A already has comparison findings for `compliance-job-e961838f0ae1`; triage runs on the existing snapshot and does not depend on SSH auth
+- Top 10 review items highlight BGP and missing policy/description issues first
+- Virtual-Ethernet review should be checked for Huawei logical-interface policy adjustments
+- Next operator action is review `reports/compliance/jobs/<job_id>/triage/` and the triage section in the job UI
+- Keep guardrails: no NetBox writes, no `/sync`, no ApprovalRecord, no ApplyPlan, no automatic remediation
+
 ## Current Focus (FASE 4.59)
 
 - Real-write execution tool is ready

@@ -1,0 +1,50 @@
+{
+  "job_id": null,
+  "status": "VIRTUAL_ETHERNET_REVIEW_COMPLETED",
+  "evaluated_at": "2026-05-05T13:20:05.200582+00:00",
+  "findings_total": 3,
+  "reviewed_findings": [
+    {
+      "finding_id": "CMP-ECD73947B0",
+      "object_name": "Virtual-Ethernet0/2/100.100",
+      "rule_id": "interface.naming.invalid",
+      "triage_bucket": "likely_policy_too_strict",
+      "confidence": "high",
+      "reason": "Interface Huawei válida parece bater em policy interna rígida demais.",
+      "policy_suggestion": "Adicionar allowlist para Virtual-Ethernet e subinterfaces Huawei legítimas.",
+      "parser_suggestion": "Manter parser; a separação de brief parece correta. Tratar logical_interface como categoria própria.",
+      "severity_suggestion": "warning"
+    },
+    {
+      "finding_id": "CMP-48B6DA3065",
+      "object_name": "Virtual-Ethernet0/2/101.100",
+      "rule_id": "interface.naming.invalid",
+      "triage_bucket": "likely_policy_too_strict",
+      "confidence": "high",
+      "reason": "Interface Huawei válida parece bater em policy interna rígida demais.",
+      "policy_suggestion": "Adicionar allowlist para Virtual-Ethernet e subinterfaces Huawei legítimas.",
+      "parser_suggestion": "Manter parser; a separação de brief parece correta. Tratar logical_interface como categoria própria.",
+      "severity_suggestion": "warning"
+    },
+    {
+      "finding_id": "CMP-8412059E0F",
+      "object_name": "Virtual-Ethernet0/2/200.100",
+      "rule_id": "interface.naming.invalid",
+      "triage_bucket": "likely_policy_too_strict",
+      "confidence": "high",
+      "reason": "Interface Huawei válida parece bater em policy interna rígida demais.",
+      "policy_suggestion": "Adicionar allowlist para Virtual-Ethernet e subinterfaces Huawei legítimas.",
+      "parser_suggestion": "Manter parser; a separação de brief parece correta. Tratar logical_interface como categoria própria.",
+      "severity_suggestion": "warning"
+    }
+  ],
+  "overall_policy_suggestion": "Adicionar allowlist para Virtual-Ethernet e subinterfaces Huawei legítimas.",
+  "overall_parser_suggestion": "Manter parser; a separação de brief parece correta. Tratar logical_interface como categoria própria.",
+  "overall_severity_suggestion": "warning",
+  "decision": "VIRTUAL_ETHERNET_REVIEW_COMPLETED",
+  "files": {
+    "virtual_ethernet_review": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/triage/virtual-ethernet-review.json",
+    "virtual_ethernet_review_markdown": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/triage/VIRTUAL-ETHERNET-REVIEW.md",
+    "virtual_ethernet_review_report_path": "compliance/jobs/compliance-job-e961838f0ae1/triage/VIRTUAL-ETHERNET-REVIEW.md"
+  }
+}

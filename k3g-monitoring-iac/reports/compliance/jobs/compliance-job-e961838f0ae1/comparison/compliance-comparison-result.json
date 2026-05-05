@@ -1,0 +1,2524 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "status": "COMPLIANCE_COMPARE_COMPLETED_WITH_FINDINGS",
+  "decision": "COMPLIANCE_COMPARE_COMPLETED_WITH_FINDINGS",
+  "parser_result": true,
+  "parser_safety_validation": true,
+  "summary": {
+    "devices": 1,
+    "findings_total": 105,
+    "blockers": 0,
+    "errors": 3,
+    "warnings": 100,
+    "info": 2
+  },
+  "safety": {
+    "netbox_write": false,
+    "device_connection": false,
+    "sync_called": false,
+    "approval_record_created": false,
+    "apply_plan_created": false
+  },
+  "registry": {
+    "policy_dir": "policies/compliance",
+    "file_count": 16,
+    "required_count": 13,
+    "optional_count": 3,
+    "blocker_count": 0,
+    "warning_count": 0,
+    "policy_names": [
+      "as-path-policy.yaml",
+      "bgp-policy.yaml",
+      "comments-policy.yaml",
+      "community-policy.yaml",
+      "compliance-severity-policy.yaml",
+      "default-readonly.yaml",
+      "dependency-map.yaml",
+      "discovery-elements.yaml",
+      "huawei-ne8000-readonly.yaml",
+      "interface-policy.yaml",
+      "ip-prefix-policy.yaml",
+      "naming-conventions.yaml",
+      "route-policy-policy.yaml",
+      "snmp-policy.yaml",
+      "ssh-readonly-collection-policy.yaml",
+      "vrf-policy.yaml"
+    ]
+  },
+  "devices": [
+    {
+      "device_id": 1890,
+      "name": "4WNET-MNS-KTG-RX",
+      "profile": "default-readonly",
+      "findings": [
+        {
+          "finding_id": "CMP-B0ED197AD0",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-FE75504980",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/0(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/0(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-80E3577493",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/1(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/1(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-6C46DA6F73",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/2(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/2(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-79786299EC",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/3(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/3(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-1CFEBB7F48",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/4(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/4(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-B4A542CC89",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/5(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/5(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-CB153C93B8",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.812",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-A075F93D07",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.828",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-CDC6FF2D8F",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.1580",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-3AE851DD91",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.1606",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-586DAEA60B",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.2033",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-EF0426F092",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.2651",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-FDEF9E9F4A",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.2749",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-FE310B00D1",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.3902",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-1DE26A68D2",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.3967",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-7CEA3E1891",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk0.4005",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-E2C69F8F0A",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Eth-Trunk1",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-8588B1D179",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Ethernet0/0/0",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Ethernet0/0/0"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-655FCB1A5C",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/6(10G)",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-3740F45D14",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/6(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/6(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-3644659003",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/7(10G)",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-42A559F67E",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/7(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/7(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-AD107E2DA6",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/8(10G)",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-BE0E159900",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/8(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/8(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-2722EF2B20",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/9(10G)",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-1574582148",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "GigabitEthernet0/5/9(10G)",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "GigabitEthernet0/5/9(10G)"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-4D2419EC81",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "LoopBack0",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "up(s)"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-5F01B5DEC2",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "LoopBack1",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "up(s)"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-37073A0586",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Tunnel0",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-8AEE58B988",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Tunnel0",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Tunnel0"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-3A99848AD5",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Tunnel1",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "*down",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-6E75B0D143",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Tunnel1",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Tunnel1"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-9D90DFC902",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/100",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-10ED039E62",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/100",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Virtual-Ethernet0/2/100"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-ECD73947B0",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/100.100",
+          "rule_id": "interface.naming.invalid",
+          "severity": "error",
+          "status": "open",
+          "title": "Nomenclatura de subinterface fora do padrão",
+          "description": "Subinterface não segue naming convention.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Virtual-Ethernet0/2/100.100"
+          },
+          "recommendation": "Ajustar nome conforme naming-conventions.yaml.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 2
+        },
+        {
+          "finding_id": "CMP-82D96F9E87",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/101",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-A743617324",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/101",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Virtual-Ethernet0/2/101"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-48B6DA3065",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/101.100",
+          "rule_id": "interface.naming.invalid",
+          "severity": "error",
+          "status": "open",
+          "title": "Nomenclatura de subinterface fora do padrão",
+          "description": "Subinterface não segue naming convention.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Virtual-Ethernet0/2/101.100"
+          },
+          "recommendation": "Ajustar nome conforme naming-conventions.yaml.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 2
+        },
+        {
+          "finding_id": "CMP-76E7D0E61C",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/200",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-4E37AA8162",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/200",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Virtual-Ethernet0/2/200"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-8412059E0F",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/200.100",
+          "rule_id": "interface.naming.invalid",
+          "severity": "error",
+          "status": "open",
+          "title": "Nomenclatura de subinterface fora do padrão",
+          "description": "Subinterface não segue naming convention.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Virtual-Ethernet0/2/200.100"
+          },
+          "recommendation": "Ajustar nome conforme naming-conventions.yaml.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 2
+        },
+        {
+          "finding_id": "CMP-3A35D2BBEB",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/201",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "down"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-2F328E214C",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Ethernet0/2/201",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Virtual-Ethernet0/2/201"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-376CDECFCD",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Template0",
+          "rule_id": "interface.state.mismatch",
+          "severity": "warning",
+          "status": "open",
+          "title": "Estado físico/protocolo inconsistente",
+          "description": "Physical e protocol não batem no resumo parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].physical/protocol",
+            "value": {
+              "physical": "up",
+              "protocol": "up(s)"
+            }
+          },
+          "recommendation": "Revisar estado operacional da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-8155A6885F",
+          "device_id": 1890,
+          "scope": "interface",
+          "object_type": "interface",
+          "object_name": "Virtual-Template0",
+          "rule_id": "interface.naming.invalid",
+          "severity": "warning",
+          "status": "open",
+          "title": "Nomenclatura de interface fora do padrão",
+          "description": "Nome de interface não bate com base_inventory_patterns.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "interfaces[].name",
+            "value": "Virtual-Template0"
+          },
+          "recommendation": "Revisar nomenclatura da interface.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-0AB8A50C9B",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.0.14",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-883817B876",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.0.14",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-F6F650E018",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.0.14",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 270966 662130 710278 0 9543h32m Established 733.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "270966 662130 710278 0 9543h32m Established 733"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-22F9AEF23C",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.1.2",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-8DDB9986A4",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.1.2",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-A3F23949A5",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.1.2",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 268707 0 32 0 4487h46m Idle 0.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "268707 0 32 0 4487h46m Idle 0"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-DDE7312D7C",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.1.6",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-D085447A75",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.1.6",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-FFA6E852D1",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.1.6",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 268707 18811 18854 0 0267h11m Established 11.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "268707 18811 18854 0 0267h11m Established 11"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-F1645063A8",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.255.6",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-2C045B206C",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.255.6",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-9545FF0AEE",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.255.6",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 268707 0 0 0 9543h36m Active 0.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "268707 0 0 0 9543h36m Active 0"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-4AE6CE0AC4",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.255.10",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-A3C7BEA76B",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.255.10",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-8C8439C43C",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "10.20.255.10",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 270966 796141 789696 0 ****h33m Established 0.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "270966 796141 789696 0 ****h33m Established 0"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-33A22C2CEB",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "104.234.244.30",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-AFC4C074F4",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "104.234.244.30",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-64CD987066",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "104.234.244.30",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 268843 0 0 0 4348h25m Active 0.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "268843 0 0 0 4348h25m Active 0"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-78643C3BC3",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.6",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-0D5569B392",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.6",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-1DB6A3E0E5",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.6",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 268248 0 0 0 5310h02m Idle 0.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "268248 0 0 0 5310h02m Idle 0"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-D576383016",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.13",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-5190687BD4",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.13",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-F9F4B092D6",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.13",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 269608 31543 34058 0 0244h50m Established 14.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "269608 31543 34058 0 0244h50m Established 14"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-154F7CEC68",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.18",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-973AC9F935",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.18",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-E232EDAA87",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.18",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 272460 155935 23482460 0 2229h12m Established 2.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "272460 155935 23482460 0 2229h12m Established 2"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-FDDD2040C0",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.34",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-5F0D7C7813",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.34",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-8C164AD7B2",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.34",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 263934 27913787 180824 0 2551h41m Established 1039603.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "263934 27913787 180824 0 2551h41m Established 1039603"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-4E7E7C2EAB",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.54",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-4A1FB8C8DB",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.54",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-B11C19F472",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.54",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 269485 14647 2340990 0 0213h31m Established 1.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "269485 14647 2340990 0 0213h31m Established 1"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-3D175D3795",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.66",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-9FF0C55A0E",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.66",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-B0440F0A71",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.66",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 266396 52033 51781 0 0244h49m Established 7.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "266396 52033 51781 0 0244h49m Established 7"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-C566C00738",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.74",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-0B3EDA7B4B",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.74",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-140157A8F6",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.74",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 272748 0 0 0 4040h10m Idle 0.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "272748 0 0 0 4040h10m Idle 0"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-2DCD1604BE",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.78",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-C8B0795FD3",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.78",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-BE1EC5E591",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.78",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 271532 0 0 0 5501h23m Active 0.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "271532 0 0 0 5501h23m Active 0"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-7038A8DB84",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.86",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-B24F2C519E",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.86",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-61DB3C98BD",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.86",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 61674 267942 38709219 0 3830h56m Established 4.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "61674 267942 38709219 0 3830h56m Established 4"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-F393366620",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.90",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-4680093ABF",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.90",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-209762428D",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.90",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 263450 23794 4152675 0 0341h14m Established 10.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "263450 23794 4152675 0 0341h14m Established 10"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-62C0B57770",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.94",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-6D336BA972",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.94",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-C31A642AD1",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "172.28.1.94",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 263450 0 0 0 2646h26m Idle 0.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "263450 0 0 0 2646h26m Idle 0"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-D668E5F9A4",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "189.2.240.169",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-8E9292FB4C",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "189.2.240.169",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-D11179F285",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "189.2.240.169",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 4230 4048141 43620 0 0309h46m Established 1037868.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "4230 4048141 43620 0 0309h46m Established 1037868"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-4A468B8E61",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "200.242.78.57",
+          "rule_id": "bgp.peer.description.required",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem descrição",
+          "description": "Peer BGP sem description no inventário parseado.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].description",
+            "value": null
+          },
+          "recommendation": "Revisar cadastro/descrição do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-61C6345224",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "200.242.78.57",
+          "rule_id": "bgp.peer.policy.missing",
+          "severity": "warning",
+          "status": "open",
+          "title": "BGP peer sem política import/export",
+          "description": "Peer sem import_policy ou export_policy detectada.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].import_policy/export_policy",
+            "value": {
+              "import_policy": null,
+              "export_policy": null
+            }
+          },
+          "recommendation": "Confirmar políticas de importação e exportação.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-349F823871",
+          "device_id": 1890,
+          "scope": "bgp",
+          "object_type": "bgp_peer",
+          "object_name": "200.242.78.57",
+          "rule_id": "bgp.peer.state.not_established",
+          "severity": "warning",
+          "status": "open",
+          "title": "Peer BGP fora de Established",
+          "description": "Peer em estado 4230 12772878 137204 0 0987h42m Established 1037863.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "bgp_peers[].state",
+            "value": "4230 12772878 137204 0 0987h42m Established 1037863"
+          },
+          "recommendation": "Validar sessão BGP e estabilidade do peer.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "optional_enrichment",
+          "severity_rank": 1
+        },
+        {
+          "finding_id": "CMP-41E723BA69",
+          "device_id": 1890,
+          "scope": "route_policy",
+          "object_type": "route_policy",
+          "object_name": "*",
+          "rule_id": "route_policy.missing",
+          "severity": "info",
+          "status": "open",
+          "title": "Nenhuma route-policy parseada",
+          "description": "Parsed inventory sem route-policies.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "route_policies",
+            "value": null
+          },
+          "recommendation": "Verificar se o comando display route-policy foi coletado.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "data_missing_for_check",
+          "severity_rank": 0
+        },
+        {
+          "finding_id": "CMP-C55B546A7F",
+          "device_id": 1890,
+          "scope": "prefix_list",
+          "object_type": "prefix_list",
+          "object_name": "*",
+          "rule_id": "prefix_list.missing",
+          "severity": "info",
+          "status": "open",
+          "title": "Nenhum prefix-list parseado",
+          "description": "Parsed inventory sem prefix-lists.",
+          "evidence": {
+            "source": "parsed_inventory",
+            "field": "ip_prefixes/ipv6_prefixes",
+            "value": null
+          },
+          "recommendation": "Verificar se os comandos display ip ip-prefix / display ipv6 prefix foram coletados.",
+          "write_required": false,
+          "approval_required": false,
+          "finding_type": "data_missing_for_check",
+          "severity_rank": 0
+        }
+      ],
+      "summary": {
+        "findings_total": 105,
+        "blockers": 0,
+        "errors": 3,
+        "warnings": 100,
+        "info": 2
+      },
+      "safety": {
+        "netbox_write": false,
+        "device_connection": false,
+        "sync_called": false,
+        "approval_record_created": false,
+        "apply_plan_created": false
+      },
+      "files": {
+        "findings_json": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/comparison/devices/1890/compliance-findings.json",
+        "findings_markdown": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/comparison/devices/1890/COMPLIANCE-FINDINGS.md",
+        "findings_markdown_report_path": "compliance/jobs/compliance-job-e961838f0ae1/comparison/devices/1890/COMPLIANCE-FINDINGS.md"
+      }
+    }
+  ],
+  "checked_at": "2026-05-05T12:52:27.768946+00:00",
+  "files": {
+    "comparison_result": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/comparison/compliance-comparison-result.json",
+    "comparison_result_markdown": "/Users/keslleykssantos/projects/ativos/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-e961838f0ae1/comparison/COMPLIANCE-COMPARISON-RESULT.md",
+    "comparison_result_report_path": "compliance/jobs/compliance-job-e961838f0ae1/comparison/COMPLIANCE-COMPARISON-RESULT.md"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "checked_at": "2026-05-05T12:52:27.535561+00:00",
+  "decision": "PARSER_SAFETY_VALID_WITH_WARNINGS",
+  "status": "PARSER_SAFETY_VALID_WITH_WARNINGS",
+  "parser_result_exists": true,
+  "parsed_inventory_exists": true,
+  "raw_not_displayed_in_ui": true,
+  "netbox_write": false,
+  "ssh_called": false,
+  "approval_record_created": false,
+  "apply_plan_created": false,
+  "checks": {
+    "parser_result_exists": true,
+    "parsed_inventory_exists": true,
+    "netbox_write_false": true,
+    "ssh_not_called": true,
+    "approval_record_absent": true,
+    "apply_plan_absent": true
+  },
+  "warnings": [
+    "parser artifact mentions netbox",
+    "display bgp peer output is empty",
+    "display ip routing-table protocol bgp skipped",
+    "display route-policy output is empty",
+    "1 commands skipped"
+  ],
+  "issues": []
+}

@@ -94,6 +94,7 @@ Then open: **http://127.0.0.1:8890**
 - Vendor collection profiles, redaction, and parser staging
 - Huawei NE8000 local parser baseline, parsed inventory artifacts, and parser safety validation
 - Findings review, remediation draft generation, draft safety validation, and promotion gate
+- Findings triage, top-10 human review items, and Virtual-Ethernet policy review
 - Draft artifacts live under `reports/compliance/jobs/<job_id>/remediation/drafts/`
 - No automatic collection, no SSH/SNMP/NETCONF, no NetBox writes
 

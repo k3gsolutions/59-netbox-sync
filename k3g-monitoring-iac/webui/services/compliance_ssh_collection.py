@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
@@ -30,6 +31,7 @@ from .compliance_ssh_policy import (
     validate_commands_allowed,
     validate_ssh_env,
 )
+from .compliance_connection_resolver import resolve_device_connection
 
 
 SSH_COLLECTION_COMPLETED = "SSH_COLLECTION_COMPLETED"
@@ -67,6 +69,51 @@ def _load_ssh_preflight(results_dir: Path) -> dict:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return {}
+
+
+def _drain_shell_output(channel: Any, timeout: int) -> str:
+    """Read shell output until it goes quiet or timeout expires."""
+    deadline = time.monotonic() + max(timeout, 1)
+    quiet_since: float | None = None
+    chunks: list[str] = []
+
+    while time.monotonic() < deadline:
+        if hasattr(channel, "recv_ready") and channel.recv_ready():
+            try:
+                raw = channel.recv(65535)
+            except Exception:
+                break
+            text = raw.decode("utf-8", errors="ignore") if raw else ""
+            if text:
+                chunks.append(text)
+                quiet_since = None
+            continue
+
+        if quiet_since is None:
+            quiet_since = time.monotonic()
+        elif time.monotonic() - quiet_since >= 0.4:
+            break
+        time.sleep(0.05)
+
+    return "".join(chunks)
+
+
+def _read_shell_prompt(channel: Any, timeout: int) -> str:
+    """Drain initial banner/prompt output from an interactive shell."""
+    return _drain_shell_output(channel, timeout)
+
+
+def _run_shell_command(channel: Any, command: str, timeout: int) -> str:
+    """Send a command over an interactive shell and collect its output."""
+    channel.send(f"{command}\n")
+    return _drain_shell_output(channel, timeout)
+
+
+def _normalize_exception(exc: Exception) -> str:
+    text = str(exc).strip()
+    if text:
+        return text
+    return exc.__class__.__name__
 
 
 def execute_ssh_readonly_collection(job_id: str, operator: str, confirm_execute_read_only: bool = True, jobs_base: Optional[Path] = None) -> dict:
@@ -178,7 +225,12 @@ def execute_ssh_readonly_collection(job_id: str, operator: str, confirm_execute_
 
     for device in devices:
         device_id = str(device.get("device_id") or device.get("id") or "unknown")
-        host = _extract_host(device.get("primary_ip4"))
+
+        # Resolve connection with priority: override > selected > primary_ip4 > env > 22
+        conn = resolve_device_connection(job_id, device, jobs_base)
+        host = conn.get("host")
+        port = conn.get("port", 22)
+
         device_dir = results_dir / "devices" / device_id
         raw_dir = device_dir / "raw"
         redacted_dir = device_dir / "redacted"
@@ -195,6 +247,9 @@ def execute_ssh_readonly_collection(job_id: str, operator: str, confirm_execute_
             "device_id": device.get("device_id"),
             "name": device.get("name"),
             "host": host,
+            "port": port,
+            "connection_source": conn.get("source", "default"),
+            "override_applied": conn.get("override_applied", False),
             "status": "pending",
             "commands_executed_count": 0,
             "redaction_applied": False,
@@ -210,22 +265,26 @@ def execute_ssh_readonly_collection(job_id: str, operator: str, confirm_execute_
             password = os.getenv("COMPLIANCE_SSH_PASSWORD")
             ssh.connect(
                 hostname=host,
-                port=int(env.get("port", 22)),
+                port=int(port),
                 username=username,
                 password=password,
                 timeout=int(env.get("timeout", 10)),
+                banner_timeout=int(env.get("timeout", 10)),
+                auth_timeout=int(env.get("timeout", 10)),
                 look_for_keys=False,
                 allow_agent=False,
             )
             if username or password:
                 device_result["password_logged"] = False
                 device_result["password_saved"] = False
+            shell = ssh.invoke_shell()
+            if hasattr(shell, "settimeout"):
+                shell.settimeout(int(env.get("timeout", 10)))
+            _read_shell_prompt(shell, int(env.get("timeout", 10)))
+            _run_shell_command(shell, "screen-length 0 temporary", int(env.get("timeout", 10)))
             for command in commands:
                 safe_name = sanitize_command_filename(command)
-                stdin, stdout, stderr = ssh.exec_command(command, timeout=int(env.get("timeout", 10)))
-                raw_output = stdout.read().decode("utf-8", errors="ignore")
-                raw_error = stderr.read().decode("utf-8", errors="ignore")
-                raw_text = raw_output if not raw_error else f"{raw_output}\n{raw_error}"
+                raw_text = _run_shell_command(shell, command, int(env.get("timeout", 10)))
                 raw_file = raw_dir / f"{safe_name}.txt"
                 raw_file.write_text(raw_text, encoding="utf-8")
                 redaction_result = redact_file(raw_file, redacted_dir / f"{safe_name}.txt")
@@ -237,8 +296,8 @@ def execute_ssh_readonly_collection(job_id: str, operator: str, confirm_execute_
                         "device_id": device.get("device_id"),
                         "host": host,
                         "executed_at": _now(),
-                        "stdout_bytes": len(raw_output.encode("utf-8")),
-                        "stderr_bytes": len(raw_error.encode("utf-8")),
+                        "stdout_bytes": len(raw_text.encode("utf-8")),
+                        "stderr_bytes": 0,
                         "redaction_applied": True,
                         "sensitive_findings_count": len(findings),
                         "redacted_file": str(redacted_dir / f"{safe_name}.txt"),
@@ -260,6 +319,8 @@ def execute_ssh_readonly_collection(job_id: str, operator: str, confirm_execute_
                 device_result["commands_executed_count"] += 1
                 device_result["redaction_applied"] = True
                 device_result["sensitive_findings_count"] += int(redaction_result["sensitive_findings_count"])
+            if hasattr(shell, "close"):
+                shell.close()
             if hasattr(ssh, "close"):
                 ssh.close()
             device_result["status"] = "completed"
@@ -267,8 +328,10 @@ def execute_ssh_readonly_collection(job_id: str, operator: str, confirm_execute_
         except Exception as exc:
             any_errors = True
             device_result["status"] = "failed"
-            device_result["errors"].append(str(exc))
+            device_result["errors"].append(_normalize_exception(exc))
             try:
+                if "shell" in locals() and hasattr(shell, "close"):
+                    shell.close()
                 if "ssh" in locals() and hasattr(ssh, "close"):
                     ssh.close()
             except Exception:

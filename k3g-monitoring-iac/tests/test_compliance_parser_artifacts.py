@@ -131,6 +131,39 @@ def _make_exec_result(output: str):
     return stdin, stdout, stderr
 
 
+class FakeShell:
+    def __init__(self, command_outputs: dict[str, str], prompt: str = "<4WNET-MNS-KTG-RX_NE8000>"):
+        self.command_outputs = command_outputs
+        self.prompt = prompt
+        self.sent_commands: list[str] = []
+        self.timeout = None
+        self.buffer = bytearray((prompt + "\n").encode("utf-8"))
+
+    def settimeout(self, timeout):
+        self.timeout = timeout
+
+    def send(self, data):
+        command = data.strip()
+        self.sent_commands.append(command)
+        output = self.command_outputs.get(command, "")
+        payload = [command]
+        if output:
+            payload.append(output)
+        payload.append(self.prompt)
+        self.buffer.extend(("\n".join(payload) + "\n").encode("utf-8"))
+
+    def recv_ready(self):
+        return bool(self.buffer)
+
+    def recv(self, size):
+        chunk = bytes(self.buffer[:size])
+        del self.buffer[:size]
+        return chunk
+
+    def close(self):
+        return None
+
+
 def _command_output(command: str) -> str:
     command = command.lower()
     if command.startswith("display version"):
@@ -233,12 +266,9 @@ def _run_preflight(client: LocalHttpClient, jobs_base: Path, job_id: str):
 def _run_collection(client: LocalHttpClient, jobs_base: Path, job_id: str):
     plan = json.loads((jobs_base / job_id / "collection-plan.json").read_text(encoding="utf-8"))
     planned_commands = build_read_only_commands(plan["devices"][0])
+    shell = FakeShell({command: _command_output(command) for command in planned_commands})
     ssh_client = MagicMock()
-
-    def _exec(command, timeout=None):
-        return _make_exec_result(_command_output(command))
-
-    ssh_client.exec_command.side_effect = _exec
+    ssh_client.invoke_shell.return_value = shell
     ssh_client_class = MagicMock(return_value=ssh_client)
     with patch("webui.services.compliance_jobs.JOBS_BASE", jobs_base), patch(
         "webui.services.compliance_ssh_collection.JOBS_BASE", jobs_base
@@ -253,7 +283,7 @@ def _run_collection(client: LocalHttpClient, jobs_base: Path, job_id: str):
         )
     assert response.status_code == 200
     assert ssh_client.connect.call_count == 1
-    assert ssh_client.exec_command.call_count == len(planned_commands)
+    assert ssh_client.invoke_shell.call_count == 1
     return response.json()
 
 

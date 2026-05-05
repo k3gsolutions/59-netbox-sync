@@ -1,0 +1,78 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "checked_at": "2026-05-04T18:34:52.180427+00:00",
+  "decision": "COLLECTION_PLAN_PREPARED",
+  "status": "prepared",
+  "precondition": "COLLECTION_START_GATE_READY",
+  "devices": [
+    {
+      "device_id": 1890,
+      "name": "4WNET-MNS-KTG-RX",
+      "primary_ip4": "104.234.244.255/32",
+      "platform": null,
+      "manufacturer": "Huawei",
+      "model": "NE8000 M8 DC",
+      "collection_profile": {
+        "profile_id": "huawei-ne8000-readonly",
+        "vendor": "Huawei",
+        "platform": "NE8000",
+        "valid": true,
+        "issues": []
+      },
+      "planned_commands": [
+        "display version",
+        "display device",
+        "display interface brief",
+        "display ip interface brief",
+        "display ipv6 interface brief",
+        "display bgp peer",
+        "display bgp vpnv4 all peer",
+        "display bgp vpnv6 all peer",
+        "display ip routing-table protocol bgp",
+        "display route-policy",
+        "display ip ip-prefix",
+        "display ipv6 prefix",
+        "display snmp-agent sys-info",
+        "display current-configuration | include sysname",
+        "display current-configuration | include snmp-agent",
+        "display current-configuration | include ntp-service",
+        "display current-configuration | include ssh",
+        "display current-configuration | include stelnet",
+        "display current-configuration | include local-user"
+      ],
+      "profile_id": "huawei-ne8000-readonly",
+      "allowed_collection_methods": [
+        "ssh_read_only",
+        "snmp_read_only"
+      ],
+      "forbidden_methods": [
+        "netconf_write",
+        "cli_config",
+        "netbox_write",
+        "sync"
+      ],
+      "command_policy": [
+        "show/display only",
+        "no configure/system-view",
+        "no commit/save"
+      ],
+      "expected_outputs": [
+        "interfaces",
+        "bgp",
+        "vrf",
+        "route-policy",
+        "prefix-list",
+        "snmp",
+        "system info"
+      ]
+    }
+  ],
+  "safety": {
+    "netbox_write": false,
+    "device_connection_started": false,
+    "collection_started": false,
+    "approval_record_created": false,
+    "apply_plan_created": false
+  },
+  "collection_started": false
+}

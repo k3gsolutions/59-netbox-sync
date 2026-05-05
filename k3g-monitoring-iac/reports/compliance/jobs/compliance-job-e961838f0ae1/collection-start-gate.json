@@ -1,0 +1,47 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "operator": "Keslley",
+  "confirm": true,
+  "checked_at": "2026-05-04T18:34:49.630839+00:00",
+  "decision": "COLLECTION_START_GATE_READY",
+  "status": "ready",
+  "blocked_reason": "",
+  "checks": {
+    "job_status_prepared": true,
+    "devices_selected": true,
+    "confirm_true": true,
+    "operator_present": true,
+    "original_safety_present": true,
+    "collection_started_false": true,
+    "netbox_write_false": true,
+    "approval_record_absent": true,
+    "apply_plan_absent": true
+  },
+  "job_request": {
+    "job_id": "compliance-job-e961838f0ae1",
+    "status": "prepared",
+    "mode": "read_only",
+    "triggered_by": "Keslley",
+    "created_at": "2026-05-04T18:34:46.801649+00:00",
+    "device_ids": [
+      1890
+    ],
+    "safety": {
+      "netbox_write": false,
+      "device_connection_started": false,
+      "collection_started": false,
+      "approval_record_created": false,
+      "apply_plan_created": false
+    },
+    "next_required_action": "manual_review_before_collection"
+  },
+  "selected_devices_count": 1,
+  "safety": {
+    "netbox_write": false,
+    "device_connection_started": false,
+    "collection_started": false,
+    "approval_record_created": false,
+    "apply_plan_created": false
+  },
+  "next_required_action": "collection_plan"
+}

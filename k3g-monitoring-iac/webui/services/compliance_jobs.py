@@ -394,6 +394,10 @@ def load_compliance_job(job_id: str, jobs_base: Optional[Path] = None) -> dict:
     remediation_draft_validation_markdown = _load_text(job_dir / "remediation" / "drafts" / "REMEDIATION-DRAFT-VALIDATION.md")
     remediation_promotion_gate = _load_json(job_dir / "remediation" / "drafts" / "remediation-promotion-gate.json")
     remediation_promotion_gate_markdown = _load_text(job_dir / "remediation" / "drafts" / "REMEDIATION-PROMOTION-GATE.md")
+    triage = _load_json(job_dir / "triage" / "findings-triage.json")
+    triage_markdown = _load_text(job_dir / "triage" / "FINDINGS-TRIAGE.md")
+    virtual_ethernet_review = _load_json(job_dir / "triage" / "virtual-ethernet-review.json")
+    virtual_ethernet_review_markdown = _load_text(job_dir / "triage" / "VIRTUAL-ETHERNET-REVIEW.md")
 
     return {
         "job_id": job_id,
@@ -432,6 +436,10 @@ def load_compliance_job(job_id: str, jobs_base: Optional[Path] = None) -> dict:
         "remediation_draft_validation_markdown": remediation_draft_validation_markdown,
         "remediation_promotion_gate": remediation_promotion_gate,
         "remediation_promotion_gate_markdown": remediation_promotion_gate_markdown,
+        "triage": triage,
+        "triage_markdown": triage_markdown,
+        "virtual_ethernet_review": virtual_ethernet_review,
+        "virtual_ethernet_review_markdown": virtual_ethernet_review_markdown,
         "finding_decisions_markdown": finding_decisions_markdown,
         "remediation_draft_eligibility_markdown": remediation_draft_eligibility_markdown,
         "files": {
@@ -468,6 +476,10 @@ def load_compliance_job(job_id: str, jobs_base: Optional[Path] = None) -> dict:
             "remediation_draft_validation_markdown": str(job_dir / "remediation" / "drafts" / "REMEDIATION-DRAFT-VALIDATION.md"),
             "remediation_promotion_gate": str(job_dir / "remediation" / "drafts" / "remediation-promotion-gate.json"),
             "remediation_promotion_gate_markdown": str(job_dir / "remediation" / "drafts" / "REMEDIATION-PROMOTION-GATE.md"),
+            "triage": str(job_dir / "triage" / "findings-triage.json"),
+            "triage_markdown": str(job_dir / "triage" / "FINDINGS-TRIAGE.md"),
+            "virtual_ethernet_review": str(job_dir / "triage" / "virtual-ethernet-review.json"),
+            "virtual_ethernet_review_markdown": str(job_dir / "triage" / "VIRTUAL-ETHERNET-REVIEW.md"),
         },
     }
 

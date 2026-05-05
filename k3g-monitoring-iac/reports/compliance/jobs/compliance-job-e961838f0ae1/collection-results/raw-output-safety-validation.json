@@ -1,0 +1,90 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "decision": "RAW_OUTPUT_SAFETY_VALID",
+  "status": "RAW_OUTPUT_SAFETY_VALID",
+  "checked_at": "2026-05-04T23:38:33.096992+00:00",
+  "issues": [],
+  "warnings": [],
+  "sensitive_findings_count": 0,
+  "executed_commands": [
+    {
+      "device_id": "1890",
+      "command": "display bgp vpnv4 all peer"
+    },
+    {
+      "device_id": "1890",
+      "command": "display current-configuration | include local-user"
+    },
+    {
+      "device_id": "1890",
+      "command": "display snmp-agent sys-info"
+    },
+    {
+      "device_id": "1890",
+      "command": "display bgp peer"
+    },
+    {
+      "device_id": "1890",
+      "command": "display version"
+    },
+    {
+      "device_id": "1890",
+      "command": "display ipv6 interface brief"
+    },
+    {
+      "device_id": "1890",
+      "command": "display current-configuration | include ntp-service"
+    },
+    {
+      "device_id": "1890",
+      "command": "display current-configuration | include snmp-agent"
+    },
+    {
+      "device_id": "1890",
+      "command": "display ip interface brief"
+    },
+    {
+      "device_id": "1890",
+      "command": "display device"
+    },
+    {
+      "device_id": "1890",
+      "command": "display route-policy"
+    },
+    {
+      "device_id": "1890",
+      "command": "display ipv6 prefix"
+    },
+    {
+      "device_id": "1890",
+      "command": "display current-configuration | include stelnet"
+    },
+    {
+      "device_id": "1890",
+      "command": "display current-configuration | include sysname"
+    },
+    {
+      "device_id": "1890",
+      "command": "display ip routing-table protocol bgp"
+    },
+    {
+      "device_id": "1890",
+      "command": "display interface brief"
+    },
+    {
+      "device_id": "1890",
+      "command": "display bgp vpnv6 all peer"
+    },
+    {
+      "device_id": "1890",
+      "command": "display ip ip-prefix"
+    },
+    {
+      "device_id": "1890",
+      "command": "display current-configuration | include ssh"
+    }
+  ],
+  "raw_files_checked": 19,
+  "meta_files_checked": 19,
+  "redacted_files_checked": 19
+}

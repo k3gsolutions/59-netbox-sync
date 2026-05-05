@@ -1,0 +1,96 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "operator": "Keslley",
+  "confirm_read_only": true,
+  "decision": "SSH_PREFLIGHT_READY_CONFIG_ONLY",
+  "status": "SSH_PREFLIGHT_READY_CONFIG_ONLY",
+  "checked_at": "2026-05-04T20:12:24.736487+00:00",
+  "env": {
+    "username_present": true,
+    "password_present": true,
+    "port": 22,
+    "timeout": 10,
+    "tcp_check_enabled": false
+  },
+  "policy": {
+    "allowed_protocol": "ssh",
+    "allowed_command_prefixes": [
+      "display",
+      "show"
+    ]
+  },
+  "preconditions": {
+    "start_gate_ready": true,
+    "plan_prepared": true,
+    "safety_valid": true,
+    "confirm_read_only": true
+  },
+  "planned_devices": [
+    {
+      "device_id": 1890,
+      "name": "4WNET-MNS-KTG-RX",
+      "host": "104.234.244.255",
+      "port": 51212,
+      "timeout": 10,
+      "connection_source": "connection_override",
+      "override_applied": true,
+      "planned_commands": [
+        "display version",
+        "display device",
+        "display interface brief",
+        "display ip interface brief",
+        "display ipv6 interface brief",
+        "display bgp peer",
+        "display bgp vpnv4 all peer",
+        "display bgp vpnv6 all peer",
+        "display ip routing-table protocol bgp",
+        "display route-policy",
+        "display ip ip-prefix",
+        "display ipv6 prefix",
+        "display snmp-agent sys-info",
+        "display current-configuration | include sysname",
+        "display current-configuration | include snmp-agent",
+        "display current-configuration | include ntp-service",
+        "display current-configuration | include ssh",
+        "display current-configuration | include stelnet",
+        "display current-configuration | include local-user"
+      ],
+      "command_files": [
+        "display-version",
+        "display-device",
+        "display-interface-brief",
+        "display-ip-interface-brief",
+        "display-ipv6-interface-brief",
+        "display-bgp-peer",
+        "display-bgp-vpnv4-all-peer",
+        "display-bgp-vpnv6-all-peer",
+        "display-ip-routing-table-protocol-bgp",
+        "display-route-policy",
+        "display-ip-ip-prefix",
+        "display-ipv6-prefix",
+        "display-snmp-agent-sys-info",
+        "display-current-configuration-include-sysname",
+        "display-current-configuration-include-snmp-agent",
+        "display-current-configuration-include-ntp-service",
+        "display-current-configuration-include-ssh",
+        "display-current-configuration-include-stelnet",
+        "display-current-configuration-include-local-user"
+      ]
+    }
+  ],
+  "command_issues": [],
+  "host_issues": [],
+  "tcp_check": {
+    "enabled": false,
+    "attempted": false,
+    "success": false,
+    "issues": []
+  },
+  "safety": {
+    "password_saved": false,
+    "password_logged": false,
+    "commands_executed": false,
+    "netbox_write": false,
+    "sync_called": false
+  }
+}

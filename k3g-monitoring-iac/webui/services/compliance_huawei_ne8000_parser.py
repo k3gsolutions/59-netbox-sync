@@ -62,6 +62,43 @@ def _split_key_value(line: str) -> tuple[str, str] | None:
     return None
 
 
+def _looks_like_interface_name(name: str) -> bool:
+    text = (name or "").strip()
+    if not text:
+        return False
+    lowered = text.lower()
+    if lowered in {
+        "interface",
+        "phy",
+        "physical",
+        "protocol",
+        "description",
+        "ip",
+        "address/mask",
+        "vpn",
+        "inuti/oututi",
+        "inerrors",
+        "outerrors",
+    }:
+        return False
+    if text.startswith(("display ", "The number", "PHY:", "PHY", "*down:", "^down:", "!down:")):
+        return False
+    if text.startswith(("(", ")", "-", "<")) and not re.match(r"^(?:Eth-Trunk|GigabitEthernet|Ethernet|Virtual-|LoopBack|Tunnel|NULL0|BAGG|XGigabitEthernet)", text, re.I):
+        return False
+    return bool(
+        re.match(
+            r"^(?:"
+            r"(?:Eth-Trunk|Eth|Ethernet|GigabitEthernet|XGigabitEthernet|FastEthernet|GE|FE|MEth|LoopBack|Tunnel|NULL0|Virtual-Ethernet|Virtual-Template)"
+            r"\d+(?:/\d+)*(?:\.\d+)?(?:\(\d+[A-Za-z]*\))?"
+            r"|"
+            r"Eth-Trunk\d+\.\d+"
+            r")$",
+            text,
+            re.I,
+        )
+    )
+
+
 def parse_display_version(text: str) -> dict[str, Any]:
     lines = _lines(text)
     result: dict[str, Any] = {
@@ -131,11 +168,14 @@ def _parse_brief_rows(text: str, expected_columns: int = 4) -> list[dict[str, An
         if not stripped:
             continue
         lowered = stripped.lower()
-        if lowered.startswith(("interface", "ifname", "phy", "protocol", "---")):
+        if lowered.startswith(("interface", "ifname", "phy", "protocol", "---", "the number")):
             continue
-        parts = re.split(r"\s{2,}|\t+", stripped)
-        if len(parts) < expected_columns:
-            parts = re.split(r"\s+", stripped)
+        if " " not in stripped:
+            continue
+        name, remainder = stripped.split(None, 1)
+        if not _looks_like_interface_name(name):
+            continue
+        parts = [name] + re.split(r"\s+", remainder.strip())
         if len(parts) < expected_columns:
             continue
         rows.append({"columns": parts, "line": stripped})
