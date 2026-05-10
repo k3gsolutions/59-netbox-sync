@@ -203,6 +203,48 @@ class NetBoxClient:
 
         return self._fetch("/api/dcim/devices/", params)
 
+    def list_tenants(self, limit: int = 100) -> list[dict]:
+        """
+        List all tenants from NetBox.
+
+        Args:
+            limit: Max results per page
+
+        Returns:
+            List of tenant dicts {id, name, slug, group}
+
+        Raises:
+            NetBoxAuthError: on 401/403
+            NetBoxClientError: on request or parsing error
+        """
+        return self._fetch("/api/tenancy/tenants/", {"limit": limit})
+
+    def get_devices_by_tenant(
+        self,
+        tenant_id: int,
+        status: str = "active",
+        limit: int = 100,
+    ) -> list[dict]:
+        """
+        Fetch devices filtered by tenant ID.
+
+        Args:
+            tenant_id: NetBox tenant ID
+            status: Device status (default "active")
+            limit: Max results
+
+        Returns:
+            List of device dicts for the tenant
+
+        Raises:
+            NetBoxAuthError: on 401/403
+            NetBoxClientError: on request or parsing error
+        """
+        return self._fetch(
+            "/api/dcim/devices/",
+            {"tenant_id": tenant_id, "status": status, "limit": limit}
+        )
+
 
 def get_netbox_client() -> NetBoxClient:
     """

@@ -170,7 +170,7 @@ def status_label(status: str) -> str:
         "go": "Liberado",
         "go_with_restrictions": "Liberado com restrições",
         "go_week2_review": "Liberado para Semana 2",
-        "go_with_restrictions_uat_present": "Liberado com restrições UAT",
+        "go_with_restrictions_uat_present": "Liberado com restrições de dados legados",
         "keep_as_real": "Manter como real",
         "week1_response_ready": "Resposta da Semana 1 pronta",
         "week1_response_ready_with_restrictions": "Resposta da Semana 1 pronta com restrições",
@@ -254,16 +254,25 @@ def status_label(status: str) -> str:
 # Dashboard
 # ============================================================================
 
+def _safe_dashboard_value(label: str, default, func, *args):
+    """Return a dashboard value without letting a single helper break the page."""
+    try:
+        return func(*args)
+    except Exception as exc:
+        print(f"[webui] dashboard {label} failed: {exc}")
+        return default
+
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     """Dashboard home page."""
-    latest_report = get_latest_report(ROOT)
-    reports = list_reports(ROOT)
-    devices = list_devices(ROOT)
-    approvals = list_approvals(ROOT)
-    batch_results = list_batch_results(ROOT)
-    incidents = list_incidents(ROOT)
-    apply_plans = list_apply_plans(ROOT)
+    latest_report = _safe_dashboard_value("latest_report", None, get_latest_report, ROOT)
+    reports = _safe_dashboard_value("reports", [], list_reports, ROOT)
+    devices = _safe_dashboard_value("devices", [], list_devices, ROOT)
+    approvals = _safe_dashboard_value("approvals", [], list_approvals, ROOT)
+    batch_results = _safe_dashboard_value("batch_results", [], list_batch_results, ROOT)
+    incidents = _safe_dashboard_value("incidents", [], list_incidents, ROOT)
+    apply_plans = _safe_dashboard_value("apply_plans", [], list_apply_plans, ROOT)
 
     # Count by approval status
     approvals_pending = sum(1 for a in approvals if "pending" in a.get("path", ""))
@@ -272,9 +281,9 @@ async def index(request: Request):
     # Batch results status
     latest_batch = batch_results[0] if batch_results else None
     batch_noop = sum(1 for b in batch_results if "NO-OP" in b.get("name", "") or "already" in b.get("name", "").lower())
-    week1_execution = _week1_execution_overview("4WNET-MNS-KTG-RX")
-    week2_review = _week2_review_overview("4WNET-MNS-KTG-RX")
-    controlled_operation = _controlled_operation_overview()
+    week1_execution = _safe_dashboard_value("week1_execution", {}, _week1_execution_overview, "4WNET-MNS-KTG-RX")
+    week2_review = _safe_dashboard_value("week2_review", {}, _week2_review_overview, "4WNET-MNS-KTG-RX")
+    controlled_operation = _safe_dashboard_value("controlled_operation", {}, _controlled_operation_overview)
 
     context = {
         "request": request,
@@ -784,6 +793,7 @@ async def service_engagement_device(request: Request, device: str):
 
     pending_items = load_pending_items(device)
     validation_assets = _load_validation_assets(device)
+    compliance_refresh_job = _latest_compliance_job_for_device(device)
 
     context = {
         "request": request,
@@ -801,6 +811,8 @@ async def service_engagement_device(request: Request, device: str):
         "snapshot_file": validation_assets["snapshot_file"],
         "week2_review_file": validation_assets["week2_review_file"],
         "uat_detected": _detect_uat_active(),
+        "compliance_refresh_job": compliance_refresh_job,
+        "compliance_refresh_job_id": compliance_refresh_job.get("job_id") if compliance_refresh_job else None,
     }
 
     return templates.TemplateResponse("service_engagement_device.html", context)
@@ -922,7 +934,7 @@ async def uat_audit_view(request: Request, device: str):
     readiness_content = readiness_report.read_text(encoding="utf-8") if readiness_report.exists() else None
     context = {
         "request": request,
-        "title": f"UAT Audit: {device}",
+        "title": f"Auditoria de dados legados: {device}",
         "device": device,
         "audit_report": {"name": audit_report.name, "path": str(audit_report.relative_to(REPORTS_DIR))} if audit_report.exists() else None,
         "readiness_report": {"name": readiness_report.name, "path": str(readiness_report.relative_to(REPORTS_DIR))} if readiness_report.exists() else None,
@@ -1472,6 +1484,22 @@ def _count_pending_items(pending_items):
     return counts
 
 
+def _latest_compliance_job_for_device(device: str) -> Optional[dict]:
+    """Return the newest compliance job for a selected device name."""
+    wanted = (device or "").strip().lower()
+    if not wanted:
+        return None
+    for job in list_compliance_jobs():
+        try:
+            selected = load_compliance_job(str(job.get("job_id") or "")).get("selected_devices") or {}
+        except KeyError:
+            continue
+        for selected_device in selected.get("devices") or []:
+            if str(selected_device.get("name") or "").strip().lower() == wanted:
+                return job
+    return None
+
+
 def _pending_validation_command(device: str) -> str:
     responses_dir = REPORTS_DIR / "pilot-device-compliance" / "week1-responses"
     output = REPORTS_DIR / "pilot-device-compliance" / "week1-response-validation.md"
@@ -1682,11 +1710,7 @@ def _controlled_cycle_week1_pending_context(cycle_id: str) -> dict:
         "items": items,
         "count": len(items),
         "responses_dir": str(responses_dir.relative_to(REPORTS_DIR)) if responses_dir.exists() else None,
-        "seed_commands": [
-            f"python3 tools/local/controlled_cycle_week1_seed_response.py --cycle-id {cycle_id} --device {cycle['device']} --device-id {cycle['device_id']} --cycle-dir reports/controlled-operation/{cycle['cycle_id']} --team service --object-type subinterface --object-key Eth-Trunk0.10 --response-status answered --tenant \"Cliente Piloto\" --service-type customer-internet --criticality gold --owner \"UAT Service Owner\" --evidence \"UAT evidence\" --notes \"UAT response\" --output-dir reports/controlled-operation/{cycle['cycle_id']}/week1",
-            f"python3 tools/local/controlled_cycle_week1_seed_response.py --cycle-id {cycle_id} --device {cycle['device']} --device-id {cycle['device_id']} --cycle-dir reports/controlled-operation/{cycle['cycle_id']} --team network_ops --object-type ip_address --object-key 192.0.2.1/30 --response-status answered --interface GigabitEthernet0/5/0 --vrf _public_ --relation-type infrastructure --owner \"UAT Network Ops\" --evidence \"UAT evidence\" --notes \"UAT response\" --output-dir reports/controlled-operation/{cycle['cycle_id']}/week1",
-            f"python3 tools/local/controlled_cycle_week1_seed_response.py --cycle-id {cycle_id} --device {cycle['device']} --device-id {cycle['device_id']} --cycle-dir reports/controlled-operation/{cycle['cycle_id']} --team bgp --object-type bgp_peer --object-key 203.0.113.1 --response-status answered --remote-asn 65000 --remote-bgp-group UAT-GROUP --policy-intent \"UAT policy intent\" --criticality silver --owner \"UAT BGP Owner\" --evidence \"UAT evidence\" --notes \"UAT response\" --output-dir reports/controlled-operation/{cycle['cycle_id']}/week1",
-        ],
+        "seed_commands": [],
     }
 
 
@@ -2107,6 +2131,7 @@ async def controlled_operation_cycle_real_write_closure(request: Request, cycle_
 async def response_edit_form(request: Request, device: str):
     """Compatibility page for the pending-item editor."""
     pending_items = load_pending_items(device)
+    compliance_refresh_job = _latest_compliance_job_for_device(device)
     context = {
         "request": request,
         "title": f"Pending Items: {device}",
@@ -2115,6 +2140,8 @@ async def response_edit_form(request: Request, device: str):
         "pending_count": len(pending_items),
         "pending_counts": _count_pending_items(pending_items),
         "validation_command": _pending_validation_command(device),
+        "compliance_refresh_job": compliance_refresh_job,
+        "compliance_refresh_job_id": compliance_refresh_job.get("job_id") if compliance_refresh_job else None,
     }
     return templates.TemplateResponse("response_edit.html", context)
 
@@ -2135,11 +2162,13 @@ async def response_edit_submit(request: Request, device: str):
 async def pending_items_view(request: Request, device: str, format: Optional[str] = Query(None)):
     """Return pending items as HTML or JSON."""
     pending_items = load_pending_items(device)
+    compliance_refresh_job = _latest_compliance_job_for_device(device)
     if (format or "").lower() == "json" or "application/json" in request.headers.get("accept", "").lower():
         return JSONResponse({
             "device": device,
             "count": len(pending_items),
             "summary": _count_pending_items(pending_items),
+            "compliance_refresh_job_id": compliance_refresh_job.get("job_id") if compliance_refresh_job else None,
             "items": pending_items,
         })
 
@@ -2151,6 +2180,8 @@ async def pending_items_view(request: Request, device: str, format: Optional[str
         "pending_count": len(pending_items),
         "pending_counts": _count_pending_items(pending_items),
         "validation_command": _pending_validation_command(device),
+        "compliance_refresh_job": compliance_refresh_job,
+        "compliance_refresh_job_id": compliance_refresh_job.get("job_id") if compliance_refresh_job else None,
     }
     return templates.TemplateResponse("service_engagement_pending_items.html", context)
 
@@ -2683,6 +2714,157 @@ async def get_compliance_candidates(
         )
 
 
+@app.get("/compliance/tenants", response_class=JSONResponse)
+async def get_compliance_tenants(limit: int = Query(100)):
+    """Get list of NetBox tenants for compliance UI."""
+    try:
+        client = get_netbox_client()
+        tenants = client.list_tenants(limit=limit)
+        return JSONResponse({
+            "success": True,
+            "tenants": [
+                {
+                    "id": t.get("id"),
+                    "name": t.get("name"),
+                    "slug": t.get("slug"),
+                    "group": t.get("group", {}).get("name") if t.get("group") else None,
+                }
+                for t in tenants
+            ],
+        })
+    except NetBoxNotConfiguredError:
+        return JSONResponse(
+            {"success": False, "error": "NetBox não configurado"},
+            status_code=503,
+        )
+    except NetBoxAuthError:
+        return JSONResponse(
+            {"success": False, "error": "Falha de autenticação no NetBox"},
+            status_code=401,
+        )
+    except NetBoxClientError as e:
+        return JSONResponse(
+            {"success": False, "error": f"Erro ao conectar ao NetBox: {e}"},
+            status_code=500,
+        )
+
+
+@app.get("/compliance/devices", response_class=JSONResponse)
+async def get_compliance_devices(tenant_id: int = Query(...)):
+    """Get devices by tenant, filtered for compliance eligibility."""
+    try:
+        client = get_netbox_client()
+        devices = client.get_devices_by_tenant(tenant_id, status="active", limit=100)
+
+        # Filter for compliance candidates
+        eligible = []
+        for device in devices:
+            if is_compliance_candidate(device):
+                candidate = normalize_compliance_candidate(device)
+                eligible.append({
+                    "id": candidate["id"],
+                    "name": candidate["name"],
+                    "primary_ip4": candidate["primary_ip4"],
+                    "site": candidate["site"],
+                    "role": candidate["role"],
+                    "manufacturer": candidate["manufacturer"],
+                    "model": candidate["model"],
+                })
+
+        return JSONResponse({
+            "success": True,
+            "devices": eligible,
+            "count": len(eligible),
+        })
+    except NetBoxNotConfiguredError:
+        return JSONResponse(
+            {"success": False, "error": "NetBox não configurado"},
+            status_code=503,
+        )
+    except NetBoxAuthError:
+        return JSONResponse(
+            {"success": False, "error": "Falha de autenticação no NetBox"},
+            status_code=401,
+        )
+    except NetBoxClientError as e:
+        return JSONResponse(
+            {"success": False, "error": f"Erro ao conectar ao NetBox: {e}"},
+            status_code=500,
+        )
+
+
+@app.post("/compliance/analyze", response_class=JSONResponse)
+async def analyze_device_compliance(request: Request):
+    """Analyze device compliance across selected contexts."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse(
+            {"success": False, "error": f"Payload inválido: {exc}"},
+            status_code=400,
+        )
+
+    device_id = payload.get("device_id")
+    contexts = payload.get("contexts", [])
+    ssh_creds = payload.get("ssh", {})
+    snmp_community = payload.get("snmp_community")
+
+    if not device_id or not contexts:
+        return JSONResponse(
+            {"success": False, "error": "device_id e contexts são obrigatórios"},
+            status_code=400,
+        )
+
+    try:
+        client = get_netbox_client()
+        device = client.get_device_by_id(device_id)
+        if not device:
+            return JSONResponse(
+                {"success": False, "error": "Dispositivo não encontrado no NetBox"},
+                status_code=404,
+            )
+
+        from .services.compliance_analyze_contexts import analyze_device
+
+        # Prepare SSH credentials with device defaults
+        ssh_host = ssh_creds.get("host") or (device.get("primary_ip4", "").split("/")[0] if device.get("primary_ip4") else "")
+        ssh_credentials = {
+            "host": ssh_host,
+            "port": int(ssh_creds.get("port", 22)),
+            "username": ssh_creds.get("username", "admin"),
+            "password": ssh_creds.get("password", ""),
+        }
+
+        findings, summary = analyze_device(device, contexts, ssh_credentials, snmp_community)
+
+        return JSONResponse({
+            "success": True,
+            "findings": [dict(f) for f in findings],
+            "summary": summary,
+        })
+
+    except NetBoxNotConfiguredError:
+        return JSONResponse(
+            {"success": False, "error": "NetBox não configurado"},
+            status_code=503,
+        )
+    except NetBoxAuthError:
+        return JSONResponse(
+            {"success": False, "error": "Falha de autenticação no NetBox"},
+            status_code=401,
+        )
+    except NetBoxClientError as e:
+        return JSONResponse(
+            {"success": False, "error": f"Erro ao conectar ao NetBox: {e}"},
+            status_code=500,
+        )
+    except Exception as e:
+        return JSONResponse(
+            {"success": False, "error": f"Erro na análise: {str(e)}"},
+            status_code=500,
+        )
+
+
 @app.get("/compliance/jobs", response_class=HTMLResponse)
 async def compliance_jobs_list(request: Request):
     """List prepared compliance jobs."""
@@ -2951,6 +3133,96 @@ async def compliance_job_compare(job_id: str, request: Request):
 
     status_code = 200 if result["decision"] != "COMPLIANCE_COMPARE_BLOCKED" else 409
     return JSONResponse({"success": True, **result}, status_code=status_code)
+
+
+@app.post("/compliance/jobs/{job_id}/refresh-query", response_class=JSONResponse)
+async def compliance_job_refresh_query(job_id: str, request: Request):
+    """Run a fresh read-only device collection, parser validation, and compliance comparison."""
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Payload inválido: {exc}"}, status_code=400)
+
+    operator = str(payload.get("operator") or "").strip()
+    confirm_refresh_read_only = bool(payload.get("confirm_refresh_read_only"))
+    if not operator:
+        return JSONResponse({"success": False, "error": "operator é obrigatório"}, status_code=400)
+    if confirm_refresh_read_only is not True:
+        return JSONResponse({"success": False, "error": "confirm_refresh_read_only deve ser true"}, status_code=400)
+
+    try:
+        job = load_compliance_job(job_id)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado"}, status_code=404)
+
+    steps: list[dict] = []
+
+    def _record(step: str, result: dict) -> dict:
+        steps.append(
+            {
+                "step": step,
+                "decision": result.get("decision") or result.get("status") or "unknown",
+                "success": result.get("success", True),
+            }
+        )
+        return result
+
+    try:
+        if (job.get("collection_start_gate") or {}).get("decision") != "COLLECTION_START_GATE_READY":
+            result = _record("collection_start_gate", create_collection_start_gate(job_id, operator, True))
+            if result.get("decision") != "COLLECTION_START_GATE_READY":
+                return JSONResponse({"success": False, "error": "collection start gate bloqueado", "steps": steps}, status_code=409)
+            job = load_compliance_job(job_id)
+
+        if (job.get("collection_plan") or {}).get("decision") != "COLLECTION_PLAN_PREPARED":
+            result = _record("collection_plan", create_collection_plan(job_id))
+            if result.get("decision") != "COLLECTION_PLAN_PREPARED":
+                return JSONResponse({"success": False, "error": "collection plan bloqueado", "steps": steps}, status_code=409)
+            job = load_compliance_job(job_id)
+
+        result = _record("collection_structure", execute_collection_job(job_id, operator, simulation_only=True))
+        if result.get("decision") != "COLLECTION_SAFETY_VALID":
+            return JSONResponse({"success": False, "error": "estrutura de coleta inválida", "steps": steps}, status_code=409)
+
+        result = _record("ssh_preflight", run_ssh_preflight(job_id, operator, True))
+        if result.get("decision") == "SSH_PREFLIGHT_BLOCKED":
+            return JSONResponse({"success": False, "error": "pré-requisitos SSH bloqueados", "steps": steps}, status_code=409)
+
+        result = _record("ssh_collection", execute_ssh_readonly_collection(job_id, operator, True))
+        if result.get("decision") not in {"SSH_COLLECTION_COMPLETED", "SSH_COLLECTION_COMPLETED_WITH_ERRORS"}:
+            return JSONResponse({"success": False, "error": "coleta SSH read-only não concluída", "steps": steps}, status_code=409)
+
+        result = _record("raw_validation", validate_raw_collection_outputs(job_id))
+        if result.get("decision") == "RAW_OUTPUT_SAFETY_INVALID":
+            return JSONResponse({"success": False, "error": "raw output safety validation inválida", "steps": steps}, status_code=409)
+
+        result = _record("parse", parse_job_collection(job_id))
+        if result.get("decision") not in {"PARSER_COMPLETED", "PARSER_COMPLETED_WITH_WARNINGS"}:
+            return JSONResponse({"success": False, "error": "parser não concluiu", "steps": steps}, status_code=409)
+
+        result = _record("parser_validation", validate_parser_outputs(job_id))
+        if result.get("decision") == "PARSER_SAFETY_INVALID":
+            return JSONResponse({"success": False, "error": "parser safety validation inválida", "steps": steps}, status_code=409)
+
+        result = _record("compare", compare_job(job_id))
+        if result.get("decision") == "COMPLIANCE_COMPARE_BLOCKED":
+            return JSONResponse({"success": False, "error": "comparação de compliance bloqueada", "steps": steps}, status_code=409)
+    except KeyError:
+        return JSONResponse({"success": False, "error": "Job não encontrado", "steps": steps}, status_code=404)
+    except RuntimeError as exc:
+        return JSONResponse({"success": False, "error": str(exc), "steps": steps}, status_code=503)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "error": str(exc), "steps": steps}, status_code=409)
+
+    return JSONResponse(
+        {
+            "success": True,
+            "decision": "COMPLIANCE_QUERY_REFRESHED",
+            "message": "Nova coleta read-only, parser e comparação concluídos.",
+            "steps": steps,
+        },
+        status_code=200,
+    )
 
 
 @app.get("/compliance/jobs/{job_id}/triage", response_class=JSONResponse)
