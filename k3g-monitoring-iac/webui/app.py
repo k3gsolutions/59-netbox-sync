@@ -2714,104 +2714,157 @@ async def get_compliance_candidates(
         )
 
 
-@app.get("/compliance/tenants", response_class=JSONResponse)
-async def get_compliance_tenants(limit: int = Query(100)):
-    """Get list of NetBox tenants for compliance UI."""
+@app.get("/compliance/eligible-tenants", response_class=JSONResponse)
+async def get_compliance_eligible_tenants(limit: int = Query(100)):
+    """Get list of tenants with eligible compliance devices."""
     try:
         client = get_netbox_client()
-        tenants = client.list_tenants(limit=limit)
-        return JSONResponse({
-            "success": True,
-            "tenants": [
-                {
-                    "id": t.get("id"),
-                    "name": t.get("name"),
-                    "slug": t.get("slug"),
-                    "group": t.get("group", {}).get("name") if t.get("group") else None,
-                }
-                for t in tenants
-            ],
-        })
+        all_tenants = client.list_tenants(limit=limit)
+
+        # Count eligible devices per tenant
+        eligible_tenants = []
+        for tenant in all_tenants:
+            tenant_id = tenant.get("id")
+            if not tenant_id:
+                continue
+
+            devices = client.get_devices_by_tenant(tenant_id, status="active", limit=1000)
+            eligible_count = sum(1 for d in devices if is_compliance_candidate(d))
+
+            if eligible_count > 0:
+                eligible_tenants.append({
+                    "id": tenant_id,
+                    "name": tenant.get("name", ""),
+                    "slug": tenant.get("slug", ""),
+                    "description": tenant.get("description", ""),
+                    "device_count": eligible_count,
+                })
+
+        return JSONResponse(eligible_tenants)
+
     except NetBoxNotConfiguredError:
-        return JSONResponse(
-            {"success": False, "error": "NetBox não configurado"},
-            status_code=503,
-        )
+        return JSONResponse({"detail": "NetBox não configurado"}, status_code=503)
     except NetBoxAuthError:
-        return JSONResponse(
-            {"success": False, "error": "Falha de autenticação no NetBox"},
-            status_code=401,
-        )
+        return JSONResponse({"detail": "Falha de autenticação no NetBox"}, status_code=401)
     except NetBoxClientError as e:
-        return JSONResponse(
-            {"success": False, "error": f"Erro ao conectar ao NetBox: {e}"},
-            status_code=500,
-        )
+        return JSONResponse({"detail": f"Erro ao conectar ao NetBox: {e}"}, status_code=500)
 
 
-@app.get("/compliance/devices", response_class=JSONResponse)
-async def get_compliance_devices(tenant_id: int = Query(...)):
-    """Get devices by tenant, filtered for compliance eligibility."""
+@app.get("/compliance/eligible-devices", response_class=JSONResponse)
+async def get_compliance_eligible_devices(tenant_id: int = Query(...)):
+    """Get eligible devices for a tenant."""
     try:
         client = get_netbox_client()
         devices = client.get_devices_by_tenant(tenant_id, status="active", limit=100)
 
-        # Filter for compliance candidates
         eligible = []
         for device in devices:
             if is_compliance_candidate(device):
-                candidate = normalize_compliance_candidate(device)
+                primary_ip = device.get("primary_ip4", "")
+                if primary_ip and isinstance(primary_ip, dict):
+                    primary_ip = primary_ip.get("address", "")
+                elif isinstance(primary_ip, str):
+                    primary_ip = primary_ip.split("/")[0]
+
+                manufacturer = ""
+                model = ""
+                if device.get("device_type"):
+                    dt = device["device_type"]
+                    if isinstance(dt, dict):
+                        manufacturer = dt.get("manufacturer", {}).get("name", "") if dt.get("manufacturer") else ""
+                        model = dt.get("model", "")
+
+                site = ""
+                if device.get("site"):
+                    site = device["site"].get("name", "") if isinstance(device["site"], dict) else str(device["site"])
+
                 eligible.append({
-                    "id": candidate["id"],
-                    "name": candidate["name"],
-                    "primary_ip4": candidate["primary_ip4"],
-                    "site": candidate["site"],
-                    "role": candidate["role"],
-                    "manufacturer": candidate["manufacturer"],
-                    "model": candidate["model"],
+                    "id": device.get("id"),
+                    "name": device.get("name", ""),
+                    "manufacturer": manufacturer,
+                    "model": model,
+                    "site": site,
+                    "primary_ip": primary_ip,
                 })
 
-        return JSONResponse({
-            "success": True,
-            "devices": eligible,
-            "count": len(eligible),
-        })
+        return JSONResponse(eligible)
+
     except NetBoxNotConfiguredError:
-        return JSONResponse(
-            {"success": False, "error": "NetBox não configurado"},
-            status_code=503,
-        )
+        return JSONResponse({"detail": "NetBox não configurado"}, status_code=503)
     except NetBoxAuthError:
-        return JSONResponse(
-            {"success": False, "error": "Falha de autenticação no NetBox"},
-            status_code=401,
-        )
+        return JSONResponse({"detail": "Falha de autenticação no NetBox"}, status_code=401)
     except NetBoxClientError as e:
-        return JSONResponse(
-            {"success": False, "error": f"Erro ao conectar ao NetBox: {e}"},
-            status_code=500,
-        )
+        return JSONResponse({"detail": f"Erro ao conectar ao NetBox: {e}"}, status_code=500)
 
 
-@app.post("/compliance/analyze", response_class=JSONResponse)
-async def analyze_device_compliance(request: Request):
-    """Analyze device compliance across selected contexts."""
+@app.get("/compliance/eligible-contexts", response_class=JSONResponse)
+async def get_compliance_eligible_contexts():
+    """Get list of available compliance analysis contexts."""
+    contexts = [
+        {
+            "id": "interfaces",
+            "label": "Interfaces",
+            "description": "Validar estado, descrição e velocidade das interfaces",
+            "icon": "🌐",
+            "collection_method": "snmp",
+        },
+        {
+            "id": "bgp",
+            "label": "BGP",
+            "description": "Verificar status das sessões BGP e peers",
+            "icon": "🔗",
+            "collection_method": "ssh",
+        },
+        {
+            "id": "seguranca",
+            "label": "Segurança",
+            "description": "Validar SSH, STelnet, usuários e credenciais",
+            "icon": "🔐",
+            "collection_method": "ssh",
+        },
+        {
+            "id": "nomenclaturas",
+            "label": "Nomenclaturas",
+            "description": "Verificar padrão de nomenclatura de interfaces",
+            "icon": "🏷️",
+            "collection_method": "ssh",
+        },
+        {
+            "id": "ntp_snmp",
+            "label": "NTP/SNMP",
+            "description": "Validar NTP e configurações SNMP",
+            "icon": "⏰",
+            "collection_method": "ssh",
+        },
+        {
+            "id": "sysname",
+            "label": "Sysname",
+            "description": "Verificar hostname do dispositivo",
+            "icon": "💻",
+            "collection_method": "ssh",
+        },
+    ]
+    return JSONResponse(contexts)
+
+
+@app.post("/compliance/analyze-guided", response_class=JSONResponse)
+async def analyze_device_guided(request: Request):
+    """Analyze device compliance across selected contexts (guided wizard format)."""
     try:
         payload = await request.json()
     except Exception as exc:
         return JSONResponse(
-            {"success": False, "error": f"Payload inválido: {exc}"},
+            {"detail": f"Payload inválido: {exc}"},
             status_code=400,
         )
 
     device_id = payload.get("device_id")
+    tenant_id = payload.get("tenant_id")
     contexts = payload.get("contexts", [])
-    ssh_creds = payload.get("ssh", {})
-    snmp_community = payload.get("snmp_community")
 
     if not device_id or not contexts:
         return JSONResponse(
-            {"success": False, "error": "device_id e contexts são obrigatórios"},
+            {"detail": "device_id e contexts são obrigatórios"},
             status_code=400,
         )
 
@@ -2820,47 +2873,78 @@ async def analyze_device_compliance(request: Request):
         device = client.get_device_by_id(device_id)
         if not device:
             return JSONResponse(
-                {"success": False, "error": "Dispositivo não encontrado no NetBox"},
+                {"detail": "Dispositivo não encontrado"},
                 status_code=404,
             )
 
+        # Get tenant name
+        tenant_name = "Desconhecido"
+        if device.get("tenant"):
+            tenant_id_from_device = device["tenant"].get("id")
+            if tenant_id_from_device:
+                tenant = client.get_tenant_by_id(tenant_id_from_device)
+                if tenant:
+                    tenant_name = tenant.get("name", "Desconhecido")
+
         from .services.compliance_analyze_contexts import analyze_device
 
-        # Prepare SSH credentials with device defaults
-        ssh_host = ssh_creds.get("host") or (device.get("primary_ip4", "").split("/")[0] if device.get("primary_ip4") else "")
+        ssh_host = device.get("primary_ip4", "").split("/")[0] if device.get("primary_ip4") else ""
         ssh_credentials = {
             "host": ssh_host,
-            "port": int(ssh_creds.get("port", 22)),
-            "username": ssh_creds.get("username", "admin"),
-            "password": ssh_creds.get("password", ""),
+            "port": 22,
+            "username": "admin",
+            "password": "",
         }
 
-        findings, summary = analyze_device(device, contexts, ssh_credentials, snmp_community)
+        findings, summary = analyze_device(device, contexts, ssh_credentials)
+
+        # Map findings to wizard format
+        wizard_findings = []
+        for f in findings:
+            wizard_findings.append({
+                "status": "failed" if f["severity"] in ["blocker", "error"] else ("warning" if f["severity"] == "warning" else "approved"),
+                "context": f.get("context", ""),
+                "item": f.get("object", ""),
+                "title": f.get("message", ""),
+                "details": f.get("details", {}),
+            })
+
+        # Determine overall status
+        failed_count = sum(1 for f in wizard_findings if f["status"] == "failed")
+        warning_count = sum(1 for f in wizard_findings if f["status"] == "warning")
+        overall_status = "failed" if failed_count > 0 else ("attention" if warning_count > 0 else "ok")
 
         return JSONResponse({
-            "success": True,
-            "findings": [dict(f) for f in findings],
-            "summary": summary,
+            "device": device.get("name", ""),
+            "tenant": tenant_name,
+            "status": overall_status,
+            "summary": {
+                "approved": len([f for f in wizard_findings if f["status"] == "approved"]),
+                "warning": warning_count,
+                "failed": failed_count,
+            },
+            "findings": wizard_findings,
+            "collection_notes": [],
         })
 
     except NetBoxNotConfiguredError:
         return JSONResponse(
-            {"success": False, "error": "NetBox não configurado"},
+            {"detail": "NetBox não configurado"},
             status_code=503,
         )
     except NetBoxAuthError:
         return JSONResponse(
-            {"success": False, "error": "Falha de autenticação no NetBox"},
+            {"detail": "Falha de autenticação no NetBox"},
             status_code=401,
         )
     except NetBoxClientError as e:
         return JSONResponse(
-            {"success": False, "error": f"Erro ao conectar ao NetBox: {e}"},
+            {"detail": f"Erro ao conectar ao NetBox: {e}"},
             status_code=500,
         )
     except Exception as e:
         return JSONResponse(
-            {"success": False, "error": f"Erro na análise: {str(e)}"},
+            {"detail": f"Erro na análise: {str(e)}"},
             status_code=500,
         )
 
@@ -4078,7 +4162,12 @@ import requests
 @app.api_route("/compliance/guided/{path:path}", methods=["GET", "POST"])
 async def proxy_compliance_guided(request: Request, path: str):
     """Proxy requests to the netops_netbox_sync API to bypass mixed content and CORS."""
-    url = f"http://127.0.0.1:8888/compliance/{path}"
+    if path == "health":
+        url = "http://127.0.0.1:8888/health"
+    elif path.startswith("compliance/"):
+        url = f"http://127.0.0.1:8888/{path}"
+    else:
+        url = f"http://127.0.0.1:8888/compliance/{path}"
     params = dict(request.query_params)
     
     body = None
