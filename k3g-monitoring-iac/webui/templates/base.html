@@ -6,35 +6,138 @@
     <title>{% block title %}{% endblock %} — k3g Compliance</title>
     <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1><a href="/">⚙️ k3g Compliance & Governance</a></h1>
-            <nav>
-                <a href="/">Painel</a>
-                <a href="/devices">Dispositivos</a>
-                <a href="/compliance">Compliance</a>
-                <a href="/service-engagement">Pendências de Serviço</a>
-                <a href="/outreach">Comunicação com Times</a>
-                <a href="/controlled-operation">Operação Controlada</a>
-                <a href="/controlled-operation/cycles">Ciclos</a>
-                <a href="/approvals">Aprovações</a>
-                <a href="/incidents">Incidentes</a>
-                <a href="/outreach/execution-log">Logs</a>
-                <a href="/operations/handoff">Operação</a>
-                <a href="/apply-plans">Planos de Aplicação</a>
-                <a href="/batch-results">Resultados em Lote</a>
-            </nav>
+<body class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">⚙️</div>
+            <h1 class="sidebar-title">k3g Compliance</h1>
+        </div>
+
+        <nav class="sidebar-nav">
+            <!-- Principal -->
+            <div class="nav-section">
+                <button class="nav-section-header" data-toggle="principal">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Principal</span>
+                    <span class="nav-chevron">›</span>
+                </button>
+                <ul class="nav-group" id="principal">
+                    <li><a href="/" class="nav-link">Painel</a></li>
+                    <li><a href="/devices" class="nav-link">Dispositivos</a></li>
+                    <li><a href="/compliance" class="nav-link">Compliance</a></li>
+                </ul>
+            </div>
+
+            <!-- Operação -->
+            <div class="nav-section">
+                <button class="nav-section-header" data-toggle="operacao">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-label">Operação</span>
+                    <span class="nav-chevron">›</span>
+                </button>
+                <ul class="nav-group" id="operacao">
+                    <li><a href="/controlled-operation" class="nav-link">Operação Controlada</a></li>
+                    <li><a href="/controlled-operation/cycles" class="nav-link">Ciclos</a></li>
+                    <li><a href="/operations/handoff" class="nav-link">Handoff</a></li>
+                </ul>
+            </div>
+
+            <!-- Aprovações -->
+            <div class="nav-section">
+                <button class="nav-section-header" data-toggle="aprovacoes">
+                    <span class="nav-icon">✅</span>
+                    <span class="nav-label">Aprovações</span>
+                    <span class="nav-chevron">›</span>
+                </button>
+                <ul class="nav-group" id="aprovacoes">
+                    <li><a href="/approvals" class="nav-link">Fila de Aprovação</a></li>
+                    <li><a href="/service-engagement" class="nav-link">Pendências de Serviço</a></li>
+                </ul>
+            </div>
+
+            <!-- Comunicação -->
+            <div class="nav-section">
+                <button class="nav-section-header" data-toggle="comunicacao">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-label">Comunicação</span>
+                    <span class="nav-chevron">›</span>
+                </button>
+                <ul class="nav-group" id="comunicacao">
+                    <li><a href="/outreach" class="nav-link">com Teams</a></li>
+                    <li><a href="/outreach/execution-log" class="nav-link">Logs</a></li>
+                </ul>
+            </div>
+
+            <!-- Dados -->
+            <div class="nav-section">
+                <button class="nav-section-header" data-toggle="dados">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-label">Dados</span>
+                    <span class="nav-chevron">›</span>
+                </button>
+                <ul class="nav-group" id="dados">
+                    <li><a href="/apply-plans" class="nav-link">Planos</a></li>
+                    <li><a href="/batch-results" class="nav-link">Resultados</a></li>
+                    <li><a href="/incidents" class="nav-link">Incidentes</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="api-status">
+                <span class="status-dot ok"></span>
+                <span class="status-text">v3.0</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="app-main">
+        <header class="app-header">
+            <h1 class="page-title">{% block title %}{% endblock %}</h1>
         </header>
 
-        <main>
+        <main class="app-content">
             {% block content %}{% endblock %}
         </main>
 
-        <footer>
-            <p>Painel de compliance somente leitura v3.0 — sem escrita, sem tokens</p>
+        <footer class="app-footer">
+            <p>Painel de compliance somente leitura — sem escrita, sem tokens</p>
         </footer>
     </div>
+
     <script src="{{ url_for('static', path='app.js') }}"></script>
+    <script>
+        // Sidebar toggle logic
+        document.querySelectorAll('.nav-section-header').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const groupId = this.dataset.toggle;
+                const group = document.getElementById(groupId);
+                const section = this.closest('.nav-section');
+
+                section.classList.toggle('open');
+                group.classList.toggle('hidden');
+
+                // Persist preference
+                localStorage.setItem(`nav-${groupId}`, section.classList.contains('open') ? '1' : '0');
+            });
+
+            // Restore state
+            const groupId = btn.dataset.toggle;
+            const isOpen = localStorage.getItem(`nav-${groupId}`) === '1';
+            if (isOpen) {
+                btn.closest('.nav-section').classList.add('open');
+                document.getElementById(groupId).classList.remove('hidden');
+            }
+        });
+
+        // Highlight current page
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.href === window.location.href || link.pathname === window.location.pathname) {
+                link.classList.add('active');
+            }
+        });
+    </script>
 </body>
 </html>
