@@ -13,12 +13,14 @@ import time
 import logging
 from contextlib import asynccontextmanager
 
+import pathlib
 from fastapi import FastAPI, Request, HTTPException, Security
 from fastapi.security.api_key import APIKeyHeader
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from app.api.routes import compliance, device, netbox, sync
+from app.api.routes import compliance, compliance_guided, device, netbox, sync
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Logging
@@ -127,6 +129,13 @@ app.include_router(device.router)
 app.include_router(netbox.router)
 app.include_router(sync.router)
 app.include_router(compliance.router)
+app.include_router(compliance_guided.router)
+
+# ── Static webui ──────────────────────────────────────────────────
+_WEBUI_DIR = pathlib.Path(__file__).parent.parent.parent.parent / "webui"
+if _WEBUI_DIR.is_dir():
+    app.mount("/ui", StaticFiles(directory=str(_WEBUI_DIR), html=True), name="webui")
+    logger.info("WebUI servindo em /ui  (dir: %s)", _WEBUI_DIR)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

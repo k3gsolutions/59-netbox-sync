@@ -4073,6 +4073,36 @@ async def health():
     """Health check."""
     return {"status": "ok", "version": "3.0"}
 
+import requests
+
+@app.api_route("/compliance/guided/{path:path}", methods=["GET", "POST"])
+async def proxy_compliance_guided(request: Request, path: str):
+    """Proxy requests to the netops_netbox_sync API to bypass mixed content and CORS."""
+    url = f"http://127.0.0.1:8888/compliance/{path}"
+    params = dict(request.query_params)
+    
+    body = None
+    if request.method == "POST":
+        try:
+            body = await request.json()
+        except Exception:
+            body = None
+            
+    try:
+        if request.method == "GET":
+            resp = requests.get(url, params=params, timeout=60)
+        else:
+            resp = requests.post(url, params=params, json=body, timeout=60)
+            
+        try:
+            content = resp.json()
+        except Exception:
+            content = {"error": "Invalid JSON from backend"}
+            
+        return JSONResponse(status_code=resp.status_code, content=content)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
+
 
 if __name__ == "__main__":
     import uvicorn

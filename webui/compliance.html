@@ -1,24 +1,53 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Compliance — NetOps</title>
+<meta name="description" content="Análise guiada de conformidade de dispositivos NetBox"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="compliance.css"/>
+</head>
+<body>
 
-{% block title %}Análise de Compliance Guiada{% endblock %}
+<!-- ===== SIDEBAR ===== -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">⚡</div>
+    <div class="sidebar-logo-text">NetOps</div>
+  </div>
+  <ul class="sidebar-nav">
+    <li><a href="#" class="sidebar-link"><span class="sidebar-icon">🏠</span>Dashboard</a></li>
+    <li><a href="#" class="sidebar-link"><span class="sidebar-icon">🔄</span>Sincronização</a></li>
+    <li><a href="compliance.html" class="sidebar-link active"><span class="sidebar-icon">✅</span>Compliance</a></li>
+    <li><a href="#" class="sidebar-link"><span class="sidebar-icon">📊</span>Relatórios</a></li>
+    <li><a href="#" class="sidebar-link"><span class="sidebar-icon">⚙️</span>Configurações</a></li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="sidebar-status" id="api-status-dot" title="Status da API">
+      <span class="status-dot" id="dot"></span>
+      <span id="api-status-label">Verificando...</span>
+    </div>
+  </div>
+</nav>
 
-{% block content %}
-<link rel="stylesheet" href="{{ url_for('static', path='compliance_guided.css') }}">
+<!-- ===== MAIN ===== -->
+<div class="app-main">
 
   <!-- Header -->
-  <header class="wizard-app-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+  <header class="app-header">
     <div class="app-header-left">
       <h1 class="page-title">Análise de Compliance</h1>
       <p class="page-subtitle">Validação guiada de dispositivos por cliente e contexto</p>
     </div>
     <div class="app-header-right">
       <div class="api-url-badge" id="api-url-badge">
-        <span class="mono">131.108.136.133:8888</span>
+        <span class="mono">localhost:8888</span>
       </div>
       <button class="btn btn-ghost" id="btn-settings" title="Configurações da API">⚙️</button>
     </div>
   </header>
-
 
   <!-- API Settings Modal -->
   <div class="modal-overlay hidden" id="settings-modal">
@@ -29,7 +58,7 @@
       </div>
       <div class="modal-body">
         <label class="form-label">URL da API</label>
-        <input type="text" class="form-input" id="input-api-url" placeholder="http://131.108.136.133:8888" value="http://131.108.136.133:8888"/>
+        <input type="text" class="form-input" id="input-api-url" placeholder="http://localhost:8888" value="http://localhost:8888"/>
         <label class="form-label" style="margin-top:16px">API Key (opcional)</label>
         <input type="password" class="form-input" id="input-api-key" placeholder="Deixe vazio se não configurada"/>
       </div>
@@ -225,7 +254,6 @@
   </div>
 </div>
 
-
-
-<script src="{{ url_for('static', path='compliance_guided.js') }}"></script>
-{% endblock %}
+<script src="compliance.js"></script>
+</body>
+</html>
