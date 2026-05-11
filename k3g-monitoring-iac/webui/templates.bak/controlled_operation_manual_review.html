@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Revisão Manual {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Revisão Manual: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Decisão</div><div class="summary-value">{{ review.decision or approvals.readiness_decision or 'N/A' | status_label }}</div></div>
+    <div class="summary-card"><div class="summary-label">Propostos</div><div class="summary-value">{{ approvals.records | length if approvals.records else 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Prontidão</div><div class="summary-value">{{ approvals.readiness_decision | status_label }}</div></div>
+    <div class="summary-card"><div class="summary-label">Revisão humana</div><div class="summary-value">Obrigatória</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Registros propostos</div>
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>approval_id</th>
+                <th>object_key</th>
+                <th>status</th>
+                <th>reviewer</th>
+                <th>revisado em</th>
+                <th>origem</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for approval in approvals.records %}
+            <tr>
+                <td><code>{{ approval.approval_id }}</code></td>
+                <td><code>{{ approval.object_key }}</code></td>
+                <td>{{ approval.status | status_label }}</td>
+                <td>{{ approval.reviewer or 'Pendente' }}</td>
+                <td class="mono">{{ approval.reviewed_at or '-' }}</td>
+                <td>{{ approval.origin or '-' }}</td>
+            </tr>
+        {% endfor %}
+        {% if not approvals.records %}
+            <tr><td colspan="6">Nenhum registro localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">Arquivos</div>
+    <ul class="compact-list">
+        {% if approvals.readiness_file %}<li><a href="/reports/view?path={{ approvals.readiness_file.path }}">Ver gate</a></li>{% endif %}
+        {% if approvals.readiness_json_file %}<li><a href="/reports/download?path={{ approvals.readiness_json_file.path }}">Baixar gate JSON</a></li>{% endif %}
+        {% if review.review_file %}<li><a href="/reports/view?path={{ review.review_file.path }}">Ver revisão</a></li>{% endif %}
+        {% if review.review_json_file %}<li><a href="/reports/download?path={{ review.review_json_file.path }}">Baixar revisão JSON</a></li>{% endif %}
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-header">Navegação</div>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals" class="btn btn-small">Aprovações</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals/readiness" class="btn btn-small">Prontidão</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week2/review" class="btn btn-small">Semana 2</a>
+    </div>
+    <p>Esta página só exibe leitura. Nenhuma aprovação automática acontece aqui.</p>
+</div>
+{% endblock %}

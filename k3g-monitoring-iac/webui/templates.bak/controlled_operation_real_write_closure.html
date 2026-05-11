@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Real write closure {{ cycle.cycle_id }}{% endblock %}
+{% block content %}
+<h2>Real-write closure: {{ cycle.cycle_id }}</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="summary-label">Decisão</div><div class="summary-value">{{ chain.closure_json_file.content.decision | status_label if chain.closure_json_file else 'N/A' }}</div></div>
+  <div class="summary-card"><div class="summary-label">Reason</div><div class="summary-value">{{ chain.closure_json_file.content.reason if chain.closure_json_file else 'N/A' }}</div></div>
+  <div class="summary-card"><div class="summary-label">Execução</div><div class="summary-value">{{ chain.execution_result_json_file.content.status | status_label if chain.execution_result_json_file else 'N/A' }}</div></div>
+  <div class="summary-card"><div class="summary-label">Compliance</div><div class="summary-value">{{ chain.post_write_compliance_json_file.content.decision | status_label if chain.post_write_compliance_json_file else 'N/A' }}</div></div>
+</div>
+<div class="card">
+  <div class="card-header">Arquivos</div>
+  <ul class="compact-list">
+    {% if chain.closure_json_file %}<li><a href="/reports/download?path={{ chain.closure_json_file.path }}">Closure JSON</a></li>{% endif %}
+    {% if chain.closure_report_file %}<li><a href="/reports/download?path={{ chain.closure_report_file.path }}">Closure MD</a></li>{% endif %}
+  </ul>
+</div>
+<div class="card"><div class="card-header">Navegação</div><div class="pending-validation-links">
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write/execution" class="btn btn-small">Execução</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write/verification" class="btn btn-small">Verificação</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write/compliance" class="btn btn-small">Compliance</a>
+</div></div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Operação controlada{% endblock %}
+
+{% block content %}
+<h2>Operação Controlada</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Status global</div><div class="summary-value">{{ index.overall_status | status_label }}</div></div>
+    <div class="summary-card"><div class="summary-label">Ciclos</div><div class="summary-value">{{ index.total_cycles }}</div></div>
+    <div class="summary-card"><div class="summary-label">Encerrados</div><div class="summary-value">{{ counts.closed_success + counts.closed_with_restrictions }}</div></div>
+    <div class="summary-card"><div class="summary-label">Com restrições</div><div class="summary-value">{{ counts.closed_with_restrictions }}</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Visão geral</div>
+    <p>Leitura global dos ciclos controlados. Nenhuma ação de escrita aparece aqui.</p>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/cycles" class="btn btn-primary btn-small">Ver ciclos</a>
+        {% if latest_cycle %}
+        <a href="/controlled-operation/{{ latest_cycle.cycle_id }}" class="btn btn-small">Último ciclo</a>
+        <a href="/controlled-operation/{{ latest_cycle.cycle_id }}/handoff" class="btn btn-small">Handoff</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Índice</div>
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>Ciclo</th>
+                <th>Dispositivo</th>
+                <th>Status</th>
+                <th>Handoff</th>
+                <th>Próximo passo</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for cycle in cycles %}
+            <tr>
+                <td><code>{{ cycle.cycle_id }}</code></td>
+                <td>{{ cycle.device }}</td>
+                <td><span class="badge badge-info">{{ cycle.current_status | status_label }}</span></td>
+                <td>{{ cycle.handoff_decision or 'N/A' }}</td>
+                <td>{{ cycle.next_action }}</td>
+                <td class="pending-actions">
+                    <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Detalhe</a>
+                    <a href="/controlled-operation/{{ cycle.cycle_id }}/start-gate" class="btn btn-small">Start gate</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

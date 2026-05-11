@@ -1,0 +1,76 @@
+{
+  "job_id": "compliance-job-fffa2a5843df",
+  "generated_at": "2026-05-06T20:46:32.772798+00:00",
+  "layer": "post_parser_pre_compare",
+  "summary": {
+    "devices": 0,
+    "contexts_total": 0,
+    "statuses": {
+      "WITHIN_STANDARD": 0,
+      "OUT_OF_STANDARD": 0,
+      "NEEDS_STANDARDIZATION": 0,
+      "INFORMATIONAL_ALERT": 0
+    }
+  },
+  "contexts": [],
+  "inventory_summary": {
+    "devices": 0,
+    "contexts": {
+      "security_access": {
+        "label": "Seguranca e Acessos",
+        "optional": false,
+        "present_devices": 0,
+        "items_total": 0
+      },
+      "interfaces": {
+        "label": "Interfaces e Subinterfaces",
+        "optional": false,
+        "present_devices": 0,
+        "items_total": 0
+      },
+      "vpns": {
+        "label": "VPNs",
+        "optional": false,
+        "present_devices": 0,
+        "items_total": 0
+      },
+      "tunnels": {
+        "label": "Tuneis",
+        "optional": true,
+        "present_devices": 0,
+        "items_total": 0
+      },
+      "bgp": {
+        "label": "BGP",
+        "optional": false,
+        "present_devices": 0,
+        "items_total": 0
+      },
+      "mpls": {
+        "label": "MPLS",
+        "optional": true,
+        "present_devices": 0,
+        "items_total": 0
+      },
+      "ospf": {
+        "label": "OSPF",
+        "optional": true,
+        "present_devices": 0,
+        "items_total": 0
+      }
+    }
+  },
+  "safety": {
+    "netbox_write": false,
+    "sync_called": false,
+    "apply_plan_created": false,
+    "approval_record_created": false,
+    "ssh_write": false,
+    "config_mode": false,
+    "netconf_write": false,
+    "snmp_write": false
+  },
+  "files": {
+    "context_summary": "/data/home-moved/Projects/_legacy_lowercase_projects/59-netbox_sync/k3g-monitoring-iac/reports/compliance/jobs/compliance-job-fffa2a5843df/analysis/context-summary.json"
+  }
+}

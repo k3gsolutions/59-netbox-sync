@@ -1,4 +1,14 @@
 (function () {
+  try {
+    if (window.trustedTypes && window.trustedTypes.createPolicy) {
+      window.trustedTypes.createPolicy('default', {
+        createHTML: (string) => string
+      });
+    }
+  } catch (e) {
+    console.warn("TrustedTypes default policy already created or error:", e);
+  }
+
   const BLOCKED_TERMS = [
     "token",
     "password",

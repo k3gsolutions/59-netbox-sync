@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Archive {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Archive: {{ cycle.cycle_id }}</h2>
+
+<div class="card">
+    <div class="card-header">Resumo</div>
+    <p>Arquivo de finalização local. Sem escrita no NetBox, sem plano de aplicação e sem rollback automático.</p>
+    {% if archive_file %}
+    <p><a href="/reports/view?path={{ archive_file.path }}">Ver arquivo</a> | <a href="/reports/download?path={{ archive_file.path }}">Baixar</a></p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Conteúdo</div>
+    {% if archive_content %}
+    <pre class="pre-wrap">{{ archive_content }}</pre>
+    {% else %}
+    <p>Nenhum archive localizado.</p>
+    {% endif %}
+</div>
+{% endblock %}

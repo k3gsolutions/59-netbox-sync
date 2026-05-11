@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Pacote de comunicação da Semana 1{% endblock %}
+
+{% block content %}
+<h2>Pacote de comunicação da Semana 1</h2>
+
+<div class="card">
+    <h3>📦 Materiais de comunicação</h3>
+    <p>Documentos para coleta de respostas dos times durante a Semana 1 (2026-05-02 a 2026-05-08).</p>
+    <p><strong>Situação:</strong> Pronto para distribuir</p>
+</div>
+
+<div class="section">
+    <h3>📋 Arquivos de comunicação</h3>
+    <p>Total: {{ total_files }} files</p>
+
+    {% if outreach_files %}
+    <table class="full-width">
+        <thead>
+            <tr>
+                <th>Arquivo</th>
+                <th>Tamanho</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for file in outreach_files %}
+            <tr>
+                <td><strong>{{ file.name }}</strong></td>
+                <td>{{ file.size }} bytes</td>
+                <td>
+                    <a href="/reports/view?path={{ file.path }}" class="button small">Ver</a>
+                    <a href="/reports/download?path={{ file.path }}" class="button small">Baixar</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert">Nenhum arquivo de comunicação encontrado. Rode generate_week1_outreach_pack.py.</div>
+    {% endif %}
+</div>
+
+<div class="section">
+    <h3>📨 Enviar mensagens aos times</h3>
+    <p>Clique abaixo para ver as mensagens por time:</p>
+
+    <ul style="list-style: none;">
+        <li style="margin: 10px 0;">
+            <a href="/outreach/service-team" class="button">Mensagem do time de serviço</a>
+            <span style="color: #666; font-size: 0.9em;"> — 5 subinterfaces</span>
+        </li>
+        <li style="margin: 10px 0;">
+            <a href="/outreach/network-ops" class="button">Mensagem do Network Ops</a>
+            <span style="color: #666; font-size: 0.9em;"> — 1 IP address</span>
+        </li>
+        <li style="margin: 10px 0;">
+            <a href="/outreach/bgp-team" class="button">Mensagem do time BGP</a>
+            <span style="color: #666; font-size: 0.9em;"> — 1 BGP peer</span>
+        </li>
+    </ul>
+</div>
+
+<h3>Linha do tempo</h3>
+<table class="full-width">
+    <tr>
+        <td><strong>2026-05-02</strong></td>
+        <td>Distribuir mensagens e templates CSV para os times</td>
+    </tr>
+    <tr>
+        <td><strong>2026-05-02 to 2026-05-08</strong></td>
+        <td>Times preenchem as respostas</td>
+    </tr>
+    <tr>
+        <td><strong>2026-05-08 EOD</strong></td>
+        <td>Prazo final das respostas</td>
+    </tr>
+    <tr>
+        <td><strong>2026-05-09</strong></td>
+        <td>Validação + painel de revisão da Semana 2</td>
+    </tr>
+</table>
+
+<h3>Relacionados</h3>
+<ul>
+    <li><a href="/service-engagement">Pendências de serviço</a></li>
+    <li><a href="/operations/handoff">Passagem operacional</a></li>
+    <li><a href="/operations/readiness">Prontidão operacional</a></li>
+</ul>
+
+{% endblock %}

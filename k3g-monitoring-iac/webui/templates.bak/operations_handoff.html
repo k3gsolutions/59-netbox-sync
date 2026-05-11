@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Passagem operacional{% endblock %}
+
+{% block content %}
+<h2>Pacote de passagem operacional</h2>
+
+<div class="card">
+    <h3>🚀 Guia de implantação e operação</h3>
+    <p>Runbook completo para operadores NOC, procedimentos, parada de emergência e métricas de sucesso.</p>
+</div>
+
+{% if handoff_content %}
+<div class="section">
+    <div class="report-content">
+        {{ handoff_content|safe }}
+    </div>
+
+    {% if handoff_file %}
+    <p style="margin-top: 20px;">
+        <a href="/reports/download?path={{ handoff_file.path }}" class="button">Baixar pacote</a>
+    </p>
+    {% endif %}
+</div>
+{% else %}
+<div class="alert">
+    <p>Pacote de passagem operacional não encontrado.</p>
+    <p>See: docs/47-operational-handoff.md</p>
+</div>
+{% endif %}
+
+<h3>Seções principais</h3>
+<ul>
+    <li>Papéis e responsabilidades (NOC, aprovador, operações)</li>
+    <li>Procedimentos do fluxo (aprovação, aplicação em lote, monitoramento)</li>
+    <li>Passos de implantação (prontidão, critérios, execução)</li>
+    <li>Procedimentos de emergência (paradas, rollback, escalonamento)</li>
+    <li>Checklist de monitoramento (métricas de sucesso, alertas)</li>
+</ul>
+
+<h3>Relacionados</h3>
+<ul>
+    <li><a href="/outreach">Comunicação da Semana 1</a></li>
+    <li><a href="/operations/readiness">Prontidão operacional</a></li>
+    <li><a href="/approval-queue">Fila de aprovação</a></li>
+</ul>
+
+{% endblock %}

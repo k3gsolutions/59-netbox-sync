@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Dispositivos{% endblock %}
+
+{% block content %}
+<h2>Dispositivos</h2>
+
+{% if devices %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nome do dispositivo</th>
+                <th>Última atualização</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for device in devices %}
+                <tr>
+                    <td>{{ device.name }}</td>
+                    <td>{{ device.mtime }}</td>
+                    <td>
+                        <a href="/devices/{{ device.name }}" class="button-small">Detalhes</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Nenhum dispositivo encontrado</p>
+{% endif %}
+{% endblock %}

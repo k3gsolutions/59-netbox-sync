@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Relatório de promoção: {{ device }}{% endblock %}
+
+{% block content %}
+<h2>Relatório de promoção dos rascunhos da Semana 2: {{ device }}</h2>
+
+<div class="card">
+    <h3>Status da promoção</h3>
+    <p>Relatório dos rascunhos promovidos de <code>draft_review</code> para registros de aprovação <code>proposed</code>.</p>
+</div>
+
+{% if report_file %}
+<div class="section">
+    <h3>📊 Relatório de promoção</h3>
+
+    <div class="report-content">
+        {{ report_content|safe }}
+    </div>
+
+    <p style="margin-top: 20px;">
+        <a href="/reports/download?path={{ report_file.path }}" class="button">Baixar relatório</a>
+    </p>
+</div>
+{% else %}
+<div class="alert">
+    <p>Ainda não há relatório de promoção.</p>
+    <p>Rode o script de promoção para gerar um relatório:</p>
+    <code>python3 promote_week2_drafts_to_approvals.py ...</code>
+</div>
+{% endif %}
+
+<h3>O que acontece depois</h3>
+<ol>
+    <li>Registros promovidos ficam com status: <code>proposed</code></li>
+    <li>Registros de aprovação NÃO são aprovados automaticamente</li>
+    <li>Fluxo manual de aprovação/rejeição aplicado</li>
+    <li>State transitions tracked with audit trail</li>
+    <li>Acompanhar pela fila de aprovação</li>
+</ol>
+
+<h3>Relacionados</h3>
+<ul>
+    <li><a href="/service-engagement/{{ device }}/week2-review">Painel de revisão da Semana 2</a></li>
+    <li><a href="/service-engagement/{{ device }}/approval-drafts">Rascunhos de aprovação</a></li>
+    <li><a href="/service-engagement/{{ device }}">Pendências de serviço</a></li>
+    <li><a href="/approval-queue">Fila de aprovação</a></li>
+</ul>
+
+{% endblock %}

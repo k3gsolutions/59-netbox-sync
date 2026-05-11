@@ -1,0 +1,73 @@
+<div class="pending-items-table-wrap" data-device="{{ device }}">
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Chave</th>
+                <th>Time responsável</th>
+                <th>Campos faltantes</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in pending_items %}
+            <tr id="pending-row-{{ item.safe_item_id }}" data-safe-item-id="{{ item.safe_item_id }}">
+                <td><code>{{ item.object_type }}</code></td>
+                <td>
+                    <code>{{ item.object_key }}</code>
+                </td>
+                <td>{{ item.responsible_team }}</td>
+                <td>
+                    {% if item.missing_fields %}
+                        <span id="missing-fields-{{ item.safe_item_id }}">{{ item.missing_fields | join(', ') }}</span>
+                    {% else %}
+                        <span id="missing-fields-{{ item.safe_item_id }}" class="text-muted">nenhum</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% set status = item.current_status %}
+                    <span id="pending-status-{{ item.safe_item_id }}" class="badge {{ 'badge-success' if status == 'answered' else 'badge-warning' if status == 'needs_clarification' else 'badge-danger' if status in ['blocked', 'rejected'] else 'badge-pending' }}">{{ status | status_label }}</span>
+                </td>
+                <td>
+                    <div class="pending-actions">
+                        <button id="pending-button-{{ item.safe_item_id }}" class="btn btn-primary btn-small" type="button" onclick="openPendingItemModal('{{ item.safe_item_id }}', '{{ device }}')">
+                            {% if item.current_status == 'answered' %}Editar pendência{% else %}Completar pendência{% endif %}
+                        </button>
+                        {% if item.evidence %}
+                        <button class="btn btn-small" type="button" onclick="togglePendingItemDetail('evidence-{{ item.safe_item_id }}')">Ver evidência</button>
+                        {% endif %}
+                        {% if item.updated_at or item.updated_by %}
+                        <button class="btn btn-small" type="button" onclick="togglePendingItemDetail('log-{{ item.safe_item_id }}')">Ver log</button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% if item.evidence %}
+            <tr id="evidence-{{ item.safe_item_id }}" class="pending-item-detail hidden">
+                <td colspan="6">
+                    <div class="pending-item-detail-card">
+                        <div class="pending-item-detail-label">Evidência</div>
+                        <pre>{{ item.evidence }}</pre>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+            {% if item.updated_at or item.updated_by or item.csv_path %}
+            <tr id="log-{{ item.safe_item_id }}" class="pending-item-detail hidden">
+                <td colspan="6">
+                    <div class="pending-item-detail-card">
+                        <div class="pending-item-detail-label">Log local</div>
+                        <div class="mono">
+                            updated_by={{ item.updated_by or 'n/a' }}<br>
+                            updated_at={{ item.updated_at or 'n/a' }}<br>
+                            csv_path={{ item.csv_path }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

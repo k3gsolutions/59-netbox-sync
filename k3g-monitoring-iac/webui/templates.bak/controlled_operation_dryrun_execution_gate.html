@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Dry-run gate {{ cycle.cycle_id }}{% endblock %}
+{% block content %}
+<h2>Dry-run gate: {{ cycle.cycle_id }}</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="summary-label">Geração</div><div class="summary-value">{{ applyplans.generation_decision | status_label }}</div></div>
+  <div class="summary-card"><div class="summary-label">Validação</div><div class="summary-value">{{ applyplans.validation_decision | status_label }}</div></div>
+  <div class="summary-card"><div class="summary-label">Planos</div><div class="summary-value">{{ applyplans.plans | length }}</div></div>
+  <div class="summary-card"><div class="summary-label">Modo</div><div class="summary-value">dry_run</div></div>
+</div>
+<div class="card">
+  <div class="card-header">Gate local</div>
+  <p>Esta página só mostra o gate local da simulação. Nenhuma execução acontece aqui.</p>
+  <ul class="compact-list">
+    {% for plan in applyplans.plans %}
+    <li><code>{{ plan.apply_plan_id }}</code> - {{ plan.status | status_label }} - {{ plan.execution_policy.next_gate if plan.execution_policy else '-' }}</li>
+    {% endfor %}
+  </ul>
+</div>
+<div class="card"><div class="card-header">Navegação</div><div class="pending-validation-links">
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/applyplan/simulation" class="btn btn-small">Simulação</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/applyplan" class="btn btn-small">ApplyPlan</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+</div></div>
+{% endblock %}

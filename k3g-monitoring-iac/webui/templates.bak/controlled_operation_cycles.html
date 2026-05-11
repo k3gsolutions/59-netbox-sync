@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Ciclos controlados{% endblock %}
+
+{% block content %}
+<h2>Ciclos Controlados</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Total</div><div class="summary-value">{{ index.total_cycles }}</div></div>
+    <div class="summary-card"><div class="summary-label">Planejados</div><div class="summary-value">{{ counts.planned }}</div></div>
+    <div class="summary-card"><div class="summary-label">Encerrados</div><div class="summary-value">{{ counts.closed_success + counts.closed_with_restrictions }}</div></div>
+    <div class="summary-card"><div class="summary-label">Bloqueados</div><div class="summary-value">{{ counts.action_required }}</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Lista de ciclos</div>
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>Ciclo</th>
+                <th>Dispositivo</th>
+                <th>Status</th>
+                <th>Itens</th>
+                <th>Handoff</th>
+                <th>Próximo passo</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for cycle in cycles %}
+            <tr>
+                <td><a href="/controlled-operation/{{ cycle.cycle_id }}"><code>{{ cycle.cycle_id }}</code></a></td>
+                <td>{{ cycle.device }}</td>
+                <td><span class="badge badge-info">{{ cycle.current_status | status_label }}</span></td>
+                <td>{{ cycle.total_items }}/{{ cycle.max_items }}</td>
+                <td>{{ cycle.handoff_decision or 'N/A' }}</td>
+                <td>{{ cycle.next_action }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">Leitura</div>
+    <p>Esta visão é somente leitura. Não há POST, PATCH, DELETE, sincronização, plano de aplicação ou rollback automático.</p>
+</div>
+{% endblock %}

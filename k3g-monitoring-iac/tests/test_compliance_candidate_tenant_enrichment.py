@@ -105,7 +105,8 @@ class TestImprovedRejectionReasons:
 
     def test_reason_tenant_missing(self):
         """Device without tenant = tenant_missing."""
-        device = {"status": "active", "custom_fields": {"Compliance": True}}
+        device = {"status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"}, "custom_fields": {"Compliance": True}}
         reason = get_rejection_reason(device)
         assert reason == "tenant_missing"
 
@@ -113,6 +114,7 @@ class TestImprovedRejectionReasons:
         """Device with tenant but no group = tenant_group_missing."""
         device = {
             "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "custom_fields": {"Compliance": True},
             "tenant": {"id": 55, "name": "4W NET"}  # no group
         }
@@ -123,6 +125,7 @@ class TestImprovedRejectionReasons:
         """Device with wrong group = wrong_tenant_group."""
         device = {
             "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "custom_fields": {"Compliance": True},
             "tenant": {
                 "name": "4W NET",
@@ -136,6 +139,7 @@ class TestImprovedRejectionReasons:
         """Device eligible after group injected = None."""
         device = {
             "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "custom_fields": {"Compliance": True},
             "tenant": {
                 "name": "4W NET",
@@ -156,6 +160,7 @@ class TestApiResponseDiagnostics:
             "id": 1890,
             "name": "4WNET-MNS-KTG-RX",
             "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "custom_fields": {"Compliance": True},
             "tenant": {"id": 55, "name": "4W NET"}
         }
@@ -186,6 +191,7 @@ class TestApiResponseDiagnostics:
             "id": 1890,
             "name": "4WNET-MNS-KTG-RX",
             "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "custom_fields": {"Compliance": True},
             "tenant": {"id": 55, "name": "4W NET"}  # no group initially
         }
@@ -242,6 +248,7 @@ class TestNoNetBoxWrites:
             "id": 1890,
             "name": "test",
             "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "custom_fields": {"Compliance": True},
             "tenant": {"id": 55, "name": "4W NET"}
         }
@@ -287,6 +294,7 @@ class TestIntegrationDeviceWithoutGroup:
             "id": 1890,
             "name": "4WNET-MNS-KTG-RX",
             "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "custom_fields": {"Compliance": True},
             "tenant": {
                 "id": 55,

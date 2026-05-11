@@ -1,12 +1,13 @@
 """SNMP collection for compliance — interface discovery and verification."""
 
 import os
+import asyncio
 from typing import Any, Dict, List, Optional
 
 try:
-    from pysnmp.hlapi import (
+    from pysnmp.hlapi.asyncio import (
         SnmpEngine, CommunityData, UdpTransportTarget, ContextData,
-        getCmd, ObjectType, ObjectIdentity, SnmpErrorIndication
+        bulkCmd, ObjectType, ObjectIdentity
     )
 except ImportError:
     SnmpEngine = None
@@ -49,11 +50,6 @@ def collect_interfaces_snmp(
         return False, [], "SNMP_COMMUNITY not configured"
 
     try:
-        engine = SnmpEngine()
-        target = UdpTransportTarget((host, port), timeout=timeout, retries=1)
-        community_data = CommunityData(community, mpModel=0)
-        context = ContextData()
-
         interfaces = []
         # OID base for IF-MIB::ifTable
         oid_ifName = ObjectType(ObjectIdentity("1.3.6.1.2.1.2.2.1.2"))
@@ -63,18 +59,32 @@ def collect_interfaces_snmp(
         oid_ifSpeed = ObjectType(ObjectIdentity("1.3.6.1.2.1.2.2.1.5"))
         oid_ifType = ObjectType(ObjectIdentity("1.3.6.1.2.1.2.2.1.3"))
 
-        # Walk ifTable
-        error_indication, error_status, error_index, var_binds = next(
-            engine.bulkCmd(
-                community_data, target, context, 0, 25,
-                oid_ifName, oid_ifAlias, oid_ifAdminStatus, oid_ifOperStatus,
-                oid_ifSpeed, oid_ifType,
-                maxRepetitions=10
+        async def _bulk_walk():
+            return await bulkCmd(
+                SnmpEngine(),
+                CommunityData(community, mpModel=0),
+                UdpTransportTarget((host, port), timeout=timeout, retries=1),
+                ContextData(),
+                0,
+                25,
+                oid_ifName,
+                oid_ifAlias,
+                oid_ifAdminStatus,
+                oid_ifOperStatus,
+                oid_ifSpeed,
+                oid_ifType,
+                lexicographicMode=False,
             )
+
+        error_indication, error_status, error_index, var_binds = asyncio.run(
+            _bulk_walk()
         )
 
         if error_indication:
             return False, [], f"SNMP error: {error_indication}"
+
+        if error_status:
+            return False, [], f"SNMP error: {error_status.prettyPrint()}"
 
         # Parse results
         status_map = {1: "up", 2: "down", 3: "testing"}
@@ -84,49 +94,51 @@ def collect_interfaces_snmp(
         }
 
         ifaces_by_idx = {}
-        for var_bind in var_binds:
-            oid_str = str(var_bind[0])
-            value = var_bind[1]
+        for row in var_binds:
+            row_binds = row if isinstance(row, (list, tuple)) else (row,)
+            for var_bind in row_binds:
+                oid_str = str(var_bind[0])
+                value = var_bind[1]
 
-            if not value:
-                continue
+                if not value:
+                    continue
 
-            if ".1.3.6.1.2.1.2.2.1.2." in oid_str:  # ifName
-                idx = oid_str.split(".")[-1]
-                if idx not in ifaces_by_idx:
-                    ifaces_by_idx[idx] = {}
-                ifaces_by_idx[idx]["name"] = str(value)
-                ifaces_by_idx[idx]["index"] = int(idx)
+                if "1.3.6.1.2.1.2.2.1.2." in oid_str:  # ifName
+                    idx = oid_str.split(".")[-1]
+                    if idx not in ifaces_by_idx:
+                        ifaces_by_idx[idx] = {}
+                    ifaces_by_idx[idx]["name"] = str(value)
+                    ifaces_by_idx[idx]["index"] = int(idx)
 
-            elif ".1.3.6.1.2.1.31.1.1.1.18." in oid_str:  # ifAlias
-                idx = oid_str.split(".")[-1]
-                if idx not in ifaces_by_idx:
-                    ifaces_by_idx[idx] = {}
-                ifaces_by_idx[idx]["description"] = str(value)
+                elif "1.3.6.1.2.1.31.1.1.1.18." in oid_str:  # ifAlias
+                    idx = oid_str.split(".")[-1]
+                    if idx not in ifaces_by_idx:
+                        ifaces_by_idx[idx] = {}
+                    ifaces_by_idx[idx]["description"] = str(value)
 
-            elif ".1.3.6.1.2.1.2.2.1.7." in oid_str:  # ifAdminStatus
-                idx = oid_str.split(".")[-1]
-                if idx not in ifaces_by_idx:
-                    ifaces_by_idx[idx] = {}
-                ifaces_by_idx[idx]["admin_status"] = status_map.get(int(value), "unknown")
+                elif "1.3.6.1.2.1.2.2.1.7." in oid_str:  # ifAdminStatus
+                    idx = oid_str.split(".")[-1]
+                    if idx not in ifaces_by_idx:
+                        ifaces_by_idx[idx] = {}
+                    ifaces_by_idx[idx]["admin_status"] = status_map.get(int(value), "unknown")
 
-            elif ".1.3.6.1.2.1.2.2.1.8." in oid_str:  # ifOperStatus
-                idx = oid_str.split(".")[-1]
-                if idx not in ifaces_by_idx:
-                    ifaces_by_idx[idx] = {}
-                ifaces_by_idx[idx]["oper_status"] = status_map.get(int(value), "unknown")
+                elif "1.3.6.1.2.1.2.2.1.8." in oid_str:  # ifOperStatus
+                    idx = oid_str.split(".")[-1]
+                    if idx not in ifaces_by_idx:
+                        ifaces_by_idx[idx] = {}
+                    ifaces_by_idx[idx]["oper_status"] = status_map.get(int(value), "unknown")
 
-            elif ".1.3.6.1.2.1.2.2.1.5." in oid_str:  # ifSpeed
-                idx = oid_str.split(".")[-1]
-                if idx not in ifaces_by_idx:
-                    ifaces_by_idx[idx] = {}
-                ifaces_by_idx[idx]["speed"] = int(value)
+                elif "1.3.6.1.2.1.2.2.1.5." in oid_str:  # ifSpeed
+                    idx = oid_str.split(".")[-1]
+                    if idx not in ifaces_by_idx:
+                        ifaces_by_idx[idx] = {}
+                    ifaces_by_idx[idx]["speed"] = int(value)
 
-            elif ".1.3.6.1.2.1.2.2.1.3." in oid_str:  # ifType
-                idx = oid_str.split(".")[-1]
-                if idx not in ifaces_by_idx:
-                    ifaces_by_idx[idx] = {}
-                ifaces_by_idx[idx]["type"] = type_map.get(int(value), f"type_{int(value)}")
+                elif "1.3.6.1.2.1.2.2.1.3." in oid_str:  # ifType
+                    idx = oid_str.split(".")[-1]
+                    if idx not in ifaces_by_idx:
+                        ifaces_by_idx[idx] = {}
+                    ifaces_by_idx[idx]["type"] = type_map.get(int(value), f"type_{int(value)}")
 
         # Build final list
         for iface in ifaces_by_idx.values():

@@ -1,0 +1,31 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "status": "USER_VALIDATION_APPLIED",
+  "validated_by": "operator",
+  "validated_at": "2026-05-05T22:58:14.748810+00:00",
+  "summary": {
+    "total_findings": 105,
+    "validated": 1,
+    "pending": 104,
+    "accepted": 0,
+    "false_positive": 0,
+    "ignored_temporarily": 0,
+    "needs_remediation": 1,
+    "needs_more_evidence": 0,
+    "blocked": 0
+  },
+  "next_phase_allowed": false,
+  "next_phase": null,
+  "items_for_next_phase": [
+    "CMP-B0ED197AD0"
+  ],
+  "blocked_items": [],
+  "pending_items": [],
+  "safety": {
+    "netbox_write": false,
+    "device_write": false,
+    "sync_called": false,
+    "approval_record_created": false,
+    "apply_plan_created": false
+  }
+}

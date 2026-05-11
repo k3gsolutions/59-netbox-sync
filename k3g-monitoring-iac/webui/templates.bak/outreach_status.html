@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Status da comunicação{% endblock %}
+{% block content %}
+<h2>Status das respostas da Semana 1</h2>
+<div class="card">
+    <h3>📊 Painel de monitoramento</h3>
+    <p>Status em tempo real da comunicação da Semana 1.</p>
+</div>
+{% if status_content %}
+<div class="section">
+    <div class="report-content">{{ status_content|safe }}</div>
+    {% if status_file %}<p><a href="/reports/download?path={{ status_file.path }}" class="button">Baixar retrato do status</a></p>{% endif %}
+</div>
+{% else %}
+<div class="alert">Retrato do status ainda não gerado. Rode: <code>python3 tools/local/track_week1_outreach_execution.py ...</code></div>
+{% endif %}
+<div class="card">
+    <h3>Pendências do dispositivo</h3>
+    <p>Abrir o editor do dispositivo principal da Semana 1.</p>
+    <a class="btn btn-primary btn-small" href="{{ pending_link }}">Editar pendências</a>
+</div>
+<h3>Atalhos</h3>
+<ul>
+    <li><a href="/outreach/execution-log">Log de execução</a></li>
+    <li><a href="/outreach/reminders">Lembretes</a></li>
+    <li><a href="/outreach">Pacote de comunicação</a></li>
+</ul>
+{% endblock %}

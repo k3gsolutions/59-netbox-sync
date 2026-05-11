@@ -28,6 +28,7 @@ from .validators import (
     validate_service_type,
     validate_status,
     validate_tenant,
+    parse_interface_description,
     validate_vrf,
 )
 
@@ -445,7 +446,22 @@ def validate_response_payload(item: Dict[str, str], payload: Dict[str, object]) 
         return False, errors, []
 
     if status == "answered":
-        if object_type == "subinterface" or responsible_team == "service-team":
+        if object_type == "interface":
+            proposed_desc = _stringify(payload.get("proposed_description"))
+            if proposed_desc:
+                valid, parsed, desc_errors = parse_interface_description(proposed_desc)
+                if not valid:
+                    errors.append(f"proposed_description: {', '.join(desc_errors)}")
+
+            valid, err = validate_owner(_stringify(payload.get("owner")), required=False)
+            if not valid:
+                errors.append(f"owner: {err}")
+
+            valid, err = validate_evidence(_stringify(payload.get("evidence")), required=False)
+            if not valid:
+                errors.append(f"evidence: {err}")
+
+        elif object_type == "subinterface" or responsible_team == "service-team":
             valid, err = validate_tenant(_stringify(payload.get("tenant")), required=True)
             if not valid:
                 errors.append(f"tenant: {err}")
@@ -754,7 +770,29 @@ def build_pending_item_schema(item: Dict[str, object]) -> Dict[str, object]:
             "value": item.get("updated_by", ""),
         }
     ]
-    if object_type == "subinterface" or team == "service-team":
+    if object_type == "interface":
+        fields.extend([
+            {
+                "name": "proposed_description",
+                "label": "Proposed Description",
+                "type": "textarea",
+                "required": False,
+                "value": item.get("proposed_description", ""),
+                "help": "Format: SVC|CID|HOST_REMOTO|PORTA_REMOTA|BANDA|COMENTARIO_OU_ROLE"
+            },
+            {"name": "owner", "label": "Owner", "type": "text", "required": False, "value": item.get("owner", "")},
+            {"name": "evidence", "label": "Evidence", "type": "textarea", "required": False, "value": item.get("evidence", "")},
+            {"name": "notes", "label": "Notes", "type": "textarea", "required": False, "value": item.get("notes", "")},
+            {
+                "name": "status",
+                "label": "Status",
+                "type": "select",
+                "required": True,
+                "choices": MODAL_STATUS_CHOICES,
+                "value": item.get("current_status", "answered"),
+            },
+        ])
+    elif object_type == "subinterface" or team == "service-team":
         fields.extend([
             {"name": "tenant", "label": "Tenant", "type": "text", "required": False, "value": item.get("tenant", "")},
             {

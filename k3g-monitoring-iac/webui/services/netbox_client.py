@@ -223,6 +223,7 @@ class NetBoxClient:
         self,
         tenant_id: int,
         status: str = "active",
+        role: Optional[str] = None,
         limit: int = 100,
     ) -> list[dict]:
         """
@@ -231,6 +232,7 @@ class NetBoxClient:
         Args:
             tenant_id: NetBox tenant ID
             status: Device status (default "active")
+            role: Optional device role slug
             limit: Max results
 
         Returns:
@@ -240,10 +242,10 @@ class NetBoxClient:
             NetBoxAuthError: on 401/403
             NetBoxClientError: on request or parsing error
         """
-        return self._fetch(
-            "/api/dcim/devices/",
-            {"tenant_id": tenant_id, "status": status, "limit": limit}
-        )
+        params = {"tenant_id": tenant_id, "status": status, "limit": limit}
+        if role:
+            params["role"] = role
+        return self._fetch("/api/dcim/devices/", params)
 
 
 def get_netbox_client() -> NetBoxClient:

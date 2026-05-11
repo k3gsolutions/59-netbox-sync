@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Rascunhos de aprovação: {{ device }}{% endblock %}
+
+{% block content %}
+<h2>Rascunhos de aprovação: {{ device }}</h2>
+
+<div class="card">
+    <h3>Status do rascunho</h3>
+    <p>Rascunhos de aprovação com status <code>draft_review</code> aguardando decisão humana.</p>
+    <p><strong>Atenção:</strong> Rascunhos não são aprovações. Eles só viram Registro de Aprovação após decisão humana.</p>
+    <p><strong>Total de rascunhos:</strong> {{ total_drafts }}</p>
+</div>
+
+{% if drafts %}
+<div class="section">
+    <h3>📋 Rascunhos pendentes de promoção</h3>
+
+    <table class="full-width">
+        <thead>
+            <tr>
+                <th>Chave do objeto</th>
+                <th>Ação</th>
+                <th>Status</th>
+                <th>Decisão</th>
+                <th>Criado em</th>
+                <th>Arquivo</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for draft in drafts %}
+            <tr>
+                <td><code>{{ draft.object_key }}</code></td>
+                <td>{{ draft.action }}</td>
+                <td><span class="badge badge-{{ 'success' if draft.allowed_to_promote else 'warning' }}">{{ 'Pode ser promovido' if draft.allowed_to_promote else 'Precisa ajuste' }}</span></td>
+                <td>{{ draft.review_state }}</td>
+                <td>{{ draft.created_at }}</td>
+                <td><small>{{ draft.name }}</small></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="alert">
+    <strong>Próximo passo:</strong> Depois de registrar as decisões no arquivo week2-review-decisions.csv,
+    execute o script de promoção para criar registros de aprovação a partir destes rascunhos.
+</div>
+
+{% else %}
+<div class="alert">
+    <p>Ainda não há rascunhos de aprovação.</p>
+    <p>Os rascunhos serão criados em <code>week2-review/week2-approval-drafts/</code> após rodar prepare_week2_review.py.</p>
+</div>
+{% endif %}
+
+<h3>Fluxo</h3>
+<ol>
+    <li>Rascunhos criados com status <code>draft_review</code></li>
+    <li>Revisão humana e decisões registradas no CSV</li>
+    <li>O script de promoção lê o CSV e cria registros de aprovação propostos</li>
+    <li>Registros criados com status <code>proposed</code> ou ficam em <code>pending</code></li>
+    <li>Fluxo separado de aprovação/rejeição aplicado depois</li>
+</ol>
+
+<h3>Relacionados</h3>
+<ul>
+    <li><a href="/service-engagement/{{ device }}/week2-review">Painel de revisão da Semana 2</a></li>
+    <li><a href="/service-engagement/{{ device }}/promotion-report">Relatório de promoção</a></li>
+    <li><a href="/service-engagement/{{ device }}">Pendências de serviço</a></li>
+    <li><a href="/approval-queue">Fila de aprovação</a></li>
+</ul>
+
+{% endblock %}

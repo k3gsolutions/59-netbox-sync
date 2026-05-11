@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados em lote{% endblock %}
+
+{% block content %}
+<h2>Resultados de aplicação em lote</h2>
+
+{% if results %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Caminho</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+                <tr>
+                    <td>{{ result.name }}</td>
+                    <td>{{ result.path }}</td>
+                    <td>
+                        <a href="/reports/view?path={{ result.path }}" class="button-small">Ver</a>
+                        <a href="/reports/download?path={{ result.path }}" class="button-small">Baixar</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Nenhum resultado em lote encontrado</p>
+{% endif %}
+{% endblock %}

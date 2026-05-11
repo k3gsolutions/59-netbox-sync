@@ -15,6 +15,9 @@ from typing import Any, Dict, Optional
 
 from .netbox_client import NetBoxClient, NetBoxClientError
 
+COMPLIANCE_ROLE_SLUGS = {"12-ativos-de-borda", "ativos-de-malha"}
+COMPLIANCE_ROLE_NAMES = {"12 - ativos de borda", "ativos de malha"}
+
 
 def get_status_value(device: dict) -> str:
     """
@@ -38,6 +41,21 @@ def get_status_value(device: dict) -> str:
         return status.get("value", "")
 
     return ""
+
+
+def is_compliance_role(device: dict) -> bool:
+    role = device.get("role") or device.get("device_role") or {}
+    if not role:
+        return False
+
+    if isinstance(role, dict):
+        role_slug = str(role.get("slug", "")).lower()
+        role_name = str(role.get("name") or role.get("display") or "").lower()
+    else:
+        role_slug = ""
+        role_name = str(role).lower()
+
+    return role_slug in COMPLIANCE_ROLE_SLUGS or role_name in COMPLIANCE_ROLE_NAMES
 
 
 def get_custom_field_bool(device: dict, *names: str) -> bool:
@@ -159,24 +177,12 @@ def get_rejection_reason(device: dict) -> Optional[str]:
     if status != "active":
         return "inactive"
 
-    if not get_custom_field_bool(device, "Compliance", "compliance"):
-        return "compliance_disabled"
-
+    if not is_compliance_role(device):
+        return "wrong_role"
+    
     tenant = device.get("tenant")
     if not tenant:
         return "tenant_missing"
-
-    group_name = get_tenant_group_name(device)
-    if not group_name:
-        # Tenant exists but no group (and enrichment didn't add it)
-        return "tenant_group_missing"
-
-    if group_name not in ("K3G Solutions", "k3g-solutions"):
-        import os
-        expected_id = os.getenv("K3G_SOLUTIONS_TENANT_GROUP_ID", "").strip()
-        if expected_id and group_name == expected_id:
-            return None  # Eligible
-        return "wrong_tenant_group"
 
     return None  # Eligible
 
@@ -202,28 +208,25 @@ def is_compliance_candidate(device: dict) -> bool:
     if status != "active":
         return False
 
-    # Gate 2: Compliance enabled (case-insensitive field lookup)
-    if not get_custom_field_bool(device, "Compliance", "compliance"):
+    # Gate 2: Role must match a compliance-enabled device function.
+    if not is_compliance_role(device):
         return False
-
-    # Gate 3: tenant present
     tenant = device.get("tenant")
     if not tenant:
         return False
 
-    # Gate 4: tenant group name or slug
-    group_name = get_tenant_group_name(device)
-    if not group_name:
-        return False
+    # Gate 4: tenant group name or slug (deprecated, now handled by role filter)
+    # group_name = get_tenant_group_name(device)
+    # if not group_name:
+    #     return False
 
-    if group_name not in ("K3G Solutions", "k3g-solutions"):
-        # Check if it's an ID match against env var
-        import os
-
-        expected_id = os.getenv("K3G_SOLUTIONS_TENANT_GROUP_ID", "").strip()
-        if expected_id and group_name == expected_id:
-            return True
-        return False
+    # if group_name not in ("K3G Solutions", "k3g-solutions"):
+    #     # Check if it's an ID match against env var
+    #     import os
+    #     expected_id = os.getenv("K3G_SOLUTIONS_TENANT_GROUP_ID", "").strip()
+    #     if expected_id and group_name == expected_id:
+    #         return True
+    #     return False
 
     return True
 

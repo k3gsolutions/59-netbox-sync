@@ -47,6 +47,7 @@ class TestSelectiveSearch:
             "id": 1890,
             "name": "4WNET-MNS-KTG-RX",
             "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "custom_fields": {"Compliance": True},
             "tenant": {"name": "K3G Solutions", "group": {"name": "K3G Solutions"}},
         }
@@ -63,6 +64,7 @@ class TestSelectiveSearch:
             {
                 "id": 1890,
                 "name": "4WNET-MNS-KTG-RX",
+                "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
                 "status": "active",
                 "custom_fields": {"Compliance": True},
                 "tenant": {"name": "K3G Solutions", "group": {"name": "K3G Solutions"}},
@@ -81,6 +83,7 @@ class TestSelectiveSearch:
             {
                 "id": 1890,
                 "name": "4WNET-MNS-KTG-RX",
+                "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
                 "status": "active",
                 "custom_fields": {"Compliance": True},
                 "tenant": {"name": "K3G Solutions", "group": {"name": "K3G Solutions"}},
@@ -179,29 +182,31 @@ class TestRejectionDiagnostics:
         assert reason == "inactive"
 
     def test_get_rejection_reason_no_compliance(self):
-        """Device without Compliance field has reason 'compliance_disabled'."""
+        """Device without role has reason 'wrong_role'."""
         device = {"status": "active", "custom_fields": {}}
         reason = get_rejection_reason(device)
-        assert reason == "compliance_disabled"
+        assert reason == "wrong_role"
 
     def test_get_rejection_reason_no_tenant(self):
         """Device without tenant = tenant_missing."""
         device = {
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "status": "active",
             "custom_fields": {"Compliance": True},
         }
         reason = get_rejection_reason(device)
         assert reason == "tenant_missing"
 
-    def test_get_rejection_reason_wrong_tenant_group(self):
-        """Device with wrong tenant group has reason 'wrong_tenant_group'."""
+    def test_get_rejection_reason_eligible_with_tenant(self):
+        """Device with role + tenant = eligible (None reason)."""
         device = {
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "status": "active",
             "custom_fields": {"Compliance": True},
-            "tenant": {"name": "Other", "group": {"name": "Other Group"}},
+            "tenant": {"name": "K3G Solutions", "group": {"name": "K3G Solutions"}},
         }
         reason = get_rejection_reason(device)
-        assert reason == "wrong_tenant_group"
+        assert reason is None
 
     def test_include_rejected_includes_reasons(self):
         """With include_rejected=True, should include rejected list with reasons."""
@@ -210,6 +215,7 @@ class TestRejectionDiagnostics:
             {
                 "id": 1,
                 "name": "eligible",
+                "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
                 "status": "active",
                 "custom_fields": {"Compliance": True},
                 "tenant": {"name": "K3G Solutions", "group": {"name": "K3G Solutions"}},
@@ -277,6 +283,7 @@ class TestSafetyBlocks:
         mock_client.get_device_by_id.return_value = {
             "id": 1890,
             "name": "test",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
             "status": "active",
             "custom_fields": {"Compliance": True},
             "tenant": {"name": "K3G Solutions", "group": {"name": "K3G Solutions"}},

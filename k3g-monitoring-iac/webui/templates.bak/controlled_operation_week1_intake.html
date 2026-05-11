@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Intake {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Week 1 Intake: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Decisão</div><div class="summary-value">{{ decision or 'N/A' }}</div></div>
+    <div class="summary-card"><div class="summary-label">Respondidas</div><div class="summary-value">{{ summary.responded or 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Pendentes</div><div class="summary-value">{{ summary.still_pending or 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Bloqueadas</div><div class="summary-value">{{ summary.invalid_format or 0 }}</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Intake local</div>
+    {% if assets.intake_file %}
+    <p><a href="/reports/view?path={{ assets.intake_file.path }}">Ver intake</a> | <a href="/reports/download?path={{ assets.intake_file.path }}">Baixar intake</a></p>
+    <pre class="pre-wrap">{{ assets.intake_file.content }}</pre>
+    {% else %}
+    <p>Intake ainda não gerado.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Resumo por time</div>
+    {% if assets.intake_json_file and assets.intake_json_file.content.teams %}
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Arquivos</th>
+                <th>Issues</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for key, team in assets.intake_json_file.content.teams.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ team.status }}</td>
+                <td>{{ team.file_count }}</td>
+                <td>{{ team.issues | join('; ') if team.issues else 'ok' }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Sem dados de team ainda.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Próximo passo</div>
+    <p>{{ next_action }}</p>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1" class="btn btn-small">Voltar</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1/pending" class="btn btn-small">Pendências</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1/validation" class="btn btn-primary btn-small">Abrir validação</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Real write freeze {{ cycle.cycle_id }}{% endblock %}
+{% block content %}
+<h2>Real-write freeze: {{ cycle.cycle_id }}</h2>
+<div class="card">
+  <div class="card-header">Freeze</div>
+  {% if chain.freeze_json_file %}
+  <p><a href="/reports/download?path={{ chain.freeze_json_file.path }}">Baixar JSON</a></p>
+  <pre class="pre-wrap">{{ chain.freeze_json_file.content | tojson(indent=2) }}</pre>
+  {% else %}
+  <p>Sem freeze gerado.</p>
+  {% endif %}
+</div>
+<div class="card"><div class="card-header">Navegação</div><div class="pending-validation-links">
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write-package" class="btn btn-small">Package</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write-authorization" class="btn btn-small">Autorização</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+</div></div>
+{% endblock %}

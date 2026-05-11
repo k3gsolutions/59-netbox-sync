@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Linha do tempo da aprovação{% endblock %}
+
+{% block content %}
+<h2>Linha do tempo da aprovação</h2>
+
+<div class="card">
+    <h3>{{ approval.id }}</h3>
+    <p><strong>Situação:</strong> {{ approval.status | status_label }}</p>
+    <p><strong>Arquivo:</strong> {{ approval.path }}</p>
+</div>
+
+{% if approval.data %}
+<div class="section">
+    <h3>Registro de Aprovação</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px;"><strong>Campo</strong></td>
+            <td style="padding: 8px;"><strong>Valor</strong></td>
+        </tr>
+        {% for key, value in approval.data.items() %}
+            {% if key != 'state_history' and key != 'staged_payload' %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 8px;">{{ key }}</td>
+                <td style="padding: 8px; font-family: monospace; font-size: 12px;">
+                    {% if value is string %}
+                        {{ value }}
+                    {% else %}
+                        {{ value | tojson }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+</div>
+
+{% if approval.data.state_history %}
+<div class="section">
+    <h3>Histórico de estados</h3>
+    <div style="border-left: 3px solid #007bff; padding-left: 15px;">
+        {% for entry in approval.data.state_history %}
+        <div style="margin-bottom: 15px;">
+            <p style="margin: 0;">
+                <strong>{{ entry.from }}</strong> → <strong>{{ entry.to }}</strong>
+            </p>
+            <p style="margin: 5px 0; font-size: 12px; color: #666;">
+                Por: {{ entry.by | default('system') }} @ {{ entry.at | default('unknown') }}
+            </p>
+            {% if entry.reason %}
+            <p style="margin: 5px 0; font-size: 12px;">
+                Motivo: {{ entry.reason }}
+            </p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if approval.data.staged_payload %}
+<div class="section">
+    <h3>Payload em estágio</h3>
+    <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 11px;">{{ approval.data.staged_payload | tojson(indent=2) }}</pre>
+</div>
+{% endif %}
+
+{% endif %}
+
+<a href="/approval-queue" class="button">Voltar à fila</a>
+<a href="/reports/download?path={{ approval.path }}" class="button">Baixar</a>
+{% endblock %}

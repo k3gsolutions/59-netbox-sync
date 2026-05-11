@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="mb-3">
+        <a href="/real-write" class="btn btn-secondary btn-sm">← Voltar</a>
+    </div>
+
+    <h1>FASE 2.56 — Encerramento da Escrita Real</h1>
+    <p class="text-muted">Device: <strong>{{ device }}</strong></p>
+
+    {% if closure %}
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header {% if 'SUCCESS' in closure.get('closure_decision', '') %}bg-success{% else %}bg-danger{% endif %} text-white">
+                        <h5 class="card-title mb-0">Decisão: {{ closure.get('closure_decision', 'DESCONHECIDO') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Closure Package ID:</strong><br><code>{{ closure.get('closure_package_id', 'N/A') }}</code></p>
+                                <p><strong>Device:</strong> {{ closure.get('device', 'N/A') }}</p>
+                                <p><strong>Execution ID:</strong><br><code>{{ closure.get('execution_id', 'N/A') }}</code></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Gerado:</strong> {{ closure.get('generated_at', 'N/A') }}</p>
+                                <p><strong>Operador:</strong> {{ closure.get('operator', 'N/A') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Resumo</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Total Itens:</strong> {{ closure.get('items', [])|length }}</p>
+                        <p><strong>Criados:</strong> {{ closure.get('total_items_created', 0) }}</p>
+                        <p><strong>Verificados:</strong> {{ closure.get('total_items_verified', 0) }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase Results -->
+        {% if closure.get('phases') %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Resultados por Fase</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fase</th>
+                            <th>Status</th>
+                            <th>ID</th>
+                            <th>Resultado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for phase_name, phase_data in closure.get('phases', {}).items() %}
+                        <tr>
+                            <td>{{ phase_name.replace('FASE_', '').replace('_', ' ') }}</td>
+                            <td><code>{{ phase_data.get('status', 'N/A') }}</code></td>
+                            <td><code>{{ phase_data.get('execution_id') or phase_data.get('verification_id') or phase_data.get('compliance_run_id', 'N/A') }}</code></td>
+                            <td>
+                                {% if phase_data.get('success') %}
+                                    <span class="badge bg-success">✓ Sucesso</span>
+                                {% else %}
+                                    <span class="badge bg-danger">✗ Falha</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Security & Audit -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Segurança</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li>{% if closure.get('token_logged') %}✗{% else %}✓{% endif %} Token não logado</li>
+                            <li>✓ Trilha de auditoria completa</li>
+                            <li>✓ Nenhum segredo exibido</li>
+                            <li>✓ One-shot execution</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="card-title mb-0">Próximas Ações</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if 'SUCCESS' in closure.get('closure_decision', '') %}
+                        <ol class="small">
+                            <li>Revisar todos os artefatos</li>
+                            <li>Confirmar objetos em NetBox</li>
+                            <li>Validar compliance passou</li>
+                            <li>Arquivar resultados</li>
+                            <li>Proceder com operação controlada</li>
+                        </ol>
+                        {% else %}
+                        <ol class="small">
+                            <li>Investigar problemas</li>
+                            <li>Não proceder com operação</li>
+                            <li>Abrir plano corretivo</li>
+                            <li>Re-avaliar quando pronto</li>
+                        </ol>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report -->
+        {% if closure_html %}
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">Relatório Completo</h5>
+            </div>
+            <div class="card-body">
+                <div class="markdown-content">
+                    {{ closure_html|safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-info">
+            Nenhum resultado de encerramento disponível.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

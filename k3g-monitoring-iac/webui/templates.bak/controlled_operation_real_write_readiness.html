@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Real write readiness {{ cycle.cycle_id }}{% endblock %}
+{% block content %}
+<h2>Real-write readiness: {{ cycle.cycle_id }}</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="summary-label">Decisão</div><div class="summary-value">{{ chain.readiness_json_file.content.decision | status_label if chain.readiness_json_file else 'N/A' }}</div></div>
+  <div class="summary-card"><div class="summary-label">Aprovados</div><div class="summary-value">{{ chain.approved_records | length }}</div></div>
+  <div class="summary-card"><div class="summary-label">Simulação</div><div class="summary-value">{{ chain.simulation_json_file.content.status | status_label if chain.simulation_json_file else 'N/A' }}</div></div>
+  <div class="summary-card"><div class="summary-label">Freeze</div><div class="summary-value">{{ chain.freeze_json_file.content.decision | status_label if chain.freeze_json_file else 'N/A' }}</div></div>
+</div>
+<div class="card">
+  <div class="card-header">Arquivos</div>
+  <ul class="compact-list">
+    {% if chain.readiness_json_file %}<li><a href="/reports/download?path={{ chain.readiness_json_file.path }}">Readiness JSON</a></li>{% endif %}
+    {% if chain.simulation_json_file %}<li><a href="/reports/download?path={{ chain.simulation_json_file.path }}">Simulation JSON</a></li>{% endif %}
+    {% if chain.dryrun_execution_gate_json_file %}<li><a href="/reports/download?path={{ chain.dryrun_execution_gate_json_file.path }}">Dry-run gate JSON</a></li>{% endif %}
+  </ul>
+</div>
+<div class="card"><div class="card-header">Navegação</div><div class="pending-validation-links">
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write-authorization" class="btn btn-small">Autorização</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}/real-write-preflight" class="btn btn-small">Preflight</a>
+  <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+</div></div>
+{% endblock %}

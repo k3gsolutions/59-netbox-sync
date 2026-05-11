@@ -1,0 +1,51 @@
+<div class="card pending-items-summary">
+    <h3>Pendências</h3>
+    <p>Fila operacional para edição local, sem escrita no NetBox.</p>
+    <div class="pending-summary-grid">
+        <div class="metric-card">
+            <div class="label">Pending</div>
+            <div class="value">{{ pending_counts.pending }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Answered</div>
+            <div class="value">{{ pending_counts.answered }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Needs Clarification</div>
+            <div class="value">{{ pending_counts.needs_clarification }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Bloqueadas</div>
+            <div class="value">{{ pending_counts.blocked }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Rejeitadas</div>
+            <div class="value">{{ pending_counts.rejected }}</div>
+        </div>
+    </div>
+</div>
+
+{% if pending_items %}
+<div class="card">
+    <div class="card-header">Pending Item Queue</div>
+    {% include "partials/pending_items_table.html" %}
+</div>
+{% else %}
+<div class="card">
+    <h3>No pending items</h3>
+    <p>Nothing to edit for this device.</p>
+</div>
+{% endif %}
+
+<div class="card">
+    <h3>Validação</h3>
+    <p>CSV local salvo em <code>reports/pilot-device-compliance/week1-responses/</code>.</p>
+    <p class="mono">{{ validation_command }}</p>
+    <div class="pending-validation-links">
+        <a class="btn btn-primary btn-small" href="/reports/view?path=pilot-device-compliance/week1-response-validation.md">Ver validação</a>
+        <a class="btn btn-small" href="/reports/download?path=pilot-device-compliance/week1-response-validation.md">Baixar validação</a>
+        <a class="btn btn-small" href="/reports/view?path=pilot-device-compliance/week1-metadata-collection-template.csv">Ver template CSV</a>
+    </div>
+</div>
+
+{% include "partials/pending_item_modal.html" %}

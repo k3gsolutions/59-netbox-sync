@@ -3,9 +3,13 @@
    ============================================================= */
 
 // ── Config ──────────────────────────────────────────────────────
-// Proxy through the main webui to avoid mixed-content (HTTPS -> HTTP) and CORS issues
-let API_BASE = '/compliance/guided';
+let API_BASE = localStorage.getItem('api_base') || '';
 let API_KEY  = localStorage.getItem('api_key')  || '';
+
+if (API_BASE === '/compliance/guided' || (window.location.protocol === 'https:' && API_BASE.startsWith('http://'))) {
+  API_BASE = '';
+  localStorage.removeItem('api_base');
+}
 
 function apiHeaders() {
   const h = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
@@ -28,6 +32,8 @@ let state = {
   currentStep: 1,
   selectedTenant: null,
   selectedDevice: null,
+  allDevices: [],
+  selectedDeviceType: 'all',
   selectedContexts: new Set(),
   allContexts: [],
   findings: [],
@@ -62,19 +68,19 @@ function goToStep(n) {
 async function checkApiStatus() {
   try {
     await apiFetch('/health');
-    $('dot').className = 'status-dot ok';
-    $('api-status-label').textContent = 'API online';
+    if ($('dot')) $('dot').className = 'status-dot ok';
+    if ($('api-status-label')) $('api-status-label').textContent = 'API online';
     return true;
   } catch {
-    $('dot').className = 'status-dot error';
-    $('api-status-label').textContent = 'API offline';
+    if ($('dot')) $('dot').className = 'status-dot error';
+    if ($('api-status-label')) $('api-status-label').textContent = 'API offline';
     return false;
   }
 }
 
 function updateApiUrlBadge() {
-  const url = new URL(API_BASE);
-  $('api-url-badge').innerHTML = `<span class="mono">${url.host}</span>`;
+  const host = API_BASE ? new URL(API_BASE).host : window.location.host;
+  $('api-url-badge').innerHTML = `<span class="mono">${host}</span>`;
 }
 
 // ── STEP 1: Tenants ──────────────────────────────────────────────
@@ -128,6 +134,10 @@ async function loadDevices(tenantId) {
   show('devices-loading');
   hide('devices-error');
   hide('devices-list');
+  hide('devices-empty');
+  hide('device-type-filter');
+  state.allDevices = [];
+  state.selectedDeviceType = 'all';
 
   try {
     const devices = await apiFetch(`/compliance/eligible-devices?tenant_id=${tenantId}`);
@@ -139,14 +149,72 @@ async function loadDevices(tenantId) {
       return;
     }
 
-    const list = $('devices-list');
-    list.innerHTML = devices.map(d => `
+    state.allDevices = devices;
+    populateDeviceTypeFilter(devices);
+    renderDeviceList();
+    show('device-type-filter');
+  } catch (err) {
+    hide('devices-loading');
+    $('devices-error').textContent = `❌ Erro ao carregar dispositivos: ${err.message}`;
+    show('devices-error');
+  }
+}
+
+function getDeviceFunction(device) {
+  return device.role || 'Sem função informada';
+}
+
+function populateDeviceTypeFilter(devices) {
+  const select = $('device-type-select');
+  const counts = new Map();
+  devices.forEach(d => {
+    const type = getDeviceFunction(d);
+    counts.set(type, (counts.get(type) || 0) + 1);
+  });
+
+  select.innerHTML = '';
+
+  const allOption = document.createElement('option');
+  allOption.value = 'all';
+  allOption.textContent = `Todas as funções (${devices.length})`;
+  select.appendChild(allOption);
+
+  [...counts.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, 'pt-BR'))
+    .forEach(([type, count]) => {
+      const option = document.createElement('option');
+      option.value = type;
+      option.textContent = `${type} (${count})`;
+      select.appendChild(option);
+    });
+
+  select.value = 'all';
+  $('device-filter-count').textContent = `${devices.length} dispositivo${devices.length !== 1 ? 's' : ''}`;
+}
+
+function renderDeviceList() {
+  const filteredDevices = state.selectedDeviceType === 'all'
+    ? state.allDevices
+    : state.allDevices.filter(d => getDeviceFunction(d) === state.selectedDeviceType);
+
+  $('device-filter-count').textContent = `${filteredDevices.length} dispositivo${filteredDevices.length !== 1 ? 's' : ''}`;
+
+  if (!filteredDevices.length) {
+    hide('devices-list');
+    show('devices-empty');
+    return;
+  }
+
+  hide('devices-empty');
+
+  const list = $('devices-list');
+  list.innerHTML = filteredDevices.map(d => `
       <div class="device-card" data-id="${d.id}" data-name="${escHtml(d.name)}">
         <div class="device-icon">🖥️</div>
         <div class="device-info">
           <div class="device-name">${escHtml(d.name)}</div>
           <div class="device-meta">
-            ${d.manufacturer ? escHtml(d.manufacturer) : ''}${d.model ? ' · ' + escHtml(d.model) : ''}${d.site ? ' · ' + escHtml(d.site) : ''}
+            ${d.role ? escHtml(d.role) : ''}${d.manufacturer ? ' · ' + escHtml(d.manufacturer) : ''}${d.model ? ' · ' + escHtml(d.model) : ''}${d.site ? ' · ' + escHtml(d.site) : ''}
           </div>
           ${d.primary_ip ? `<div class="device-ip">${escHtml(d.primary_ip)}</div>` : ''}
         </div>
@@ -154,16 +222,11 @@ async function loadDevices(tenantId) {
       </div>
     `).join('');
 
-    list.querySelectorAll('.device-card').forEach(card => {
-      card.addEventListener('click', () => selectDevice(card));
-    });
+  list.querySelectorAll('.device-card').forEach(card => {
+    card.addEventListener('click', () => selectDevice(card));
+  });
 
-    show('devices-list');
-  } catch (err) {
-    hide('devices-loading');
-    $('devices-error').textContent = `❌ Erro ao carregar dispositivos: ${err.message}`;
-    show('devices-error');
-  }
+  show('devices-list');
 }
 
 function selectDevice(card) {
@@ -185,7 +248,7 @@ async function loadContexts(deviceId) {
   $('btn-analyze').disabled = true;
 
   try {
-    const contexts = await apiFetch(`/compliance/contexts?device_id=${deviceId}`);
+    const contexts = await apiFetch('/compliance/eligible-contexts');
     state.allContexts = contexts;
     hide('contexts-loading');
 
@@ -379,10 +442,13 @@ function closeSettings() { hide('settings-modal'); }
 async function saveSettings() {
   const url = $('input-api-url').value.trim().replace(/\/$/, '');
   const key  = $('input-api-key').value.trim();
-  if (!url) return;
   API_BASE = url;
   API_KEY  = key;
-  localStorage.setItem('api_base', url);
+  if (url) {
+    localStorage.setItem('api_base', url);
+  } else {
+    localStorage.removeItem('api_base');
+  }
   localStorage.setItem('api_key', key);
   updateApiUrlBadge();
   closeSettings();
@@ -408,6 +474,12 @@ document.addEventListener('DOMContentLoaded', () => {
   $('input-api-key').value = API_KEY;
   checkApiStatus();
   loadTenants();
+
+  $('device-type-select').addEventListener('change', (event) => {
+    state.selectedDeviceType = event.target.value;
+    state.selectedDevice = null;
+    renderDeviceList();
+  });
 
   // Step navigation
   $('back-to-step1').addEventListener('click', () => goToStep(1));

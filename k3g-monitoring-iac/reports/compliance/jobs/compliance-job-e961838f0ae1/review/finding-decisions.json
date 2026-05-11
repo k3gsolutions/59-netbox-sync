@@ -1,0 +1,22 @@
+{
+  "job_id": "compliance-job-e961838f0ae1",
+  "decisions": {
+    "CMP-B0ED197AD0": {
+      "finding_id": "CMP-B0ED197AD0",
+      "reviewer": "Keslley",
+      "decision": "needs_remediation",
+      "reason": "Test reason",
+      "severity_override": null,
+      "decided_at": "2026-05-05T22:58:14.746209+00:00",
+      "status": "remediation_candidate"
+    }
+  },
+  "updated_at": "2026-05-05T22:58:14.746224+00:00",
+  "safety": {
+    "netbox_write": false,
+    "device_connection": false,
+    "sync_called": false,
+    "approval_record_created": false,
+    "apply_plan_created": false
+  }
+}

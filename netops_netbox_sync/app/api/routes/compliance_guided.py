@@ -124,10 +124,23 @@ class DeviceOut(BaseModel):
     name: str
     manufacturer: Optional[str] = None
     model: Optional[str] = None
+    role: Optional[str] = None
     site: Optional[str] = None
     primary_ip: Optional[str] = None
     status: Optional[str] = None
     platform: Optional[str] = None
+
+
+def _device_role_name(device: dict) -> Optional[str]:
+    role = device.get("role") or device.get("device_role") or {}
+    if isinstance(role, dict):
+        for key in ("name", "display", "label", "slug", "value"):
+            value = role.get(key)
+            if value:
+                return str(value)
+    if role:
+        return str(role)
+    return None
 
 
 class ContextOption(BaseModel):
@@ -677,6 +690,7 @@ def get_eligible_devices(tenant_id: int = Query(..., description="ID do tenant/c
                 device_type.get("model") if isinstance(device_type, dict)
                 else None
             ),
+            role=_device_role_name(d),
             site=site.get("name") if isinstance(site, dict) else str(site) if site else None,
             primary_ip=primary_ip,
             status=(d.get("status") or {}).get("value"),

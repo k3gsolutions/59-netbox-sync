@@ -198,6 +198,68 @@ def validate_status(value: str) -> Tuple[bool, Optional[str]]:
         return False, f"Invalid status: {value}"
     return True, None
 
+def parse_interface_description(description: str) -> Tuple[bool, Optional[Dict[str, str]], List[str]]:
+    """
+    Parse standardized interface description: SVC|CID|EMPRESA|INTERFACE|BANDA|COMMENT.
+
+    Args:
+        description: Interface description string
+
+    Returns:
+        (valid: bool, parsed: dict or None, errors: list)
+        parsed = {
+            "svc": service type (CLI, OP, PTP, PTMP, EN),
+            "cid": circuit/customer ID,
+            "empresa": customer name,
+            "interface": interface name,
+            "banda": bandwidth,
+            "comment": additional comment
+        }
+    """
+    if not description or not isinstance(description, str):
+        return False, None, ["Description is empty or not a string"]
+
+    description = description.strip()
+    parts = description.split("|")
+
+    if len(parts) != 6:
+        return False, None, [f"Expected 6 pipe-separated parts, got {len(parts)}"]
+
+    svc, cid, empresa, iface, banda, comment = [p.strip() for p in parts]
+    errors = []
+
+    # Validate SVC
+    valid_svcs = {"CLI", "OP", "PTP", "PTMP", "EN"}
+    if svc.upper() not in valid_svcs:
+        errors.append(f"Invalid SVC: {svc} (must be one of {valid_svcs})")
+
+    # Validate other fields are non-empty
+    if not cid:
+        errors.append("CID cannot be empty")
+    if not empresa:
+        errors.append("EMPRESA cannot be empty")
+    if not iface:
+        errors.append("INTERFACE cannot be empty")
+    if not banda:
+        errors.append("BANDA cannot be empty")
+    # comment can be empty
+
+    # Validate BANDA format (number + unit M/G/T)
+    if banda and not re.match(r'^\d+[MGT](?:bps)?$', banda, re.IGNORECASE):
+        errors.append(f"BANDA invalid format: {banda} (expected like 100M, 1G, 10T)")
+
+    if errors:
+        return False, None, errors
+
+    return True, {
+        "svc": svc.upper(),
+        "cid": cid,
+        "empresa": empresa,
+        "interface": iface,
+        "banda": banda,
+        "comment": comment,
+    }, []
+
 def validate_subinterface_response(data: Dict) -> Tuple[bool, List[str]]:
     """Validate subinterface form response."""
     errors = []

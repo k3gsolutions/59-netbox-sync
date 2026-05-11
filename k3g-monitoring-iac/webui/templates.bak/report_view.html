@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Relatório{% endblock %}
+
+{% block content %}
+<h2>Relatório: {{ report_path }}</h2>
+
+<p>
+    <a href="/reports/download?path={{ report_path }}" class="button">Baixar .md</a>
+</p>
+
+<div class="report-content">
+    {{ html_content | safe }}
+</div>
+
+<p><a href="/" class="button">Voltar ao painel</a></p>
+{% endblock %}

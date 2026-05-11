@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Start gate {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Start Gate: {{ cycle.cycle_id }}</h2>
+
+<div class="card">
+    <div class="card-header">Resumo</div>
+    <p>Status do ciclo: <strong>{{ cycle.current_status | status_label }}</strong></p>
+    <p>Decisão de handoff: <strong>{{ cycle.handoff_decision or 'N/A' }}</strong></p>
+    <p>Próximo passo: {{ cycle.next_action }}</p>
+    {% if gate_file %}
+    <p><a href="/reports/view?path={{ gate_file.path }}">Ver arquivo do gate</a> | <a href="/reports/download?path={{ gate_file.path }}">Baixar</a></p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Conteúdo</div>
+    {% if gate_content %}
+    <pre class="pre-wrap">{{ gate_content }}</pre>
+    {% else %}
+    <p>Nenhum start gate gerado ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}ApplyPlan dry-run {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>ApplyPlan dry-run: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Planos</div><div class="summary-value">{{ applyplans.plans | length if applyplans.plans else 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Geração</div><div class="summary-value">{{ applyplans.generation_decision | status_label }}</div></div>
+    <div class="summary-card"><div class="summary-label">Validação</div><div class="summary-value">{{ applyplans.validation_decision | status_label }}</div></div>
+    <div class="summary-card"><div class="summary-label">Modo</div><div class="summary-value">dry_run</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Planos gerados</div>
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>apply_plan_id</th>
+                <th>status</th>
+                <th>itens</th>
+                <th>origem</th>
+                <th>próximo gate</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for plan in applyplans.plans %}
+            <tr>
+                <td><code>{{ plan.apply_plan_id }}</code></td>
+                <td>{{ plan.status | status_label }}</td>
+                <td>{{ plan.item_count }}</td>
+                <td>{{ plan.source_approval_records | join(', ') }}</td>
+                <td>{{ plan.execution_policy.next_gate if plan.execution_policy else '-' }}</td>
+            </tr>
+        {% endfor %}
+        {% if not applyplans.plans %}
+            <tr><td colspan="5">Nenhum ApplyPlan localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">Arquivos</div>
+    <ul class="compact-list">
+        {% if applyplans.generation_file %}<li><a href="/reports/view?path={{ applyplans.generation_file.path }}">Ver geração</a></li>{% endif %}
+        {% if applyplans.generation_json_file %}<li><a href="/reports/download?path={{ applyplans.generation_json_file.path }}">Baixar geração JSON</a></li>{% endif %}
+        {% if applyplans.validation_file %}<li><a href="/reports/view?path={{ applyplans.validation_file.path }}">Ver validação</a></li>{% endif %}
+        {% if applyplans.validation_json_file %}<li><a href="/reports/download?path={{ applyplans.validation_json_file.path }}">Baixar validação JSON</a></li>{% endif %}
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-header">Navegação</div>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/applyplan/validation" class="btn btn-small">Validação</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals/manual-review" class="btn btn-small">Revisão manual</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+    </div>
+    <p>Esta página só exibe ApplyPlan dry-run. Nenhuma execução acontece aqui.</p>
+</div>
+{% endblock %}

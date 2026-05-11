@@ -292,6 +292,49 @@ body {
   color: var(--blue);
   margin-bottom: 18px;
 }
+.device-filter {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.device-filter-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.device-filter-select {
+  min-width: 240px;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 9px 12px;
+}
+.device-filter-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.device-filter-count {
+  color: var(--text-muted);
+  font-size: 12px;
+  padding-bottom: 9px;
+}
+.empty-row {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 18px;
+  text-align: center;
+}
 .devices-list { display: flex; flex-direction: column; gap: 10px; }
 .device-card {
   display: flex; align-items: center; gap: 16px;
@@ -566,6 +609,9 @@ body {
   .sidebar { display: none; }
   .app-main { margin-left: 0; }
   .wizard-container { padding: 16px; }
+  .device-filter { align-items: stretch; flex-direction: column; }
+  .device-filter-select { min-width: 0; width: 100%; }
+  .device-filter-count { padding-bottom: 0; }
   .results-summary { grid-template-columns: 1fr; }
   .contexts-grid { grid-template-columns: 1fr; }
   .tenant-grid { grid-template-columns: 1fr; }

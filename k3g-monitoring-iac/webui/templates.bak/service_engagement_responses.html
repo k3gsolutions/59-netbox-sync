@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Respostas da Semana 1{% endblock %}
+
+{% block content %}
+<h2>Status das respostas da Semana 1: {{ device }}</h2>
+
+<div class="card">
+    <h3>Validação das respostas da Semana 1</h3>
+    <p>Status das respostas de coleta de metadados dos times.</p>
+    <div class="pending-validation-links">
+        <a href="/service-engagement/{{ device }}/pending-items" class="btn btn-primary btn-small">Editar pendências</a>
+        <a href="/service-engagement/{{ device }}/pending-items?format=json" class="btn btn-small">Pendências em JSON</a>
+        <a href="/service-engagement/{{ device }}/validation" class="btn btn-small">Painel de validação</a>
+        <button type="button" class="btn btn-small" onclick="finalizeResponsesAndRefresh('{{ device }}')">Finalizar respostas e preparar Semana 2</button>
+    </div>
+
+    {% if validation_file %}
+        <div>
+            <p><strong>{{ validation_file.name }}</strong></p>
+            <div style="background: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 11px; white-space: pre-wrap;">
+                {{ validation_content }}
+            </div>
+            <p style="margin-top: 10px;">
+                <a href="/reports/view?path={{ validation_file.path }}" class="button">Ver relatório completo</a>
+                <a href="/reports/download?path={{ validation_file.path }}" class="button">Baixar</a>
+            </p>
+        </div>
+    {% else %}
+        <p><em>Nenhuma resposta recebida ainda. Esperado até 2026-05-08.</em></p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Pendências</div>
+    {% include "partials/pending_items_table.html" %}
+</div>
+
+<div class="card">
+    <div class="card-header">Resumo da validação</div>
+    <div class="summary-grid">
+        <div class="summary-card"><div class="summary-label">Validadas</div><div class="summary-value" id="validation-count-validated">{{ validation_summary.validated }}</div></div>
+        <div class="summary-card"><div class="summary-label">Prontas para revisão</div><div class="summary-value" id="validation-count-ready_for_review">{{ validation_summary.ready_for_review }}</div></div>
+        <div class="summary-card"><div class="summary-label">Ainda pendentes</div><div class="summary-value" id="validation-count-still_pending">{{ validation_summary.still_pending }}</div></div>
+        <div class="summary-card"><div class="summary-label">Precisam de esclarecimento</div><div class="summary-value" id="validation-count-needs_clarification">{{ validation_summary.needs_clarification }}</div></div>
+        <div class="summary-card"><div class="summary-label">Bloqueadas</div><div class="summary-value" id="validation-count-blocked">{{ validation_summary.blocked }}</div></div>
+        <div class="summary-card"><div class="summary-label">Rejeitadas</div><div class="summary-value" id="validation-count-rejected">{{ validation_summary.rejected }}</div></div>
+    </div>
+</div>
+
+<h3>Linha do tempo</h3>
+<ul>
+    <li><strong>Semana 1 (2026-05-02):</strong> Times enviam respostas</li>
+    <li><strong>Fim da Semana 1 (2026-05-08):</strong> Prazo final das respostas</li>
+    <li><strong>Semana 2 (2026-05-09):</strong> Validar e classificar</li>
+    <li><strong>Semana 2 (2026-05-09+):</strong> Revisar candidatos da Semana 2</li>
+</ul>
+
+<h3>Atalhos</h3>
+<ul>
+    <li><a href="/service-engagement/{{ device }}">Voltar para pendências</a></li>
+    <li><a href="/service-engagement/{{ device }}/week2-candidates">Candidatos da Semana 2</a></li>
+    <li><a href="/service-engagement">Todas as pendências</a></li>
+</ul>
+
+{% include "partials/pending_item_modal.html" %}
+
+{% endblock %}

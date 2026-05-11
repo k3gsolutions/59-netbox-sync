@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Week 2 {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Week 2: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Status</div><div class="summary-value">{{ assets.status_decision or 'N/A' }}</div></div>
+    <div class="summary-card"><div class="summary-label">Dispositivo</div><div class="summary-value">{{ cycle.device }}</div></div>
+    <div class="summary-card"><div class="summary-label">Itens prontos</div><div class="summary-value">{{ assets.status_summary.get('ready_items', 0) if assets.status_summary else 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Próximo passo</div><div class="summary-value">Revisão humana</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Plano Week 2</div>
+    {% if assets.plan_file %}
+    <p><a href="/reports/view?path={{ assets.plan_file.path }}">Ver plano</a> | <a href="/reports/download?path={{ assets.plan_file.path }}">Baixar plano</a></p>
+    <pre class="pre-wrap">{{ assets.plan_file.content }}</pre>
+    {% else %}
+    <p>Plano Week 2 ainda não gerado.</p>
+    {% endif %}
+    {% if assets.status_file %}
+    <p><a href="/reports/view?path={{ assets.status_file.path }}">Ver status</a> | <a href="/reports/download?path={{ assets.status_file.path }}">Baixar status</a></p>
+    <pre class="pre-wrap">{{ assets.status_file.content }}</pre>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Painel de revisão</div>
+    {% if assets.board_file %}
+    <p><a href="/reports/view?path={{ assets.board_file.path }}">Ver board</a> | <a href="/reports/download?path={{ assets.board_file.path }}">Baixar board</a></p>
+    <pre class="pre-wrap">{{ assets.board_file.content }}</pre>
+    {% else %}
+    <p>Nenhum board gerado ainda.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Decisões e rascunhos</div>
+    {% if assets.decisions_file %}
+    <p><a href="/reports/view?path={{ assets.decisions_file.path }}">Ver CSV</a> | <a href="/reports/download?path={{ assets.decisions_file.path }}">Baixar CSV</a></p>
+    {% endif %}
+    <ul class="compact-list">
+        {% for draft in assets.draft_items %}
+        <li><code>{{ draft.object_key }}</code> - {{ draft.object_type }} - {{ draft.team }} - {{ 'promovível' if draft.allowed_to_promote else 'rascunho' }}</li>
+        {% endfor %}
+        {% if not assets.draft_items %}
+        <li>Nenhum rascunho localizado</li>
+        {% endif %}
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-header">Próximos links</div>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1" class="btn btn-small">Week 1</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week1/pending" class="btn btn-small">Pendências</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week2/review" class="btn btn-small">Revisão</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals" class="btn btn-small">Aprovações</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals/readiness" class="btn btn-small">Prontidão</a>
+    </div>
+</div>
+{% endblock %}

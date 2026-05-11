@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="mb-3">
+        <a href="/real-write" class="btn btn-secondary btn-sm">← Voltar</a>
+    </div>
+
+    <h1>FASE 2.54 — Verificação Pós-Escrita</h1>
+    <p class="text-muted">Device: <strong>{{ device }}</strong></p>
+
+    {% if result %}
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header {% if 'SUCCESS' in result.get('status', '') %}bg-success{% else %}bg-danger{% endif %} text-white">
+                        <h5 class="card-title mb-0">Status: {{ result.get('status', 'DESCONHECIDO') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Verification ID:</strong><br><code>{{ result.get('verification_id', 'N/A') }}</code></p>
+                                <p><strong>Execution ID:</strong><br><code>{{ result.get('execution_id', 'N/A') }}</code></p>
+                                <p><strong>Device:</strong> {{ result.get('device', 'N/A') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Iniciad o:</strong> {{ result.get('started_at', 'N/A') }}</p>
+                                <p><strong>Finalizado:</strong> {{ result.get('finished_at', 'N/A') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Resumo</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Total:</strong> {{ result.get('total_count', 0) }}</p>
+                        <p><strong>Verificados:</strong>
+                            <span class="badge bg-success">{{ result.get('verified_count', 0) }}</span>
+                        </p>
+                        <p><strong>Falhados:</strong>
+                            <span class="badge bg-danger">{{ result.get('failed_count', 0) }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Itens Verificados</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item ID</th>
+                            <th>Object Key</th>
+                            <th>Endpoint</th>
+                            <th>Response ID</th>
+                            <th>Campos Verificados</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in result.get('items', []) %}
+                        <tr>
+                            <td><code>{{ item.get('item_id') }}</code></td>
+                            <td>{{ item.get('object_key') }}</td>
+                            <td><code>{{ item.get('endpoint') }}</code></td>
+                            <td>{{ item.get('response_id', 'N/A') }}</td>
+                            <td>
+                                {% if item.get('fields_total', 0) > 0 %}
+                                    {{ item.get('fields_verified', 0) }}/{{ item.fields_total }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.get('verification_status') == 'VERIFIED' %}
+                                    <span class="badge bg-success">✓ Verificado</span>
+                                {% elif 'SKIPPED' in item.get('verification_status', '') %}
+                                    <span class="badge bg-warning">⊘ Pulado</span>
+                                {% else %}
+                                    <span class="badge bg-danger">✗ {{ item.verification_status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Security -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Segurança</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>✓ Token não logado</li>
+                    <li>✓ Somente GET (read-only)</li>
+                    <li>✓ Sem escrita</li>
+                    <li>✓ Sem modificações</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Report -->
+        {% if result_html %}
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">Relatório Completo</h5>
+            </div>
+            <div class="card-body">
+                <div class="markdown-content">
+                    {{ result_html|safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-info">
+            Nenhum resultado de verificação disponível.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

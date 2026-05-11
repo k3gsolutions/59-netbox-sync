@@ -29,7 +29,7 @@
       </div>
       <div class="modal-body">
         <label class="form-label">URL da API</label>
-        <input type="text" class="form-input" id="input-api-url" placeholder="http://131.108.136.133:8888" value="http://131.108.136.133:8888"/>
+        <input type="text" class="form-input" id="input-api-url" placeholder="Mesma origem do painel" value=""/>
         <label class="form-label" style="margin-top:16px">API Key (opcional)</label>
         <input type="password" class="form-input" id="input-api-key" placeholder="Deixe vazio se não configurada"/>
       </div>
@@ -103,7 +103,15 @@
             <div class="spinner"></div><span>Carregando dispositivos...</span>
           </div>
           <div id="devices-error" class="error-row hidden"></div>
+          <div class="device-filter hidden" id="device-type-filter">
+            <label class="device-filter-label" for="device-type-select">Função do dispositivo</label>
+            <select class="device-filter-select" id="device-type-select">
+              <option value="all">Todas as funções</option>
+            </select>
+            <span class="device-filter-count" id="device-filter-count"></span>
+          </div>
           <div id="devices-list" class="devices-list hidden"></div>
+          <div id="devices-empty" class="empty-row hidden">Nenhum dispositivo encontrado para esta função.</div>
         </div>
         <div class="step-card-footer">
           <button class="btn btn-ghost" id="back-to-step1">← Voltar</button>
@@ -195,7 +203,7 @@
     </div>
 
   </div><!-- /wizard-container -->
-</div><!-- /app-main -->
+
 
 <!-- ===== DETAIL MODAL ===== -->
 <div class="modal-overlay hidden" id="detail-modal">

@@ -4,6 +4,13 @@ Web UI for k3g-monitoring-iac — Read-only compliance and governance dashboard.
 No writes, no tokens. NetBox API: GET-only /api/dcim/devices/.
 """
 
+# Fix import path for nested webui directory
+import sys
+from pathlib import Path as _Path
+_webui_dir = _Path(__file__).parent
+if str(_webui_dir) not in sys.path:
+    sys.path.insert(0, str(_webui_dir))
+
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -2715,31 +2722,38 @@ async def get_compliance_candidates(
 
 
 @app.get("/compliance/eligible-tenants", response_class=JSONResponse)
-async def get_compliance_eligible_tenants(limit: int = Query(100)):
+def get_compliance_eligible_tenants(limit: int = Query(100)):
     """Get list of tenants with eligible compliance devices."""
     try:
         client = get_netbox_client()
-        all_tenants = client.list_tenants(limit=limit)
+        # Fast query: get all active devices
+        devices = client.get_devices(
+            status="active",
+            role="12-ativos-de-borda",
+            limit=limit,
+        )
 
-        # Count eligible devices per tenant
-        eligible_tenants = []
-        for tenant in all_tenants:
-            tenant_id = tenant.get("id")
-            if not tenant_id:
+        tenant_map = {}
+        for d in devices:
+            if not is_compliance_candidate(d):
                 continue
+            t = d.get("tenant")
+            if not t:
+                continue
+            t_id = t.get("id")
+            if not t_id:
+                continue
+            if t_id not in tenant_map:
+                tenant_map[t_id] = {
+                    "id": t_id,
+                    "name": t.get("name", ""),
+                    "slug": t.get("slug", ""),
+                    "description": t.get("description", ""),
+                    "device_count": 0
+                }
+            tenant_map[t_id]["device_count"] += 1
 
-            devices = client.get_devices_by_tenant(tenant_id, status="active", limit=1000)
-            eligible_count = sum(1 for d in devices if is_compliance_candidate(d))
-
-            if eligible_count > 0:
-                eligible_tenants.append({
-                    "id": tenant_id,
-                    "name": tenant.get("name", ""),
-                    "slug": tenant.get("slug", ""),
-                    "description": tenant.get("description", ""),
-                    "device_count": eligible_count,
-                })
-
+        eligible_tenants = sorted(tenant_map.values(), key=lambda x: x["name"])
         return JSONResponse(eligible_tenants)
 
     except NetBoxNotConfiguredError:
@@ -2750,8 +2764,228 @@ async def get_compliance_eligible_tenants(limit: int = Query(100)):
         return JSONResponse({"detail": f"Erro ao conectar ao NetBox: {e}"}, status_code=500)
 
 
+def _device_role_name(device: dict) -> str:
+    role_raw = device.get("role") or device.get("device_role") or {}
+    if isinstance(role_raw, dict):
+        for key in ("name", "display", "label", "slug", "value"):
+            value = role_raw.get(key)
+            if value:
+                return str(value)
+    elif role_raw:
+        return str(role_raw)
+    return ""
+
+
+def _scalar_connection_value(value) -> str:
+    if isinstance(value, dict):
+        for key in ("value", "plain", "secret", "address", "display", "name", "label"):
+            if value.get(key) not in (None, "", [], {}):
+                return str(value[key]).strip()
+        return ""
+    if value in (None, "", [], {}):
+        return ""
+    return str(value).strip()
+
+
+def _normalize_connection_key(key: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", key.lower())
+
+
+def _normalize_name(value: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", str(value or "").lower())
+
+
+def _connection_candidates(mapping, prefix: str = "") -> list[tuple[str, str]]:
+    if not isinstance(mapping, dict):
+        return []
+
+    items: list[tuple[str, str]] = []
+    for key, value in mapping.items():
+        path = f"{prefix}.{key}" if prefix else str(key)
+        if isinstance(value, dict):
+            scalar = _scalar_connection_value(value)
+            if scalar:
+                items.append((path, scalar))
+            items.extend(_connection_candidates(value, path))
+        else:
+            scalar = _scalar_connection_value(value)
+            if scalar:
+                items.append((path, scalar))
+    return items
+
+
+def _lookup_connection_value(*records: dict, aliases: set[str]) -> str:
+    normalized_aliases = {_normalize_connection_key(alias) for alias in aliases}
+    sources = []
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        sources.extend((
+            record.get("custom_fields") or {},
+            record.get("local_context_data") or {},
+            record.get("config_context") or {},
+        ))
+
+    for source in sources:
+        for path, value in _connection_candidates(source):
+            normalized_path = _normalize_connection_key(path)
+            normalized_leaf = _normalize_connection_key(path.split(".")[-1])
+            if normalized_path in normalized_aliases or normalized_leaf in normalized_aliases:
+                if value.lower() in {"********", "**********", "redacted", "none", "null"}:
+                    continue
+                return value
+    return ""
+
+
+def _tenant_ref_matches(tenant_ref: dict, tenant: dict) -> bool:
+    if not tenant_ref or not tenant:
+        return False
+    if tenant_ref.get("id") and tenant_ref.get("id") == tenant.get("id"):
+        return True
+    ref_names = {
+        _normalize_name(tenant_ref.get("name")),
+        _normalize_name(tenant_ref.get("display")),
+        _normalize_name(tenant_ref.get("slug")),
+    }
+    tenant_names = {
+        _normalize_name(tenant.get("name")),
+        _normalize_name(tenant.get("display")),
+        _normalize_name(tenant.get("slug")),
+    }
+    return bool((ref_names - {""}) & (tenant_names - {""}))
+
+
+def _resolve_device_tenant_detail(device: dict, client=None) -> dict:
+    tenant_ref = device.get("tenant") or {}
+    if not isinstance(tenant_ref, dict):
+        return {}
+
+    if client and tenant_ref.get("id"):
+        tenant = client.get_tenant_by_id(tenant_ref["id"]) or {}
+        if tenant:
+            return tenant
+
+    if client:
+        try:
+            tenants = client.list_tenants(limit=500)
+            for tenant in tenants:
+                if _tenant_ref_matches(tenant_ref, tenant):
+                    return tenant
+        except Exception:
+            pass
+
+    return tenant_ref
+
+
+def _extract_device_ip(value) -> str:
+    if isinstance(value, dict):
+        value = value.get("address") or value.get("display") or value.get("value") or ""
+    text = str(value or "").strip()
+    return text.split("/")[0] if text else ""
+
+
+def _load_local_connection_override(device_id) -> dict:
+    if not device_id:
+        return {}
+
+    overrides_dir = REPORTS_DIR / "compliance" / "jobs"
+    if not overrides_dir.exists():
+        return {}
+
+    try:
+        override_files = sorted(
+            overrides_dir.glob("*/connection-override.json"),
+            key=lambda path: path.stat().st_mtime,
+            reverse=True,
+        )
+    except OSError:
+        return {}
+
+    for path in override_files:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if str(payload.get("device_id") or "") == str(device_id):
+            return payload
+    return {}
+
+
+def _resolve_guided_collection_connection(device: dict, client=None) -> dict:
+    tenant = _resolve_device_tenant_detail(device, client)
+    local_override = _load_local_connection_override(device.get("id"))
+
+    netbox_host = _lookup_connection_value(device, tenant, aliases={
+        "connection_ip", "management_ip", "mgmt_ip", "ssh_host", "ssh_ip",
+        "host", "ip", "hostname", "compliance_host",
+    })
+    override_host = _extract_device_ip(local_override.get("connection_ip"))
+    primary_host = (
+        _extract_device_ip(device.get("primary_ip4"))
+        or _extract_device_ip(device.get("primary_ip"))
+        or _extract_device_ip(device.get("primary_ip6"))
+        or _extract_device_ip(device.get("oob_ip"))
+    )
+    host = netbox_host or primary_host or override_host
+
+    netbox_ssh_port = _lookup_connection_value(device, tenant, aliases={
+        "ssh_port", "connection_port", "management_port", "mgmt_port",
+        "port", "compliance_ssh_port",
+    })
+    override_ssh_port = local_override.get("connection_port")
+    ssh_port_raw = (
+        netbox_ssh_port
+        or override_ssh_port
+        or os.getenv("COMPLIANCE_SSH_PORT", "22")
+        or "22"
+    )
+    try:
+        ssh_port = int(str(ssh_port_raw).strip())
+    except (TypeError, ValueError):
+        ssh_port = 22
+
+    ssh_username = (
+        _lookup_connection_value(device, tenant, aliases={
+            "ssh_username", "ssh_user", "username", "user", "login",
+            "usuario", "compliance_ssh_username",
+        })
+        or os.getenv("COMPLIANCE_SSH_USERNAME", "")
+    )
+    ssh_password = (
+        _lookup_connection_value(device, tenant, aliases={
+            "ssh_password", "ssh_pass", "password", "pass", "senha",
+            "compliance_ssh_password",
+        })
+        or os.getenv("COMPLIANCE_SSH_PASSWORD", "")
+    )
+    snmp_community = (
+        _lookup_connection_value(device, tenant, aliases={
+            "snmp_community", "snmpcommunity", "snmp_ro_community", "snmp_community_ro",
+            "snmp_read_community", "snmp_v2c_community", "community",
+            "comunidade_snmp", "compliance_snmp_community",
+        })
+        or os.getenv("SNMP_COMMUNITY", "")
+    )
+
+    return {
+        "host": host,
+        "ssh_port": ssh_port,
+        "ssh_username": ssh_username,
+        "ssh_password": ssh_password,
+        "snmp_community": snmp_community,
+        "sources": {
+            "host": "netbox" if netbox_host else ("primary_ip" if primary_host else ("local_override" if override_host else "missing")),
+            "ssh_port": "netbox" if netbox_ssh_port else ("local_override" if override_ssh_port else "env"),
+            "ssh_username": "netbox_or_env" if ssh_username else "missing",
+            "ssh_password": "netbox_or_env" if ssh_password else "missing",
+            "snmp_community": "netbox_tenant_or_env" if snmp_community else "missing",
+            "tenant": tenant.get("name") or tenant.get("slug") or "",
+        },
+    }
+
+
 @app.get("/compliance/eligible-devices", response_class=JSONResponse)
-async def get_compliance_eligible_devices(tenant_id: int = Query(...)):
+def get_compliance_eligible_devices(tenant_id: int = Query(...)):
     """Get eligible devices for a tenant."""
     try:
         client = get_netbox_client()
@@ -2778,11 +3012,17 @@ async def get_compliance_eligible_devices(tenant_id: int = Query(...)):
                 if device.get("site"):
                     site = device["site"].get("name", "") if isinstance(device["site"], dict) else str(device["site"])
 
+                role = _device_role_name(device)
+                if not role and device.get("id"):
+                    device_detail = client.get_device_by_id(device["id"]) or {}
+                    role = _device_role_name(device_detail)
+
                 eligible.append({
                     "id": device.get("id"),
                     "name": device.get("name", ""),
                     "manufacturer": manufacturer,
                     "model": model,
+                    "role": role,
                     "site": site,
                     "primary_ip": primary_ip,
                 })
@@ -2798,7 +3038,7 @@ async def get_compliance_eligible_devices(tenant_id: int = Query(...)):
 
 
 @app.get("/compliance/eligible-contexts", response_class=JSONResponse)
-async def get_compliance_eligible_contexts():
+def get_compliance_eligible_contexts():
     """Get list of available compliance analysis contexts."""
     contexts = [
         {
@@ -2887,16 +3127,24 @@ async def analyze_device_guided(request: Request):
                     tenant_name = tenant.get("name", "Desconhecido")
 
         from .services.compliance_analyze_contexts import analyze_device
+        from starlette.concurrency import run_in_threadpool
 
-        ssh_host = device.get("primary_ip4", "").split("/")[0] if device.get("primary_ip4") else ""
+        collection_conn = _resolve_guided_collection_connection(device, client)
         ssh_credentials = {
-            "host": ssh_host,
-            "port": 22,
-            "username": "admin",
-            "password": "",
+            "host": collection_conn["host"],
+            "port": collection_conn["ssh_port"],
+            "username": collection_conn["ssh_username"],
+            "password": collection_conn["ssh_password"],
         }
 
-        findings, summary = analyze_device(device, contexts, ssh_credentials)
+        snmp_community = collection_conn["snmp_community"]
+        findings, summary = await run_in_threadpool(
+            analyze_device,
+            device,
+            contexts,
+            ssh_credentials,
+            snmp_community,
+        )
 
         # Map findings to wizard format
         wizard_findings = []
@@ -2924,7 +3172,13 @@ async def analyze_device_guided(request: Request):
                 "failed": failed_count,
             },
             "findings": wizard_findings,
-            "collection_notes": [],
+            "collection_notes": [
+                f"Host de coleta: {collection_conn['host'] or 'não definido'}",
+                f"Porta SSH: {collection_conn['ssh_port']}",
+                "Usuário SSH: definido" if collection_conn["ssh_username"] else "Usuário SSH: não definido",
+                "Senha SSH: definida" if collection_conn["ssh_password"] else "Senha SSH: não definida",
+                "Comunidade SNMP: definida" if collection_conn["snmp_community"] else "Comunidade SNMP: não definida",
+            ],
         })
 
     except NetBoxNotConfiguredError:

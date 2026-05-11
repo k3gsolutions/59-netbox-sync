@@ -94,9 +94,11 @@
 
     <!-- Main content -->
     <div class="app-main">
+        {% block header %}
         <header class="app-header">
-            <h1 class="page-title">{% block title %}{% endblock %}</h1>
+            <h1 class="page-title">{% block page_title %}Página{% endblock %}</h1>
         </header>
+        {% endblock %}
 
         <main class="app-content">
             {% block content %}{% endblock %}

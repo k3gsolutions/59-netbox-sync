@@ -1,0 +1,22 @@
+{
+  "job_id": "compliance-job-a1623b1ee166",
+  "generated_at": "2026-05-06T20:44:20.507148+00:00",
+  "summary": {
+    "findings_total": 0,
+    "WITHIN_STANDARD": 0,
+    "OUT_OF_STANDARD": 0,
+    "NEEDS_STANDARDIZATION": 0,
+    "INFORMATIONAL_ALERT": 0
+  },
+  "findings": [],
+  "safety": {
+    "netbox_write": false,
+    "sync_called": false,
+    "apply_plan_created": false,
+    "approval_record_created": false,
+    "ssh_write": false,
+    "config_mode": false,
+    "netconf_write": false,
+    "snmp_write": false
+  }
+}

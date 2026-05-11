@@ -36,6 +36,7 @@ def mock_netbox_client():
         "id": 1890,
         "name": "4WNET-MNS-KTG-RX",
         "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
         "custom_fields": {"Compliance": True},
         "tenant": {"name": "K3G Solutions", "group": {"name": "K3G Solutions"}},
         "site": {"name": "MNS"},
@@ -52,6 +53,7 @@ def mock_netbox_client():
         "id": 1891,
         "name": "DEVICE-NONCOMPLIANT",
         "status": "active",
+            "role": {"slug": "12-ativos-de-borda", "name": "12 - ativos de borda"},
         "custom_fields": {"Compliance": False},
         "tenant": {"name": "K3G Solutions", "group": {"name": "K3G Solutions"}},
     }

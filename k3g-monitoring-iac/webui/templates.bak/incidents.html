@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Incidentes{% endblock %}
+
+{% block content %}
+<h2>Relatórios de incidente</h2>
+
+{% if incidents %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Caminho</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for incident in incidents %}
+                <tr>
+                    <td>{{ incident.name }}</td>
+                    <td>{{ incident.path }}</td>
+                    <td>
+                        <a href="/reports/view?path={{ incident.path }}" class="button-small">Ver</a>
+                        <a href="/reports/download?path={{ incident.path }}" class="button-small">Baixar</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Nenhum incidente encontrado</p>
+{% endif %}
+{% endblock %}

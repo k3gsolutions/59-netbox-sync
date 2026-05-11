@@ -1,0 +1,3 @@
+device,object_type,object_key,responsible_team,status,tenant,service_type,criticality,owner,evidence,interface,vrf,service_relation,remote_asn,remote_bgp_group,policy_intent,notes,proposed_description,updated_at,updated_by,relation_type
+4WNET-MNS-KTG-RX,ip_address,192.0.2.1/30,Network Ops,answered,,,,netops,NMS snapshot,GigabitEthernet0/5/0,default,customer-a,,,,,,2026-05-07T02:43:58.921367Z,webui-tester,infrastructure
+4WNET-MNS-KTG-RX,interface,Eth-Trunk0 :: interface.state.mismatch,Network Ops,answered,,,,netops,NMS snapshot,GigabitEthernet0/5/0,default,customer-a,,,,,,2026-05-07T02:51:13.898499Z,webui-tester,infrastructure

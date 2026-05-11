@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <h1>Escrita Real — Resumo Pós-Execução</h1>
+    <p class="text-muted">Device: <strong>{{ device }}</strong></p>
+
+    {% if not execution and not verification and not compliance and not closure %}
+    <div class="alert alert-info">
+        Artefatos de escrita real não encontrados. Nenhuma escrita foi executada ou resultados ainda não foram processados.
+    </div>
+    {% else %}
+
+    <div class="row mt-4">
+        <!-- Execution Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">FASE 2.53 — Escrita Real</h5>
+                </div>
+                <div class="card-body">
+                    {% if execution %}
+                        <p><strong>Status:</strong>
+                            {% if 'SUCCESS' in execution.get('status', '') %}
+                                <span class="badge bg-success">{{ execution.status }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ execution.status }}</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Execution ID:</strong> <code>{{ execution.get('execution_id', 'N/A') }}</code></p>
+                        <p><strong>Operador:</strong> {{ execution.get('operator', 'N/A') }}</p>
+                        <p><strong>Itens Executados:</strong> {{ execution.get('items', [])|length }}</p>
+                        <p><strong>One-shot:</strong>
+                            {% if execution.get('one_shot_execution') %}
+                                <span class="badge bg-success">Sim</span>
+                            {% else %}
+                                <span class="badge bg-warning">Não</span>
+                            {% endif %}
+                        </p>
+                        <a href="/real-write/execution" class="btn btn-sm btn-primary">Detalhes</a>
+                    {% else %}
+                        <p class="text-muted">Nenhum dado de execução disponível</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">FASE 2.54 — Verificação Pós-Escrita</h5>
+                </div>
+                <div class="card-body">
+                    {% if verification %}
+                        <p><strong>Status:</strong>
+                            {% if 'SUCCESS' in verification.get('status', '') %}
+                                <span class="badge bg-success">{{ verification.status }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ verification.status }}</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Verificados:</strong> {{ verification.get('verified_count', 0) }}/{{ verification.get('total_count', 0) }}</p>
+                        <p><strong>Falhados:</strong>
+                            {% if verification.get('failed_count', 0) > 0 %}
+                                <span class="badge bg-danger">{{ verification.failed_count }}</span>
+                            {% else %}
+                                <span class="badge bg-success">0</span>
+                            {% endif %}
+                        </p>
+                        <a href="/real-write/verification" class="btn btn-sm btn-info">Detalhes</a>
+                    {% else %}
+                        <p class="text-muted">Nenhum dado de verificação disponível</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Compliance Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="card-title mb-0">FASE 2.55 — Compliance Pós-Escrita</h5>
+                </div>
+                <div class="card-body">
+                    {% if compliance %}
+                        <p><strong>Status:</strong>
+                            {% if 'SUCCESS' in compliance.get('status', '') %}
+                                <span class="badge bg-success">{{ compliance.status }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ compliance.status }}</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Checks Passed:</strong> {{ compliance.get('checks_passed', 0) }}/{{ compliance.get('total_checks', 0) }}</p>
+                        <p><strong>Checks Failed:</strong>
+                            {% if compliance.get('checks_failed', 0) > 0 %}
+                                <span class="badge bg-danger">{{ compliance.checks_failed }}</span>
+                            {% else %}
+                                <span class="badge bg-success">0</span>
+                            {% endif %}
+                        </p>
+                        <a href="/real-write/compliance" class="btn btn-sm btn-warning">Detalhes</a>
+                    {% else %}
+                        <p class="text-muted">Nenhum dado de compliance disponível</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Closure Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">FASE 2.56 — Encerramento</h5>
+                </div>
+                <div class="card-body">
+                    {% if closure %}
+                        <p><strong>Decisão:</strong>
+                            {% if 'SUCCESS' in closure.get('closure_decision', '') %}
+                                <span class="badge bg-success">{{ closure.closure_decision }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ closure.closure_decision }}</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Closure ID:</strong> <code>{{ closure.get('closure_package_id', 'N/A') }}</code></p>
+                        <a href="/real-write/closure" class="btn btn-sm btn-secondary">Detalhes</a>
+                    {% else %}
+                        <p class="text-muted">Nenhum dado de encerramento disponível</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security & Audit Trail -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">Segurança & Trilha de Auditoria</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Confirmações de Segurança</h6>
+                            <ul class="list-unstyled">
+                                <li>✓ Token não logado</li>
+                                <li>✓ GET verification (read-only)</li>
+                                <li>✓ Sem escrita de dados</li>
+                                <li>✓ Sem rollback automático</li>
+                                <li>✓ One-shot execution</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Próximas Ações</h6>
+                            <ul class="list-unstyled">
+                                <li>1. Revisar todos os artefatos</li>
+                                <li>2. Validar verificação pós-escrita</li>
+                                <li>3. Confirmar compliance passou</li>
+                                <li>4. Proceder com encerramento</li>
+                                <li>5. Arquivar resultados</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}

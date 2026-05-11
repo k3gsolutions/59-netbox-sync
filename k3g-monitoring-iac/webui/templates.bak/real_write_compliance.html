@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="mb-3">
+        <a href="/real-write" class="btn btn-secondary btn-sm">← Voltar</a>
+    </div>
+
+    <h1>FASE 2.55 — Compliance Pós-Escrita</h1>
+    <p class="text-muted">Device: <strong>{{ device }}</strong></p>
+
+    {% if result %}
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header {% if 'SUCCESS' in result.get('status', '') %}bg-success{% else %}bg-danger{% endif %} text-white">
+                        <h5 class="card-title mb-0">Status: {{ result.get('status', 'DESCONHECIDO') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Compliance Run ID:</strong><br><code>{{ result.get('compliance_run_id', 'N/A') }}</code></p>
+                                <p><strong>Device:</strong> {{ result.get('device', 'N/A') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Iniciado:</strong> {{ result.get('started_at', 'N/A') }}</p>
+                                <p><strong>Finalizado:</strong> {{ result.get('finished_at', 'N/A') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Resumo Checks</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Total:</strong> {{ result.get('total_checks', 0) }}</p>
+                        <p><strong>Passaram:</strong>
+                            <span class="badge bg-success">{{ result.get('checks_passed', 0) }}</span>
+                        </p>
+                        <p><strong>Falharam:</strong>
+                            <span class="badge bg-danger">{{ result.get('checks_failed', 0) }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checks Table -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Verificações de Compliance</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Check ID</th>
+                            <th>Nome</th>
+                            <th>Resultado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for check in result.get('compliance_checks', []) %}
+                        <tr>
+                            <td><code>{{ check.get('check_id') }}</code></td>
+                            <td>{{ check.get('name') }}</td>
+                            <td>
+                                {% if check.get('passed') %}
+                                    <span class="badge bg-success">✓ PASS</span>
+                                {% else %}
+                                    <span class="badge bg-danger">✗ FAIL</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Security -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Segurança</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>✓ Token não logado</li>
+                    <li>✓ Read-only</li>
+                    <li>✓ Sem escrita</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Report -->
+        {% if result_html %}
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">Relatório Completo</h5>
+            </div>
+            <div class="card-body">
+                <div class="markdown-content">
+                    {{ result_html|safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-info">
+            Nenhum resultado de compliance disponível.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

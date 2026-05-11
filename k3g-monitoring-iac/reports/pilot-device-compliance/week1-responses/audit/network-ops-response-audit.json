@@ -1,0 +1,99 @@
+[
+  {
+    "timestamp": "2026-05-07T02:28:59.875480Z",
+    "updated_by": "webui-tester",
+    "team": "network-ops",
+    "object_type": "ip_address",
+    "object_key": "192.0.2.1/30",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status",
+      "owner",
+      "evidence",
+      "interface",
+      "vrf",
+      "service_relation",
+      "relation_type"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  },
+  {
+    "timestamp": "2026-05-07T02:32:18.390506Z",
+    "updated_by": "webui-tester",
+    "team": "network-ops",
+    "object_type": "ip_address",
+    "object_key": "192.0.2.1/30",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  },
+  {
+    "timestamp": "2026-05-07T02:38:46.279755Z",
+    "updated_by": "webui-tester",
+    "team": "network-ops",
+    "object_type": "ip_address",
+    "object_key": "192.0.2.1/30",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  },
+  {
+    "timestamp": "2026-05-07T02:43:58.921551Z",
+    "updated_by": "webui-tester",
+    "team": "network-ops",
+    "object_type": "ip_address",
+    "object_key": "192.0.2.1/30",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  },
+  {
+    "timestamp": "2026-05-07T02:51:13.898734Z",
+    "updated_by": "webui-tester",
+    "team": "network-ops",
+    "object_type": "interface",
+    "object_key": "Eth-Trunk0 :: interface.state.mismatch",
+    "previous_status": "pending",
+    "new_status": "answered",
+    "changed_fields": [
+      "status",
+      "owner",
+      "evidence",
+      "interface",
+      "vrf",
+      "service_relation",
+      "relation_type"
+    ],
+    "validation_result": {
+      "valid": true,
+      "status": "answered",
+      "errors": []
+    }
+  }
+]

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Prontidão de aprovação {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Prontidão de aprovação: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Decisão</div><div class="summary-value">{{ approvals.readiness_decision | status_label }}</div></div>
+    <div class="summary-card"><div class="summary-label">Propostos válidos</div><div class="summary-value">{{ approvals.readiness_summary.valid if approvals.readiness_summary else 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Inválidos</div><div class="summary-value">{{ approvals.readiness_summary.invalid if approvals.readiness_summary else 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">POST-only</div><div class="summary-value">Sim</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Gate de prontidão</div>
+    {% if approvals.readiness_file %}
+    <p><a href="/reports/view?path={{ approvals.readiness_file.path }}">Ver relatório</a> | <a href="/reports/download?path={{ approvals.readiness_json_file.path }}">Baixar JSON</a></p>
+    <pre class="pre-wrap">{{ approvals.readiness_file.content }}</pre>
+    {% else %}
+    <p>Nenhum gate de prontidão localizado.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">Registros propostos</div>
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>approval_id</th>
+                <th>object_key</th>
+                <th>status</th>
+                <th>reviewer</th>
+                <th>revisado em</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for approval in approvals.records %}
+            <tr>
+                <td><code>{{ approval.approval_id }}</code></td>
+                <td><code>{{ approval.object_key }}</code></td>
+                <td>{{ approval.status | status_label }}</td>
+                <td>{{ approval.reviewer or 'Pendente' }}</td>
+                <td class="mono">{{ approval.reviewed_at or '-' }}</td>
+            </tr>
+        {% endfor %}
+        {% if not approvals.records %}
+            <tr><td colspan="5">Nenhum registro proposto localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">Navegação</div>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals" class="btn btn-small">Aprovações</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals/manual-review" class="btn btn-small">Revisão manual</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week2/review" class="btn btn-small">Revisão Semana 2</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/applyplan" class="btn btn-small">ApplyPlan</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}" class="btn btn-small">Ciclo</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Aprovações {{ cycle.cycle_id }}{% endblock %}
+
+{% block content %}
+<h2>Aprovações: {{ cycle.cycle_id }}</h2>
+
+<div class="summary-grid">
+    <div class="summary-card"><div class="summary-label">Arquivos</div><div class="summary-value">{{ approvals.records | length if approvals.records else 0 }}</div></div>
+    <div class="summary-card"><div class="summary-label">Prontidão</div><div class="summary-value">{{ approvals.readiness_json_file.content.decision if approvals.readiness_json_file else 'N/A' }}</div></div>
+    <div class="summary-card"><div class="summary-label">Diretório</div><div class="summary-value">{{ approvals.approvals_dir or 'N/A' }}</div></div>
+    <div class="summary-card"><div class="summary-label">Revisão humana</div><div class="summary-value">Obrigatória</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">Registros de Aprovação Propostos</div>
+    <table class="pending-items-table">
+        <thead>
+            <tr>
+                <th>approval_id</th>
+                <th>object_key</th>
+                <th>categoria</th>
+                <th>status</th>
+                <th>criado em</th>
+                <th>origem</th>
+                <th>reviewer</th>
+                <th>próxima ação</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for approval in approvals.records %}
+            <tr>
+                <td><code>{{ approval.approval_id }}</code></td>
+                <td><code>{{ approval.object_key }}</code></td>
+                <td>{{ approval.object_type }}</td>
+                <td><span class="badge badge-info">{{ approval.status | status_label }}</span></td>
+                <td class="mono">{{ approval.reviewed_at or '-' }}</td>
+                <td>{{ approval.origin or '-' }}</td>
+                <td>{{ approval.reviewer or 'Pendente' }}</td>
+                <td>Revisão manual obrigatória</td>
+            </tr>
+        {% endfor %}
+        {% if not approvals.records %}
+            <tr><td colspan="8">Nenhum registro proposto localizado.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">Navegação</div>
+    <div class="pending-validation-links">
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals/manual-review" class="btn btn-small">Revisão manual</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/approvals/readiness" class="btn btn-small">Prontidão</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/applyplan" class="btn btn-small">ApplyPlan</a>
+        <a href="/controlled-operation/{{ cycle.cycle_id }}/week2/review" class="btn btn-small">Revisão Semana 2</a>
+        <a href="/approval-queue" class="btn btn-small">Fila global</a>
+    </div>
+</div>
+{% endblock %}
