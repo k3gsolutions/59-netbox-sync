@@ -139,6 +139,7 @@ class NetBoxClient:
         Fetch tenant details by ID (for group enrichment).
 
         Uses in-memory cache to avoid repeated calls for same tenant.
+        Falls back to list_tenants if direct endpoint fails, ensuring custom_fields.
 
         Args:
             tenant_id: NetBox tenant ID
@@ -159,9 +160,21 @@ class NetBoxClient:
             tenant = results[0] if results else None
             if tenant:
                 self._tenant_cache[tenant_id] = tenant
-            return tenant
+                return tenant
+        except NetBoxClientError:
+            pass
+
+        # Fallback: list all tenants and find by ID (ensures custom_fields via list endpoint)
+        try:
+            all_tenants = self.list_tenants(limit=500)
+            for tenant in all_tenants:
+                if tenant.get("id") == tenant_id:
+                    self._tenant_cache[tenant_id] = tenant
+                    return tenant
         except NetBoxClientError:
             raise
+
+        return None
 
     def get_devices(
         self,
