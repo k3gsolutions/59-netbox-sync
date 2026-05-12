@@ -89,7 +89,7 @@ class NetBoxClient:
             NetBoxClientError: on request or parsing error
         """
         try:
-            results = self._fetch(f"/api/dcim/devices/{device_id}/", {})
+            results = self._fetch(f"/api/dcim/devices/{device_id}/", {"include": "custom_fields"})
             return results[0] if results else None
         except NetBoxClientError:
             raise
@@ -108,7 +108,7 @@ class NetBoxClient:
         limit = min(limit, 10)
         return self._fetch(
             "/api/dcim/devices/",
-            {"name": name, "limit": limit}
+            {"name": name, "limit": limit, "include": "custom_fields"}
         )
 
     def search_devices(
@@ -131,7 +131,7 @@ class NetBoxClient:
         limit = min(limit, 25)
         return self._fetch(
             "/api/dcim/devices/",
-            {"q": q, "limit": limit, "offset": offset}
+            {"q": q, "limit": limit, "offset": offset, "include": "custom_fields"}
         )
 
     def get_tenant_by_id(self, tenant_id: int) -> Optional[dict]:
@@ -155,7 +155,7 @@ class NetBoxClient:
             return self._tenant_cache[tenant_id]
 
         try:
-            results = self._fetch(f"/api/tenancy/tenants/{tenant_id}/", {})
+            results = self._fetch(f"/api/tenancy/tenants/{tenant_id}/", {"include": "custom_fields"})
             tenant = results[0] if results else None
             if tenant:
                 self._tenant_cache[tenant_id] = tenant
@@ -190,7 +190,7 @@ class NetBoxClient:
             NetBoxAuthError: on 401/403
             NetBoxClientError: on request or parsing error
         """
-        params: Dict[str, Any] = {"limit": limit, "offset": offset}
+        params: Dict[str, Any] = {"limit": limit, "offset": offset, "include": "custom_fields"}
 
         if status:
             params["status"] = status
@@ -217,7 +217,7 @@ class NetBoxClient:
             NetBoxAuthError: on 401/403
             NetBoxClientError: on request or parsing error
         """
-        return self._fetch("/api/tenancy/tenants/", {"limit": limit})
+        return self._fetch("/api/tenancy/tenants/", {"limit": limit, "include": "custom_fields"})
 
     def get_devices_by_tenant(
         self,
@@ -242,7 +242,7 @@ class NetBoxClient:
             NetBoxAuthError: on 401/403
             NetBoxClientError: on request or parsing error
         """
-        params = {"tenant_id": tenant_id, "status": status, "limit": limit}
+        params = {"tenant_id": tenant_id, "status": status, "limit": limit, "include": "custom_fields"}
         if role:
             params["role"] = role
         return self._fetch("/api/dcim/devices/", params)
