@@ -1,0 +1,26 @@
+{
+  "job_id": "compliance-job-97464da1a5b9",
+  "selected_count": 1,
+  "devices": [
+    {
+      "id": 1890,
+      "name": "4WNET-MNS-KTG-RX",
+      "status": "active",
+      "tenant": "4W NET",
+      "tenant_group": "K3G Solutions",
+      "compliance_enabled": true,
+      "primary_ip4": "104.234.244.255/32",
+      "primary_ip6": null,
+      "site": "4WNET-MNS-KTG",
+      "role": "12 - Ativos de Borda",
+      "manufacturer": "Huawei",
+      "model": "NE8000 M8 DC",
+      "candidate_reason": [
+        "device_active",
+        "compliance_enabled",
+        "tenant_present",
+        "tenant_group_match"
+      ]
+    }
+  ]
+}

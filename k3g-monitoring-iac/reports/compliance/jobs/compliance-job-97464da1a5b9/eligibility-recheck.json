@@ -1,0 +1,13 @@
+{
+  "job_id": "compliance-job-97464da1a5b9",
+  "rechecked_at": "2026-05-12T00:14:01.777081+00:00",
+  "device_ids_submitted": [
+    1890
+  ],
+  "confirmed_eligible": [
+    1890
+  ],
+  "ineligible": [],
+  "all_eligible": true,
+  "recheck_method": "per_id_get_with_enrichment"
+}

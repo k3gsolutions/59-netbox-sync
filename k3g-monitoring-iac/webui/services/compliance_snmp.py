@@ -50,43 +50,39 @@ def collect_interfaces_snmp(
         return False, [], "SNMP_COMMUNITY not configured"
 
     try:
-        interfaces = []
-        # OID base for IF-MIB::ifTable
-        oid_ifName = ObjectType(ObjectIdentity("1.3.6.1.2.1.2.2.1.2"))
-        oid_ifAlias = ObjectType(ObjectIdentity("1.3.6.1.2.1.31.1.1.1.18"))
-        oid_ifAdminStatus = ObjectType(ObjectIdentity("1.3.6.1.2.1.2.2.1.7"))
-        oid_ifOperStatus = ObjectType(ObjectIdentity("1.3.6.1.2.1.2.2.1.8"))
-        oid_ifSpeed = ObjectType(ObjectIdentity("1.3.6.1.2.1.2.2.1.5"))
-        oid_ifType = ObjectType(ObjectIdentity("1.3.6.1.2.1.2.2.1.3"))
+        from pysnmp.hlapi.asyncio import walkCmd
 
-        async def _bulk_walk():
-            return await bulkCmd(
+        async def _walk_oid(oid_str):
+            results = {}
+            async for errorIndication, errorStatus, errorIndex, varBinds in walkCmd(
                 SnmpEngine(),
                 CommunityData(community, mpModel=0),
                 UdpTransportTarget((host, port), timeout=timeout, retries=1),
                 ContextData(),
-                0,
-                25,
-                oid_ifName,
-                oid_ifAlias,
-                oid_ifAdminStatus,
-                oid_ifOperStatus,
-                oid_ifSpeed,
-                oid_ifType,
-                lexicographicMode=False,
-            )
+                ObjectType(ObjectIdentity(oid_str)),
+            ):
+                if errorIndication:
+                    continue
+                for varBind in varBinds:
+                    oid = str(varBind[0])
+                    value = varBind[1]
+                    if oid.startswith(oid_str + "."):
+                        idx = oid.split(".")[-1]
+                        results[idx] = value
+            return results
 
-        error_indication, error_status, error_index, var_binds = asyncio.run(
-            _bulk_walk()
-        )
+        # Walk each OID
+        names = asyncio.run(_walk_oid("1.3.6.1.2.1.2.2.1.2"))
+        aliases = asyncio.run(_walk_oid("1.3.6.1.2.1.31.1.1.1.18"))
+        admin_statuses = asyncio.run(_walk_oid("1.3.6.1.2.1.2.2.1.7"))
+        oper_statuses = asyncio.run(_walk_oid("1.3.6.1.2.1.2.2.1.8"))
+        speeds = asyncio.run(_walk_oid("1.3.6.1.2.1.2.2.1.5"))
+        types_oids = asyncio.run(_walk_oid("1.3.6.1.2.1.2.2.1.3"))
 
-        if error_indication:
-            return False, [], f"SNMP error: {error_indication}"
+        if not names:
+            return False, [], "No interfaces found via SNMP"
 
-        if error_status:
-            return False, [], f"SNMP error: {error_status.prettyPrint()}"
-
-        # Parse results
+        # Merge all results
         status_map = {1: "up", 2: "down", 3: "testing"}
         type_map = {
             1: "other", 6: "ethernetCsmacd", 23: "ppp", 24: "softwareLoopback",
@@ -94,65 +90,19 @@ def collect_interfaces_snmp(
         }
 
         ifaces_by_idx = {}
-        for row in var_binds:
-            row_binds = row if isinstance(row, (list, tuple)) else (row,)
-            for var_bind in row_binds:
-                oid_str = str(var_bind[0])
-                value = var_bind[1]
+        for idx, name in names.items():
+            ifaces_by_idx[idx] = {
+                "index": int(idx),
+                "name": str(name),
+                "description": str(aliases.get(idx, "")),
+                "admin_status": status_map.get(int(admin_statuses.get(idx, 1)), "unknown"),
+                "oper_status": status_map.get(int(oper_statuses.get(idx, 1)), "unknown"),
+                "speed": int(speeds.get(idx, 0)) if idx in speeds else 0,
+                "type": type_map.get(int(types_oids.get(idx, 0)), f"type_{int(types_oids.get(idx, 0))}") if idx in types_oids else "unknown",
+            }
 
-                if not value:
-                    continue
-
-                if "1.3.6.1.2.1.2.2.1.2." in oid_str:  # ifName
-                    idx = oid_str.split(".")[-1]
-                    if idx not in ifaces_by_idx:
-                        ifaces_by_idx[idx] = {}
-                    ifaces_by_idx[idx]["name"] = str(value)
-                    ifaces_by_idx[idx]["index"] = int(idx)
-
-                elif "1.3.6.1.2.1.31.1.1.1.18." in oid_str:  # ifAlias
-                    idx = oid_str.split(".")[-1]
-                    if idx not in ifaces_by_idx:
-                        ifaces_by_idx[idx] = {}
-                    ifaces_by_idx[idx]["description"] = str(value)
-
-                elif "1.3.6.1.2.1.2.2.1.7." in oid_str:  # ifAdminStatus
-                    idx = oid_str.split(".")[-1]
-                    if idx not in ifaces_by_idx:
-                        ifaces_by_idx[idx] = {}
-                    ifaces_by_idx[idx]["admin_status"] = status_map.get(int(value), "unknown")
-
-                elif "1.3.6.1.2.1.2.2.1.8." in oid_str:  # ifOperStatus
-                    idx = oid_str.split(".")[-1]
-                    if idx not in ifaces_by_idx:
-                        ifaces_by_idx[idx] = {}
-                    ifaces_by_idx[idx]["oper_status"] = status_map.get(int(value), "unknown")
-
-                elif "1.3.6.1.2.1.2.2.1.5." in oid_str:  # ifSpeed
-                    idx = oid_str.split(".")[-1]
-                    if idx not in ifaces_by_idx:
-                        ifaces_by_idx[idx] = {}
-                    ifaces_by_idx[idx]["speed"] = int(value)
-
-                elif "1.3.6.1.2.1.2.2.1.3." in oid_str:  # ifType
-                    idx = oid_str.split(".")[-1]
-                    if idx not in ifaces_by_idx:
-                        ifaces_by_idx[idx] = {}
-                    ifaces_by_idx[idx]["type"] = type_map.get(int(value), f"type_{int(value)}")
-
-        # Build final list
-        for iface in ifaces_by_idx.values():
-            interfaces.append({
-                "index": iface.get("index", 0),
-                "name": iface.get("name", "unknown"),
-                "description": iface.get("description", ""),
-                "admin_status": iface.get("admin_status", "unknown"),
-                "oper_status": iface.get("oper_status", "unknown"),
-                "speed": iface.get("speed", 0),
-                "type": iface.get("type", "unknown"),
-            })
-
-        return True, sorted(interfaces, key=lambda x: x["index"]), ""
+        interfaces = sorted(ifaces_by_idx.values(), key=lambda x: x["index"])
+        return True, interfaces, ""
 
     except Exception as e:
         return False, [], f"SNMP collection failed: {str(e)}"
