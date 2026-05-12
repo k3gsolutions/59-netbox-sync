@@ -105,25 +105,26 @@ def _analyze_bgp(output: str) -> List[ComplianceFinding]:
     """Check BGP peer status from SSH display bgp peer."""
     findings: List[ComplianceFinding] = []
 
-    if not output or "display bgp" in output.lower() and "error" in output.lower():
+    if not output or ("display bgp" in output.lower() and "error" in output.lower()):
         return findings  # Device may not have BGP configured
 
-    # Look for peer status lines
-    peer_lines = re.findall(
-        r"(?:Peer\s+)?(\d+\.\d+\.\d+\.\d+|[0-9a-f:]+)\s+(\w+)",
+    # Look for BGP Peer is X.X.X.X format
+    peer_blocks = re.findall(
+        r"BGP Peer is\s+(\d+\.\d+\.\d+\.\d+)[^\n]*\n.*?BGP current state:\s+(\w+)",
         output,
-        re.IGNORECASE
+        re.IGNORECASE | re.DOTALL
     )
 
-    bad_states = {"idle", "connect", "active"}
-    for peer, state in peer_lines:
-        if state.lower() in bad_states:
+    bad_states = {"idle", "connect", "active", "opensent", "openconfirm"}
+    for peer_ip, state in peer_blocks:
+        state_lower = state.lower()
+        if state_lower in bad_states:
             findings.append(ComplianceFinding(
                 severity="error",
                 context="bgp",
-                object=peer,
+                object=peer_ip,
                 message=f"Peer em estado {state}",
-                details={"peer": peer, "state": state}
+                details={"peer": peer_ip, "state": state}
             ))
 
     return findings
