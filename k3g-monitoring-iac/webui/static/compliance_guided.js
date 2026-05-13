@@ -30,6 +30,7 @@ async function apiFetch(path, opts = {}) {
 // ── State ────────────────────────────────────────────────────────
 let state = {
   currentStep: 1,
+  analysisMode: null,  // 'netbox' | 'file'
   selectedTenant: null,
   selectedDevice: null,
   allDevices: [],
@@ -38,6 +39,12 @@ let state = {
   allContexts: [],
   findings: [],
   analysisResult: null,
+  // File mode
+  fileData: {
+    platform: 'huawei',
+    deviceName: '',
+    file: null,
+  },
 };
 
 // ── DOM refs ─────────────────────────────────────────────────────
@@ -62,6 +69,191 @@ function goToStep(n) {
   });
   show(`step-${n}`);
   state.currentStep = n;
+}
+
+// ── Mode Selection (Step 0) ─────────────────────────────────────
+function showModeChoice() {
+  show('mode-choice-modal');
+}
+
+function selectMode(mode) {
+  state.analysisMode = mode;
+  hide('mode-choice-modal');
+  if (mode === 'netbox') {
+    loadTenants();
+  } else if (mode === 'file') {
+    showFileUploadStep();
+  }
+}
+
+async function showFileUploadStep() {
+  // Hide all normal steps
+  [1,2,3,4].forEach(i => hide(`step-${i}`));
+  // Load contexts for file mode
+  await loadFileContexts();
+  // Show file upload UI
+  show('step-file-upload');
+  // Reset contexts for file mode
+  state.selectedContexts.clear();
+  $('btn-file-analyze').disabled = true;
+}
+
+async function loadFileContexts() {
+  try {
+    const contexts = await apiFetch('/compliance/eligible-contexts');
+    const grid = $('file-contexts-grid');
+    const methodLabel = { snmp: 'SNMP', ssh: 'SSH', netbox: 'NetBox' };
+    const methodClass = { snmp: 'method-snmp', ssh: 'method-ssh', netbox: 'method-netbox' };
+
+    grid.innerHTML = contexts.map(ctx => `
+      <div class="context-card" data-id="${ctx.id}">
+        <div class="context-card-top">
+          <span class="context-icon">${ctx.icon}</span>
+          <span class="context-label">${escHtml(ctx.label)}</span>
+        </div>
+        <div class="context-desc">${escHtml(ctx.description)}</div>
+        <span class="context-method ${methodClass[ctx.collection_method] || 'method-netbox'}">
+          via ${methodLabel[ctx.collection_method] || ctx.collection_method}
+        </span>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.context-card').forEach(card => {
+      card.addEventListener('click', () => {
+        toggleFileContext(card);
+      });
+    });
+  } catch (err) {
+    console.error('Failed to load file contexts:', err);
+  }
+}
+
+function toggleFileContext(card) {
+  const id = card.dataset.id;
+  if (state.selectedContexts.has(id)) {
+    state.selectedContexts.delete(id);
+    card.classList.remove('selected');
+  } else {
+    state.selectedContexts.add(id);
+    card.classList.add('selected');
+  }
+  $('btn-file-analyze').disabled = state.selectedContexts.size === 0;
+}
+
+async function runFileAnalysis() {
+  const platform = $('file-platform-select')?.value || 'huawei';
+  const deviceName = $('file-device-name')?.value || 'file-analysis';
+  const fileInput = $('file-config-input');
+  const file = fileInput?.files?.[0];
+
+  if (!file) {
+    alert('Selecione um arquivo .txt');
+    return;
+  }
+
+  if (state.selectedContexts.size === 0) {
+    alert('Selecione pelo menos um contexto');
+    return;
+  }
+
+  show('file-upload-loading');
+  hide('file-upload-error');
+  $('file-results-info').innerHTML = '';
+  $('findings-tbody').innerHTML = '';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('platform', platform);
+    formData.append('device_name', deviceName);
+    formData.append('contexts', JSON.stringify([...state.selectedContexts]));
+
+    const res = await fetch(`${API_BASE}/compliance/analyze-file`, {
+      method: 'POST',
+      headers: API_KEY ? { 'X-API-Key': API_KEY } : {},
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const body = await res.json();
+      throw new Error(body.detail || `HTTP ${res.status}`);
+    }
+
+    const result = await res.json();
+    state.analysisResult = result;
+    state.findings = result.findings || [];
+
+    hide('file-upload-loading');
+    goToFileResultsStep(result);
+
+  } catch (err) {
+    hide('file-upload-loading');
+    $('file-upload-error').textContent = `❌ Erro: ${err.message}`;
+    show('file-upload-error');
+  }
+}
+
+function goToFileResultsStep(result) {
+  hide('step-file-upload');
+  show('step-file-results');
+
+  // Results header
+  const statusLabel = { ok: '✅ Conformidade OK', attention: '⚠️ Requer atenção', failed: '❌ Não conforme' };
+  $('file-results-device-name').textContent = `📄 ${escHtml(result.device)}`;
+  $('file-results-status').textContent = `Análise de arquivo (${result.platform}) · ${statusLabel[result.status] || result.status}`;
+
+  // Summary cards
+  const s = result.summary;
+  $('file-results-summary').innerHTML = `
+    <div class="summary-card summary-approved"><span class="summary-icon">✅</span><div><div class="summary-count">${s.approved}</div><div class="summary-label">Aprovados</div></div></div>
+    <div class="summary-card summary-warning"><span class="summary-icon">⚠️</span><div><div class="summary-count">${s.warning}</div><div class="summary-label">Atenção</div></div></div>
+    <div class="summary-card summary-failed"><span class="summary-icon">❌</span><div><div class="summary-count">${s.failed}</div><div class="summary-label">Reprovados</div></div></div>
+  `;
+
+  // Collection notes
+  if (result.collection_notes?.length) {
+    $('file-notes-list').innerHTML = result.collection_notes
+      .filter(n => !n.includes('⚠'))
+      .map(n => `<li>${escHtml(n)}</li>`).join('');
+    show('file-collection-notes-box');
+  }
+
+  // Findings
+  const total = s.warning + s.failed;
+  $('file-findings-count-title').textContent = total > 0
+    ? `Encontramos ${total} ponto${total !== 1 ? 's' : ''} que precisam de atenção.`
+    : 'Todos os itens analisados estão em conformidade. ✅';
+
+  renderFileFindings('all');
+}
+
+function renderFileFindings(filter) {
+  const tbody = $('findings-tbody');
+  let list = state.findings;
+  if (filter !== 'all') list = list.filter(f => f.status === filter);
+
+  if (!list.length) {
+    tbody.innerHTML = '';
+    show('findings-empty');
+    return;
+  }
+  hide('findings-empty');
+
+  tbody.innerHTML = list.map((f, idx) => `
+    <tr data-idx="${idx}" data-status="${f.status}">
+      <td class="col-status">${badgeHtml(f.status)}</td>
+      <td class="col-context">${escHtml(f.context)}</td>
+      <td class="col-item"><span class="mono">${escHtml(f.item)}</span></td>
+      <td class="col-summary">${escHtml(f.title)}</td>
+      <td class="col-action">
+        <button class="btn btn-ghost btn-sm btn-detail" data-finding-idx="${idx}">Ver detalhes</button>
+      </td>
+    </tr>
+  `).join('');
+
+  tbody.querySelectorAll('.btn-detail').forEach(btn => {
+    btn.addEventListener('click', () => openDetail(+btn.dataset.findingIdx));
+  });
 }
 
 // ── API status check ─────────────────────────────────────────────
@@ -473,7 +665,8 @@ document.addEventListener('DOMContentLoaded', () => {
   $('input-api-url').value = API_BASE;
   $('input-api-key').value = API_KEY;
   checkApiStatus();
-  loadTenants();
+  // Show mode choice modal instead of going straight to tenants
+  showModeChoice();
 
   $('device-type-select').addEventListener('change', (event) => {
     state.selectedDeviceType = event.target.value;
@@ -541,6 +734,71 @@ document.addEventListener('DOMContentLoaded', () => {
   // Close modals on overlay click
   $('settings-modal').addEventListener('click', e => { if (e.target.id === 'settings-modal') closeSettings(); });
   $('detail-modal').addEventListener('click', e => { if (e.target.id === 'detail-modal') closeDetail(); });
+
+  // Mode choice buttons
+  $('mode-btn-netbox')?.addEventListener('click', () => selectMode('netbox'));
+  $('mode-btn-file')?.addEventListener('click', () => selectMode('file'));
+
+  // File upload form
+  $('file-platform-select')?.addEventListener('change', (e) => {
+    state.fileData.platform = e.target.value;
+  });
+
+  $('file-device-name')?.addEventListener('input', (e) => {
+    state.fileData.deviceName = e.target.value;
+  });
+
+  $('file-config-input')?.addEventListener('change', (e) => {
+    state.fileData.file = e.target.files?.[0] || null;
+    const name = state.fileData.file?.name || 'Nenhum arquivo selecionado';
+    $('file-input-name').textContent = name;
+  });
+
+  // File upload contexts select all/deselect all
+  $('file-select-all-ctx')?.addEventListener('click', () => {
+    document.querySelectorAll('#file-contexts-grid .context-card').forEach(card => {
+      card.classList.add('selected');
+      state.selectedContexts.add(card.dataset.id);
+    });
+    $('btn-file-analyze').disabled = false;
+  });
+
+  $('file-deselect-all-ctx')?.addEventListener('click', () => {
+    document.querySelectorAll('#file-contexts-grid .context-card').forEach(card => {
+      card.classList.remove('selected');
+      state.selectedContexts.delete(card.dataset.id);
+    });
+    $('btn-file-analyze').disabled = true;
+  });
+
+  // File analyze button
+  $('btn-file-analyze')?.addEventListener('click', runFileAnalysis);
+
+  // File upload: back button
+  $('back-to-mode-choice')?.addEventListener('click', () => {
+    state.analysisMode = null;
+    state.selectedContexts.clear();
+    hide('step-file-upload');
+    show('mode-choice-modal');
+  });
+
+  // File results: filter buttons
+  document.querySelectorAll('#step-file-results .filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#step-file-results .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderFileFindings(btn.dataset.filter);
+    });
+  });
+
+  // File results: new analysis button
+  $('btn-file-new-analysis')?.addEventListener('click', () => {
+    state.analysisMode = null;
+    state.selectedContexts.clear();
+    state.findings = [];
+    hide('step-file-results');
+    showModeChoice();
+  });
 
   // ESC key
   document.addEventListener('keydown', e => {

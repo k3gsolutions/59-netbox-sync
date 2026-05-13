@@ -6,7 +6,7 @@ SRC_HTML = os.path.join(ROOT, "webui/compliance.html")
 SRC_CSS = os.path.join(ROOT, "webui/compliance.css")
 SRC_JS = os.path.join(ROOT, "webui/compliance.js")
 
-DEST_HTML = os.path.join(ROOT, "k3g-monitoring-iac/webui/templates/compliance_candidates.html")
+DEST_HTML = os.path.join(ROOT, "k3g-monitoring-iac/webui/templates/compliance_guided.html")
 DEST_CSS = os.path.join(ROOT, "k3g-monitoring-iac/webui/static/compliance_guided.css")
 DEST_JS = os.path.join(ROOT, "k3g-monitoring-iac/webui/static/compliance_guided.js")
 

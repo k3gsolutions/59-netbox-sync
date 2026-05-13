@@ -69,6 +69,31 @@
     </div>
   </div>
 
+  <!-- ===== MODE CHOICE MODAL (Step 0) ===== -->
+  <div class="modal-overlay hidden" id="mode-choice-modal">
+    <div class="modal mode-choice-modal">
+      <div class="modal-header">
+        <div class="modal-title">Escolha o modo de análise</div>
+      </div>
+      <div class="modal-body" style="padding: 32px;">
+        <div class="mode-choice-grid">
+          <button class="mode-choice-btn" id="mode-btn-netbox">
+            <div class="mode-choice-icon">🏢</div>
+            <div class="mode-choice-title">Via NetBox</div>
+            <div class="mode-choice-desc">Selecione dispositivos cadastrados no NetBox. Coleta automática via SSH/SNMP.</div>
+            <div class="mode-choice-meta">• Dados atualizados • Coleta dinâmica • Completo</div>
+          </button>
+          <button class="mode-choice-btn" id="mode-btn-file">
+            <div class="mode-choice-icon">📄</div>
+            <div class="mode-choice-title">Enviar Arquivo</div>
+            <div class="mode-choice-desc">Analise uma configuração enviada manualmente. Sem conexão com o dispositivo.</div>
+            <div class="mode-choice-meta">• Análise rápida • Arquivo bruto • Sem SNMP</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== WIZARD ===== -->
   <div class="wizard-container">
 
@@ -227,6 +252,145 @@
             <tbody id="findings-tbody"></tbody>
           </table>
           <div class="findings-empty hidden" id="findings-empty">Nenhum item encontrado para este filtro.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILE UPLOAD STEP -->
+    <div class="wizard-step hidden" id="step-file-upload">
+      <div class="step-card">
+        <div class="step-card-header">
+          <div class="step-num">📄</div>
+          <div>
+            <div class="step-card-title">Analisar Arquivo de Configuração</div>
+            <div class="step-card-desc">Envie um arquivo de configuração para análise. Suportado: Huawei (display current-configuration)</div>
+          </div>
+        </div>
+        <div class="step-card-body">
+          <!-- Form Section -->
+          <div class="file-form-section">
+            <!-- Plataforma -->
+            <div class="form-group">
+              <label class="form-label">Plataforma</label>
+              <select id="file-platform-select" class="form-input">
+                <option value="huawei">Huawei NE8000/NE9000</option>
+              </select>
+            </div>
+
+            <!-- Device Name -->
+            <div class="form-group">
+              <label class="form-label">Nome do Dispositivo (opcional)</label>
+              <input type="text" id="file-device-name" class="form-input" placeholder="Ex: 4WNET-MNS-KTG-RX" />
+            </div>
+
+            <!-- File Upload -->
+            <div class="form-group">
+              <label class="form-label">Arquivo de Configuração (.txt)</label>
+              <div class="file-input-wrapper">
+                <input type="file" id="file-config-input" class="file-input-hidden" accept=".txt" />
+                <button class="file-input-btn" onclick="document.getElementById('file-config-input').click();">
+                  📁 Selecionar arquivo
+                </button>
+                <span class="file-input-name" id="file-input-name">Nenhum arquivo selecionado</span>
+              </div>
+            </div>
+
+            <!-- Contexts -->
+            <div class="form-group">
+              <label class="form-label">Contextos de Análise</label>
+              <div id="file-contexts-grid" class="contexts-grid"></div>
+              <div class="context-actions">
+                <button class="btn btn-ghost btn-sm" id="file-select-all-ctx">Selecionar todos</button>
+                <button class="btn btn-ghost btn-sm" id="file-deselect-all-ctx">Desmarcar todos</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading/Error States -->
+          <div id="file-upload-loading" class="loading-row hidden">
+            <div class="spinner"></div>
+            <span>Analisando arquivo...</span>
+          </div>
+          <div id="file-upload-error" class="error-row hidden"></div>
+        </div>
+
+        <div class="step-card-footer">
+          <button class="btn btn-ghost" id="back-to-mode-choice">← Voltar</button>
+          <button class="btn btn-primary" id="btn-file-analyze">🔍 Analisar Arquivo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILE RESULTS STEP -->
+    <div class="wizard-step hidden" id="step-file-results">
+      <div class="step-card">
+        <div class="step-card-header">
+          <div class="step-num">📊</div>
+          <div>
+            <div id="file-results-device-name" class="step-card-title"></div>
+            <div id="file-results-status" class="step-card-desc"></div>
+          </div>
+        </div>
+
+        <div class="step-card-body">
+          <!-- Summary Cards -->
+          <div id="file-results-summary" class="results-summary"></div>
+
+          <!-- Warning Banner for File Mode -->
+          <div class="warning-banner">
+            <span class="warning-icon">⚠️</span>
+            <div class="warning-text">
+              <strong>Análise por arquivo:</strong> Esta análise foi baseada em um arquivo enviado manualmente. Dados operacionais via SNMP não foram coletados. Resultados são parciais.
+            </div>
+          </div>
+
+          <!-- Collection Notes -->
+          <div id="file-collection-notes-box" class="collection-notes-box hidden">
+            <div class="collection-notes-title">ℹ️ Detalhes da Análise</div>
+            <ul id="file-notes-list" class="notes-list"></ul>
+          </div>
+
+          <!-- Findings Section -->
+          <div class="findings-section">
+            <div id="file-findings-count-title" class="findings-count-title"></div>
+
+            <!-- Filter Buttons -->
+            <div class="filter-buttons" style="margin-bottom: 16px;">
+              <button class="filter-btn active" data-filter="all">Todos</button>
+              <button class="filter-btn" data-filter="approved">✅ Aprovados</button>
+              <button class="filter-btn" data-filter="warning">⚠️ Atenção</button>
+              <button class="filter-btn" data-filter="failed">❌ Reprovados</button>
+            </div>
+
+            <div id="findings-empty" class="empty-state hidden">
+              <div class="empty-icon">✅</div>
+              <div class="empty-text">Nenhum resultado para este filtro</div>
+            </div>
+
+            <div id="findings-loading" class="loading-row hidden">
+              <div class="spinner"></div>
+              <span>Processando resultados...</span>
+            </div>
+
+            <div id="findings-error" class="error-row hidden"></div>
+
+            <table class="findings-table" style="margin-top: 16px;">
+              <thead>
+                <tr>
+                  <th class="col-status">Status</th>
+                  <th class="col-context">Contexto</th>
+                  <th class="col-item">Item</th>
+                  <th class="col-summary">Sumário</th>
+                  <th class="col-action">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="findings-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="step-card-footer">
+          <button class="btn btn-primary" id="btn-file-new-analysis">🔄 Nova Análise</button>
         </div>
       </div>
     </div>
