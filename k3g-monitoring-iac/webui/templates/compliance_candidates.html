@@ -1,463 +1,348 @@
 {% extends "base.html" %}
 
-{% block title %}Compliance — Candidatos{% endblock %}
+{% block title %}Compliance — Guiado{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', path='compliance_guided.css') }}">
 
-<header class="wizard-app-header compliance-page-header">
+<header class="wizard-app-header">
     <div class="app-header-left">
-        <h1 class="page-title">Compliance — Candidatos</h1>
-        <p class="page-subtitle">Busca, seleção e criação de Jobs de Compliance read-only</p>
+        <h1 class="page-title">Compliance Guiado</h1>
+        <p class="page-subtitle">Valide configurações e padrões operacionais de forma visual</p>
     </div>
     <div class="app-header-right">
-        <a class="btn btn-secondary btn-sm" href="/compliance/jobs">Jobs</a>
+        <div class="api-url-badge" id="api-url-badge"><span class="mono">localhost</span></div>
+        <button class="btn btn-ghost btn-sm" id="btn-mode-choice" onclick="showModeChoice()" title="Trocar modo de análise">⇄ Modo</button>
+        <button class="btn btn-secondary btn-sm" id="btn-settings">⚙️ Configurações API</button>
     </div>
 </header>
 
-<!-- Error message if NetBox not configured -->
-{% if error %}
-<div class="alert alert-error">
-    <strong>⚠ Erro:</strong> {{ error }}
-    <p style="margin-top: 0.5em; font-size: 0.9em;">
-        Configure as variáveis de ambiente:
-        <code>NETBOX_URL</code> e <code>NETBOX_TOKEN</code>
-    </p>
-</div>
-{% else %}
-
-<!-- Safety banner -->
-<div class="alert alert-info">
-    <strong>ℹ Listagem somente leitura.</strong>
-    Nenhuma conexão com equipamento foi iniciada.
-</div>
-
-<!-- Search form -->
-<div class="step-card compliance-search-panel">
-    <h3>Buscar Candidatos</h3>
-    <p style="color: #666; font-size: 0.95em;">Informe nome ou ID do dispositivo:</p>
-
-    <form id="search-form" style="display: flex; gap: 1em; align-items: flex-end; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 250px;">
-            <label for="search-input" style="display: block; margin-bottom: 0.3em; font-weight: 500;">Nome ou ID</label>
-            <input type="text" id="search-input" placeholder="Ex: 4WNET-MNS-KTG-RX ou 1890"
-                   style="width: 100%; padding: 0.6em; border: 1px solid #ddd; border-radius: 4px; font-size: 1em;">
+<div class="wizard-container">
+    <!-- STEPS BAR -->
+    <div class="steps-bar">
+        <div class="step active" id="step-ind-1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Cliente</div>
         </div>
-        <button type="button" id="search-btn"
-                style="padding: 0.6em 1.5em; background-color: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-            Buscar
-        </button>
-    </form>
+        <div class="step-line" id="line-1"></div>
+        <div class="step" id="step-ind-2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Dispositivo</div>
+        </div>
+        <div class="step-line" id="line-2"></div>
+        <div class="step" id="step-ind-3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Contextos</div>
+        </div>
+        <div class="step-line" id="line-3"></div>
+        <div class="step" id="step-ind-4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Análise</div>
+        </div>
+    </div>
 
-    <div style="margin-top: 1em; font-size: 0.85em; color: #666;">
-        <label style="display: flex; align-items: center; gap: 0.5em; margin-top: 0.5em;">
-            <input type="checkbox" id="include-rejected" />
-            Mostrar dispositivos rejeitados (não elegíveis)
-        </label>
+    <!-- STEP 1: CLIENTES -->
+    <div id="step-1" class="wizard-step">
+        <div class="step-card">
+            <div class="step-card-header">
+                <div class="step-num">1</div>
+                <div>
+                    <h2 class="step-card-title">Selecionar Cliente</h2>
+                    <p class="step-card-desc">Escolha o cliente (Tenant) cujos dispositivos deseja analisar.</p>
+                </div>
+            </div>
+            <div class="step-card-body">
+                <div id="tenants-loading" class="loading-row"><div class="spinner"></div><span>Carregando clientes elegíveis...</span></div>
+                <div id="tenants-error" class="error-row hidden"></div>
+                <div id="tenants-grid" class="tenant-grid hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 2: DISPOSITIVOS -->
+    <div id="step-2" class="wizard-step hidden">
+        <div id="selected-tenant-chip" class="selected-tenant-chip">🏢 Cliente</div>
+        <div class="step-card">
+            <div class="step-card-header">
+                <div class="step-num">2</div>
+                <div>
+                    <h2 class="step-card-title">Selecionar Dispositivo</h2>
+                    <p class="step-card-desc">Escolha o dispositivo do cliente selecionado.</p>
+                </div>
+            </div>
+            <div class="step-card-body">
+                <div id="devices-loading" class="loading-row"><div class="spinner"></div><span>Carregando dispositivos...</span></div>
+                <div id="devices-error" class="error-row hidden"></div>
+                
+                <div id="device-type-filter" class="device-filter hidden">
+                    <div class="device-filter-label">
+                        Função (Role)
+                        <select id="device-type-select" class="device-filter-select"></select>
+                    </div>
+                    <div id="device-filter-count" class="device-filter-count">0 dispositivos</div>
+                </div>
+
+                <div id="devices-list" class="devices-list hidden"></div>
+                <div id="devices-empty" class="empty-row hidden">Nenhum dispositivo encontrado.</div>
+            </div>
+            <div class="step-card-footer">
+                <button class="btn btn-ghost" id="back-to-step1">← Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3: CONTEXTOS -->
+    <div id="step-3" class="wizard-step hidden">
+        <div id="selected-device-chip" class="selected-device-chip">🖥️ Dispositivo</div>
+        <div class="step-card">
+            <div class="step-card-header">
+                <div class="step-num">3</div>
+                <div>
+                    <h2 class="step-card-title">Selecionar Contextos de Análise</h2>
+                    <p class="step-card-desc">Quais itens deseja validar no equipamento?</p>
+                </div>
+            </div>
+            <div class="step-card-body">
+                <div id="contexts-loading" class="loading-row"><div class="spinner"></div><span>Carregando contextos...</span></div>
+                <div id="contexts-error" class="error-row hidden"></div>
+                
+                <div id="context-actions" class="hidden" style="margin-bottom: 16px;">
+                    <button class="btn btn-ghost btn-sm" id="select-all-ctx">Selecionar Todos</button>
+                    <button class="btn btn-ghost btn-sm" id="deselect-all-ctx">Limpar</button>
+                </div>
+
+                <div id="contexts-grid" class="contexts-grid hidden"></div>
+            </div>
+            <div class="step-card-footer">
+                <button class="btn btn-ghost" id="back-to-step2">← Voltar</button>
+                <button class="btn btn-primary" id="btn-analyze" disabled>Executar Análise →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 4: ANÁLISE (RESULTADOS) -->
+    <div id="step-4" class="wizard-step hidden">
+        <div id="findings-loading" class="loading-row"><div class="spinner"></div><span>Executando análise... Isso pode levar alguns segundos.</span></div>
+        <div id="findings-error" class="error-row hidden"></div>
+
+        <div id="results-content" class="hidden">
+            <div class="results-header">
+                <div id="results-device-info" class="results-device-info"></div>
+                <button class="btn btn-secondary" id="btn-new-analysis">Nova Análise</button>
+            </div>
+
+            <div id="results-summary" class="results-summary"></div>
+
+            <div id="collection-notes-box" class="collection-notes hidden">
+                <div class="notes-header">Notas da Coleta</div>
+                <ul id="notes-list" class="notes-list"></ul>
+            </div>
+
+            <div class="findings-section">
+                <div class="findings-toolbar">
+                    <div id="findings-count-title" class="findings-title">Resultados</div>
+                    <div class="findings-filters">
+                        <button class="filter-btn active" data-filter="all">Todos</button>
+                        <button class="filter-btn" data-filter="failed">Reprovados</button>
+                        <button class="filter-btn" data-filter="warning">Atenção</button>
+                        <button class="filter-btn" data-filter="approved">Aprovados</button>
+                    </div>
+                </div>
+
+                <div id="findings-table-wrap">
+                    <div id="findings-tbody" class="findings-grid"></div>
+                    <div id="findings-empty" class="findings-empty hidden">Nenhuma inconsistência encontrada para este filtro.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP FILE UPLOAD -->
+    <div id="step-file-upload" class="wizard-step hidden">
+        <div class="step-card">
+            <div class="step-card-header">
+                <div class="step-num">📄</div>
+                <div>
+                    <h2 class="step-card-title">Análise de Arquivo Local</h2>
+                    <p class="step-card-desc">Faça upload de um arquivo de configuração (.txt, .csv, .json) para análise de compliance.</p>
+                </div>
+            </div>
+            <div class="step-card-body">
+                <div class="file-form-section">
+                    <div class="form-group">
+                        <label class="form-label">Plataforma</label>
+                        <select id="file-platform-select" class="form-input">
+                            <option value="huawei">Huawei (VRP)</option>
+                            <option value="cisco">Cisco (IOS/IOS-XE)</option>
+                            <option value="juniper">Juniper (Junos)</option>
+                            <option value="mikrotik">MikroTik (RouterOS)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nome do Dispositivo (opcional)</label>
+                        <input type="text" id="file-device-name" class="form-input" placeholder="Ex: BR-SAO-R01">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Arquivo de Configuração</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="file-config-input" class="file-input-hidden" accept=".txt,.csv,.json">
+                            <button type="button" class="file-input-btn" onclick="document.getElementById('file-config-input').click()">
+                                📁 Escolher Arquivo
+                            </button>
+                            <span id="file-input-name" class="file-input-name">Nenhum arquivo selecionado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin: 24px 0;">
+
+                <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text);">Selecione os Contextos (Parser Local)</h3>
+                
+                <div style="margin-bottom: 16px;">
+                    <button class="btn btn-ghost btn-sm" id="file-select-all-ctx">Selecionar Todos</button>
+                    <button class="btn btn-ghost btn-sm" id="file-deselect-all-ctx">Limpar</button>
+                </div>
+                <div id="file-contexts-grid" class="contexts-grid"></div>
+
+                <div id="file-upload-loading" class="loading-row hidden"><div class="spinner"></div><span>Processando arquivo e executando parser local...</span></div>
+                <div id="file-upload-error" class="error-row hidden"></div>
+            </div>
+            <div class="step-card-footer">
+                <button class="btn btn-ghost" id="back-to-mode-choice">← Cancelar</button>
+                <button class="btn btn-primary" id="btn-file-analyze" disabled>Analisar Arquivo →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP FILE RESULTS -->
+    <div id="step-file-results" class="wizard-step hidden">
+        <div class="warning-banner">
+            <span class="warning-icon">⚠️</span>
+            <div class="warning-text">
+                <strong>Modo Offline:</strong> Os resultados exibidos são baseados <strong>exclusivamente</strong> no arquivo fornecido. Nenhuma coleta no equipamento ou validação com o NetBox foi realizada.
+            </div>
+        </div>
+
+        <div class="results-header">
+            <div class="results-device-info">
+                <div id="file-results-device-name" class="results-device-name"></div>
+                <div id="file-results-status" class="results-device-meta"></div>
+            </div>
+            <button class="btn btn-secondary" id="btn-file-new-analysis">Nova Análise de Arquivo</button>
+        </div>
+
+        <div id="file-results-summary" class="results-summary"></div>
+
+        <div id="file-collection-notes-box" class="collection-notes hidden">
+            <div class="notes-header">Notas do Parser</div>
+            <ul id="file-notes-list" class="notes-list"></ul>
+        </div>
+
+        <div class="findings-section">
+            <div class="findings-toolbar">
+                <div id="file-findings-count-title" class="findings-title">Resultados da Análise Offline</div>
+                <div class="findings-filters">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="failed">Reprovados</button>
+                    <button class="filter-btn" data-filter="warning">Atenção</button>
+                    <button class="filter-btn" data-filter="approved">Aprovados</button>
+                </div>
+            </div>
+
+            <div id="file-findings-table-wrap">
+                <div id="file-findings-tbody" class="findings-grid"></div>
+                <div id="file-findings-empty" class="findings-empty hidden">Nenhuma inconsistência encontrada para este filtro.</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODALS -->
+
+<!-- Mode Choice Modal (Step 0) -->
+<div id="mode-choice-modal" class="modal-overlay hidden">
+    <div class="modal mode-choice-modal">
+        <div class="modal-header">
+            <div>
+                <h3 class="modal-title">Escolha o Modo de Análise</h3>
+                <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Selecione como deseja executar a análise de compliance.</p>
+            </div>
+            <button class="modal-close" id="mode-choice-close" title="Fechar e configurar manualmente">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="mode-choice-grid">
+                <button class="mode-choice-btn" id="mode-btn-netbox">
+                    <span class="mode-choice-icon">🏢</span>
+                    <span class="mode-choice-title">NetBox + Coleta Viva</span>
+                    <span class="mode-choice-desc">Fluxo guiado integrado. Escolha um cliente e dispositivo do NetBox. As evidências serão coletadas ao vivo via SSH ou SNMP.</span>
+                    <span class="mode-choice-meta">Recomendado para operação</span>
+                </button>
+                <button class="mode-choice-btn" id="mode-btn-file">
+                    <span class="mode-choice-icon">📄</span>
+                    <span class="mode-choice-title">Análise de Arquivo (Offline)</span>
+                    <span class="mode-choice-desc">Faça upload de um arquivo de configuração. O compliance será rodado usando apenas o parser local, sem conexão ao equipamento.</span>
+                    <span class="mode-choice-meta">Ideal para validação de scripts</span>
+                </button>
+            </div>
+        </div>
+        <div class="modal-footer" style="justify-content: center; padding-top:12px;">
+            <span style="font-size:11px; color:var(--text-muted);">Pressione <kbd style="background:var(--bg-card2); border:1px solid var(--border); border-radius:4px; padding:1px 6px;">Esc</kbd> ou clique em × para configurar manualmente</span>
+        </div>
     </div>
 </div>
 
-<!-- Loading indicator -->
-<div id="loading" class="loading-row" style="display: none;">
-    <div class="spinner"></div>
-    <span>Buscando candidatos...</span>
-</div>
-
-<!-- Results section -->
-<div id="results-section" style="display: none; margin-top: 2em;">
-    <!-- Message if no criteria -->
-    <div id="no-criteria-msg" style="display: none; padding: 1em; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; color: #856404;">
-        Informe nome ou ID para buscar candidatos.
-    </div>
-
-    <!-- Results table -->
-    <div id="candidates-table-container" class="compliance-table-wrap" style="display: none; overflow-x: auto; margin: 1em 0;">
-        <p><strong>Candidatos encontrados: <span id="candidate-count">0</span></strong></p>
-        <table class="findings-table compliance-candidates-table" style="width: 100%; border-collapse: collapse; font-size: 0.95em;">
-            <thead>
-                <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
-                    <th style="padding: 0.5em; text-align: left; width: 40px;">
-                        <input type="checkbox" id="select-all" />
-                    </th>
-                    <th style="padding: 0.5em; text-align: left;">Nome</th>
-                    <th style="padding: 0.5em; text-align: left;">Status</th>
-                    <th style="padding: 0.5em; text-align: left;">Tenant</th>
-                    <th style="padding: 0.5em; text-align: left;">Site</th>
-                    <th style="padding: 0.5em; text-align: left;">Função</th>
-                    <th style="padding: 0.5em; text-align: left;">IP Primário</th>
-                </tr>
-            </thead>
-            <tbody id="candidates-tbody">
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Rejected table (if include_rejected checked) -->
-    <div id="rejected-table-container" class="compliance-table-wrap" style="display: none; margin-top: 2em;">
-        <p style="color: #d9534f;"><strong>⚠ Dispositivos não elegíveis: <span id="rejected-count">0</span></strong></p>
-        <table class="findings-table compliance-candidates-table" style="width: 100%; border-collapse: collapse; font-size: 0.95em;">
-            <thead>
-                <tr style="background-color: #f8d7da; border-bottom: 2px solid #f5c6cb;">
-                    <th style="padding: 0.5em; text-align: left;">Nome</th>
-                    <th style="padding: 0.5em; text-align: left;">Razão</th>
-                </tr>
-            </thead>
-            <tbody id="rejected-tbody">
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Start button -->
-    <div id="start-section" class="collection-notes" style="display: none; margin-top: 2em;">
-        <p><strong>Selecionados: <span id="selected-count">0</span></strong></p>
-        <button id="start-compliance-btn"
-                style="padding: 0.7em 1.5em; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; opacity: 0.5; pointer-events: none;"
-                disabled>
-            Criar job de Compliance
-        </button>
-    </div>
-
-    <!-- Error message -->
-    <div id="error-msg" style="display: none; padding: 1em; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; color: #721c24; margin-top: 1em;">
+<!-- Details Modal -->
+<div id="detail-modal" class="modal-overlay hidden">
+    <div class="modal detail-modal">
+        <div class="modal-header">
+            <div>
+                <div id="detail-badge" class="modal-badge"></div>
+                <div id="detail-title" class="modal-title"></div>
+            </div>
+            <button class="modal-close" id="close-detail">×</button>
+        </div>
+        <div class="modal-body detail-grid">
+            <div id="d-context"></div>
+            <div id="d-item"></div>
+            <div id="d-expected"></div>
+            <div id="d-found"></div>
+            <div id="d-impact"></div>
+            <div id="d-recommendation"></div>
+            <div id="d-source"></div>
+            <div id="d-evidence"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="close-detail-btn">Fechar</button>
+        </div>
     </div>
 </div>
 
-<!-- Confirmation modal -->
-<div id="confirm-modal-bg" class="modal-overlay" style="display: none;"></div>
-<div id="confirm-modal" class="modal settings-modal compliance-confirm-modal" style="display: none;">
-    <h3>Criar Job de Compliance</h3>
-    <p><strong>Devices selecionados: <span id="confirm-count">0</span></strong></p>
-    <ul id="confirm-devices" style="list-style-position: inside; margin: 1em 0; padding: 1em; background-color: #f0f0f0; border-radius: 4px;"></ul>
-    <div style="background-color: #fff3cd; padding: 1em; border-radius: 4px; margin: 1em 0; border-left: 4px solid #ffc107; color: #856404;">
-        <strong>⚠️ Aviso Importante</strong><br/>
-        Esta etapa ainda não conecta no equipamento. Será criado um job local de análise para revisão.
-    </div>
-    <div style="background-color: #f8f9fa; padding: 1em; border-radius: 4px; margin: 1em 0; border-left: 4px solid #0066cc;">
-        <strong>Garantias de segurança:</strong>
-        <ul style="margin: 0.5em 0; padding-left: 1.5em;">
-            <li>Nenhuma escrita no NetBox</li>
-            <li>Nenhuma conexão SSH com equipamentos</li>
-            <li>Nenhuma query SNMP</li>
-            <li>Nenhuma coleta iniciada</li>
-        </ul>
-    </div>
-    <div style="display: flex; gap: 1em; justify-content: flex-end; margin-top: 1.5em;">
-        <button id="confirm-cancel" style="padding: 0.6em 1em; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
-        <button id="confirm-proceed" style="padding: 0.6em 1em; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Criar job de Compliance</button>
+<!-- Settings Modal -->
+<div id="settings-modal" class="modal-overlay hidden">
+    <div class="modal settings-modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Configurações da API</h3>
+            <button class="modal-close" id="close-settings">×</button>
+        </div>
+        <div class="modal-body">
+            <div style="margin-bottom: 16px;">
+                <label class="form-label">API Base URL</label>
+                <input type="text" id="input-api-url" class="form-input" placeholder="Deixe vazio para usar a mesma origem">
+            </div>
+            <div>
+                <label class="form-label">API Key (opcional)</label>
+                <input type="password" id="input-api-key" class="form-input" placeholder="Bearer token ou X-API-Key">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancel-settings">Cancelar</button>
+            <button class="btn btn-primary" id="save-settings">Salvar</button>
+        </div>
     </div>
 </div>
 
-<style>
-.compliance-page-header {
-    margin-bottom: 24px;
-    border-radius: 12px;
-    position: static;
-}
-.compliance-search-panel {
-    padding: 24px 28px;
-    margin: 16px 0 24px;
-}
-.compliance-search-panel h3 {
-    color: var(--text);
-    font-size: 16px;
-    margin-bottom: 8px;
-}
-.compliance-search-panel p,
-#results-section p,
-#start-section p {
-    color: var(--text-muted) !important;
-}
-.compliance-search-panel form {
-    margin-top: 16px;
-}
-#search-input {
-    background: var(--bg-card2) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: var(--radius-sm) !important;
-    color: var(--text) !important;
-    font-family: inherit;
-}
-#search-btn,
-#start-compliance-btn,
-#confirm-proceed {
-    background: var(--primary) !important;
-    color: #fff !important;
-    border-radius: var(--radius-sm) !important;
-}
-#confirm-cancel {
-    background: var(--bg-card2) !important;
-    color: var(--text-dim) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: var(--radius-sm) !important;
-}
-.alert {
-    padding: 14px 18px;
-    margin: 16px 0;
-    border-radius: var(--radius-sm);
-    border: 1px solid;
-}
-.alert-error {
-    background: var(--red-bg);
-    border-color: rgba(239,68,68,.25);
-    color: #fca5a5;
-}
-.alert-info {
-    background: rgba(96,165,250,.12);
-    border-color: rgba(96,165,250,.3);
-    color: var(--blue);
-}
-#no-criteria-msg,
-#error-msg {
-    border-radius: var(--radius-sm) !important;
-}
-.compliance-table-wrap {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-}
-.compliance-candidates-table {
-    min-width: 900px;
-}
-.compliance-candidates-table th,
-.compliance-candidates-table td {
-    text-align: left;
-    color: var(--text-dim);
-}
-.compliance-candidates-table td:nth-child(2) {
-    color: var(--text) !important;
-}
-.compliance-confirm-modal {
-    padding: 26px;
-    color: var(--text);
-}
-.compliance-confirm-modal ul {
-    color: var(--text-dim);
-}
-#confirm-devices {
-    background: var(--bg-card2) !important;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-}
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const searchInput = document.getElementById("search-input");
-    const searchBtn = document.getElementById("search-btn");
-    const includeRejected = document.getElementById("include-rejected");
-    const loading = document.getElementById("loading");
-    const resultsSection = document.getElementById("results-section");
-    const noCriteriaMsg = document.getElementById("no-criteria-msg");
-    const errorMsg = document.getElementById("error-msg");
-    const candidatesTableContainer = document.getElementById("candidates-table-container");
-    const rejectedTableContainer = document.getElementById("rejected-table-container");
-    const candidatesTbody = document.getElementById("candidates-tbody");
-    const rejectedTbody = document.getElementById("rejected-tbody");
-    const selectAll = document.getElementById("select-all");
-    const startSection = document.getElementById("start-section");
-    const startBtn = document.getElementById("start-compliance-btn");
-    const selectedCountSpan = document.getElementById("selected-count");
-    const candidateCountSpan = document.getElementById("candidate-count");
-    const rejectedCountSpan = document.getElementById("rejected-count");
-
-    // Search
-    function performSearch() {
-        const searchValue = searchInput.value.trim();
-        if (!searchValue) {
-            resultsSection.style.display = "block";
-            noCriteriaMsg.style.display = "block";
-            candidatesTableContainer.style.display = "none";
-            rejectedTableContainer.style.display = "none";
-            startSection.style.display = "none";
-            errorMsg.style.display = "none";
-            return;
-        }
-
-        loading.style.display = "block";
-        resultsSection.style.display = "block";
-
-        let url = "/compliance/candidates?";
-        // Determine search type
-        if (/^\d+$/.test(searchValue)) {
-            url += `id=${searchValue}`;
-        } else {
-            url += `name=${encodeURIComponent(searchValue)}`;
-        }
-
-        if (includeRejected.checked) {
-            url += "&include_rejected=true";
-        }
-
-        fetch(url)
-            .then(resp => resp.json())
-            .then(data => {
-                loading.style.display = "none";
-                noCriteriaMsg.style.display = "none";
-                errorMsg.style.display = "none";
-
-                if (data.error) {
-                    errorMsg.style.display = "block";
-                    errorMsg.textContent = data.error;
-                    candidatesTableContainer.style.display = "none";
-                    startSection.style.display = "none";
-                    return;
-                }
-
-                // Populate candidates table
-                if (data.results && data.results.length > 0) {
-                    candidateCountSpan.textContent = data.count;
-                    candidatesTbody.innerHTML = "";
-                    data.results.forEach(device => {
-                        const row = document.createElement("tr");
-                        row.style.borderBottom = "1px solid #eee";
-                        row.dataset.deviceId = device.id;
-                        row.innerHTML = `
-                            <td style="padding: 0.5em;"><input type="checkbox" class="device-checkbox" value="${device.id}" /></td>
-                            <td style="padding: 0.5em; font-weight: 500;">${device.name}</td>
-                            <td style="padding: 0.5em;"><span style="background-color: #d4edda; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.85em;">${device.status}</span></td>
-                            <td style="padding: 0.5em;">${device.tenant || '—'}</td>
-                            <td style="padding: 0.5em;">${device.site || '—'}</td>
-                            <td style="padding: 0.5em;">${device.role || '—'}</td>
-                            <td style="padding: 0.5em; font-family: monospace; font-size: 0.9em;">${device.primary_ip4 || '—'}</td>
-                        `;
-                        candidatesTbody.appendChild(row);
-
-                        row.querySelector(".device-checkbox").addEventListener("change", updateSelection);
-                    });
-                    candidatesTableContainer.style.display = "block";
-                    startSection.style.display = "block";
-                } else {
-                    candidatesTableContainer.style.display = "none";
-                    startSection.style.display = "none";
-                }
-
-                // Populate rejected table (if included)
-                if (data.rejected && data.rejected.length > 0) {
-                    rejectedCountSpan.textContent = data.rejected.length;
-                    rejectedTbody.innerHTML = "";
-                    data.rejected.forEach(device => {
-                        const row = document.createElement("tr");
-                        row.style.borderBottom = "1px solid #f5c6cb";
-                        row.innerHTML = `
-                            <td style="padding: 0.5em;">${device.name}</td>
-                            <td style="padding: 0.5em; color: #d9534f;">${device.reason}</td>
-                        `;
-                        rejectedTbody.appendChild(row);
-                    });
-                    rejectedTableContainer.style.display = "block";
-                } else {
-                    rejectedTableContainer.style.display = "none";
-                }
-
-                updateSelection();
-            })
-            .catch(err => {
-                loading.style.display = "none";
-                errorMsg.style.display = "block";
-                errorMsg.textContent = "Erro ao buscar candidatos: " + err;
-                candidatesTableContainer.style.display = "none";
-                startSection.style.display = "none";
-            });
-    }
-
-    function updateSelection() {
-        const checkboxes = document.querySelectorAll(".device-checkbox");
-        const selected = Array.from(checkboxes).filter(cb => cb.checked).length;
-        selectedCountSpan.textContent = selected;
-
-        if (selected > 0) {
-            startBtn.style.opacity = "1";
-            startBtn.style.pointerEvents = "auto";
-            startBtn.disabled = false;
-        } else {
-            startBtn.style.opacity = "0.5";
-            startBtn.style.pointerEvents = "none";
-            startBtn.disabled = true;
-        }
-
-        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-        const someChecked = Array.from(checkboxes).some(cb => cb.checked);
-        selectAll.checked = allChecked;
-        selectAll.indeterminate = someChecked && !allChecked;
-    }
-
-    // Event listeners
-    searchBtn.addEventListener("click", performSearch);
-    searchInput.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") performSearch();
-    });
-
-    selectAll.addEventListener("change", function() {
-        const checkboxes = document.querySelectorAll(".device-checkbox");
-        checkboxes.forEach(cb => cb.checked = this.checked);
-        updateSelection();
-    });
-
-    // Start compliance button
-    startBtn.addEventListener("click", function() {
-        const checkboxes = document.querySelectorAll(".device-checkbox:checked");
-        const selected = Array.from(checkboxes).map(cb => parseInt(cb.value));
-
-        document.getElementById("confirm-count").textContent = selected.length;
-        const confirmDevices = document.getElementById("confirm-devices");
-        confirmDevices.innerHTML = "";
-        selected.forEach(deviceId => {
-            const row = document.querySelector(`tr[data-device-id="${deviceId}"]`);
-            const deviceName = row ? row.cells[1].textContent : `Device ${deviceId}`;
-            const li = document.createElement("li");
-            li.textContent = deviceName;
-            confirmDevices.appendChild(li);
-        });
-
-        document.getElementById("confirm-modal-bg").style.display = "block";
-        document.getElementById("confirm-modal").style.display = "block";
-        window.pendingDeviceIds = selected;
-    });
-
-    document.getElementById("confirm-cancel").addEventListener("click", function() {
-        document.getElementById("confirm-modal-bg").style.display = "none";
-        document.getElementById("confirm-modal").style.display = "none";
-    });
-
-    document.getElementById("confirm-proceed").addEventListener("click", function() {
-        document.getElementById("confirm-modal-bg").style.display = "none";
-        document.getElementById("confirm-modal").style.display = "none";
-
-        const deviceIds = window.pendingDeviceIds || [];
-
-        fetch("/compliance/analyze", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                device_ids: deviceIds,
-                mode: "read_only",
-                triggered_by: "operator"
-            })
-        })
-        .then(resp => resp.json().then(data => ({ status: resp.status, data })))
-        .then(({ status, data }) => {
-            if (status === 200) {
-                // Success: show job created message
-                const successDiv = document.createElement("div");
-                successDiv.style.cssText = "padding: 1.5em; background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.25); border-radius: 8px; color: #22c55e; margin-top: 1.5em;";
-                successDiv.innerHTML = `
-                    <strong>✓ Job de Compliance Criado</strong><br/>
-                    <span style="font-family: monospace; font-size: 0.9em;">Job ID: ${data.job_id}</span><br/>
-                    <span style="margin-top: 0.5em; display: block;">${data.message}</span>
-                    <a class="btn btn-primary btn-sm" style="margin-top: 1em;" href="/compliance/jobs/${encodeURIComponent(data.job_id)}">Abrir job</a>
-                `;
-                resultsSection.insertBefore(successDiv, resultsSection.firstChild);
-            } else {
-                errorMsg.style.display = "block";
-                errorMsg.textContent = "✗ Erro: " + (data.error || "Falha ao criar job");
-            }
-        })
-        .catch(err => {
-            errorMsg.style.display = "block";
-            errorMsg.textContent = "✗ Erro de conexão: " + err;
-        });
-    });
-});
-</script>
-
-{% endif %}
+<script src="{{ url_for('static', path='compliance_guided.js') }}"></script>
 {% endblock %}

@@ -96,6 +96,9 @@ async function showFileUploadStep() {
   // Reset contexts for file mode
   state.selectedContexts.clear();
   $('btn-file-analyze').disabled = true;
+  // Automatically open the file picker
+  const fileInput = document.getElementById('file-config-input');
+  if (fileInput) fileInput.click();
 }
 
 async function loadFileContexts() {
@@ -147,7 +150,7 @@ async function runFileAnalysis() {
   const file = fileInput?.files?.[0];
 
   if (!file) {
-    alert('Selecione um arquivo .txt');
+    alert('Selecione um arquivo .txt, .csv ou .json');
     return;
   }
 
@@ -159,7 +162,7 @@ async function runFileAnalysis() {
   show('file-upload-loading');
   hide('file-upload-error');
   $('file-results-info').innerHTML = '';
-  $('findings-tbody').innerHTML = '';
+  $('file-findings-tbody').innerHTML = '';
 
   try {
     const formData = new FormData();
@@ -228,27 +231,34 @@ function goToFileResultsStep(result) {
 }
 
 function renderFileFindings(filter) {
-  const tbody = $('findings-tbody');
+  const tbody = $('file-findings-tbody');
   let list = state.findings;
   if (filter !== 'all') list = list.filter(f => f.status === filter);
 
   if (!list.length) {
     tbody.innerHTML = '';
-    show('findings-empty');
+    show('file-findings-empty');
     return;
   }
-  hide('findings-empty');
+  hide('file-findings-empty');
 
   tbody.innerHTML = list.map((f, idx) => `
-    <tr data-idx="${idx}" data-status="${f.status}">
-      <td class="col-status">${badgeHtml(f.status)}</td>
-      <td class="col-context">${escHtml(f.context)}</td>
-      <td class="col-item"><span class="mono">${escHtml(f.item)}</span></td>
-      <td class="col-summary">${escHtml(f.title)}</td>
-      <td class="col-action">
-        <button class="btn btn-ghost btn-sm btn-detail" data-finding-idx="${idx}">Ver detalhes</button>
-      </td>
-    </tr>
+    <div class="finding-card finding-${f.status}" data-idx="${idx}">
+      <div class="finding-card-header">
+        <div class="finding-card-badges">
+          ${badgeHtml(f.status)}
+          <span class="finding-context-badge">${escHtml(f.context)}</span>
+        </div>
+      </div>
+      <div class="finding-card-body">
+        <h4 class="finding-card-title">${escHtml(f.title)}</h4>
+        <div class="finding-card-item"><span class="mono">${escHtml(f.item)}</span></div>
+      </div>
+      <div class="finding-card-footer">
+        <div class="finding-card-source">Origem: ${escHtml(f.source || 'Local')}</div>
+        <button class="btn btn-ghost btn-sm btn-detail" data-finding-idx="${idx}">[ Ver detalhes ]</button>
+      </div>
+    </div>
   `).join('');
 
   tbody.querySelectorAll('.btn-detail').forEach(btn => {
@@ -568,15 +578,22 @@ function renderFindings(filter) {
   hide('findings-empty');
 
   tbody.innerHTML = list.map((f, idx) => `
-    <tr data-idx="${idx}" data-status="${f.status}" class="finding-row ${filter === 'all' ? '' : ''}">
-      <td class="col-status">${badgeHtml(f.status)}</td>
-      <td class="col-context">${escHtml(f.context)}</td>
-      <td class="col-item">${escHtml(f.item)}</td>
-      <td class="col-summary">${escHtml(f.title)}</td>
-      <td class="col-action">
-        <button class="btn btn-ghost btn-sm btn-detail" data-finding-idx="${findingGlobalIdx(f)}">Ver detalhes</button>
-      </td>
-    </tr>
+    <div class="finding-card finding-${f.status}" data-idx="${idx}">
+      <div class="finding-card-header">
+        <div class="finding-card-badges">
+          ${badgeHtml(f.status)}
+          <span class="finding-context-badge">${escHtml(f.context)}</span>
+        </div>
+      </div>
+      <div class="finding-card-body">
+        <h4 class="finding-card-title">${escHtml(f.title)}</h4>
+        <div class="finding-card-item"><span class="mono">${escHtml(f.item)}</span></div>
+      </div>
+      <div class="finding-card-footer">
+        <div class="finding-card-source">Origem: ${escHtml(f.source || 'N/A')}</div>
+        <button class="btn btn-ghost btn-sm btn-detail" data-finding-idx="${findingGlobalIdx(f)}">[ Ver detalhes ]</button>
+      </div>
+    </div>
   `).join('');
 
   tbody.querySelectorAll('.btn-detail').forEach(btn => {
@@ -658,28 +675,43 @@ function escHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+// ── Mode Choice Close ────────────────────────────────────────────
+function closeModeChoice() {
+  hide('mode-choice-modal');
+}
+
 // ── Event Listeners ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Initial load
-  updateApiUrlBadge();
-  $('input-api-url').value = API_BASE;
-  $('input-api-key').value = API_KEY;
-  checkApiStatus();
-  // Show mode choice modal instead of going straight to tenants
+  try {
+    // Initial load — guard against missing elements
+    if ($('api-url-badge')) updateApiUrlBadge();
+    const urlInput = $('input-api-url');
+    const keyInput = $('input-api-key');
+    if (urlInput) urlInput.value = API_BASE;
+    if (keyInput) keyInput.value = API_KEY;
+    checkApiStatus();
+  } catch(e) {
+    console.warn('[compliance] init error (non-fatal):', e);
+  }
+
+  // Show mode choice modal
   showModeChoice();
 
-  $('device-type-select').addEventListener('change', (event) => {
-    state.selectedDeviceType = event.target.value;
-    state.selectedDevice = null;
-    renderDeviceList();
-  });
+  const deviceTypeSelect = $('device-type-select');
+  if (deviceTypeSelect) {
+    deviceTypeSelect.addEventListener('change', (event) => {
+      state.selectedDeviceType = event.target.value;
+      state.selectedDevice = null;
+      renderDeviceList();
+    });
+  }
 
-  // Step navigation
-  $('back-to-step1').addEventListener('click', () => goToStep(1));
-  $('back-to-step2').addEventListener('click', () => goToStep(2));
-  $('back-to-step3').addEventListener('click', () => goToStep(3));
-  $('btn-analyze').addEventListener('click', runAnalysis);
-  $('btn-new-analysis').addEventListener('click', () => {
+  // Step navigation — use ?. so missing elements don't crash all listeners
+  $('back-to-step1')?.addEventListener('click', () => goToStep(1));
+  $('back-to-step2')?.addEventListener('click', () => goToStep(2));
+  $('back-to-step3')?.addEventListener('click', () => goToStep(3));
+  $('btn-analyze')?.addEventListener('click', runAnalysis);
+  $('btn-new-analysis')?.addEventListener('click', () => {
     state.selectedContexts.clear();
     goToStep(1);
     loadTenants();
@@ -690,7 +722,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const ind = $('step-ind-' + i);
     if (ind) {
       ind.addEventListener('click', () => {
-        // Allow navigating to any previously completed step
         if (ind.classList.contains('done') || ind.classList.contains('active')) {
           goToStep(i);
         }
@@ -699,17 +730,17 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Context select/deselect all
-  $('select-all-ctx').addEventListener('click', () => {
+  $('select-all-ctx')?.addEventListener('click', () => {
     document.querySelectorAll('.context-card').forEach(card => {
       card.classList.add('selected');
       state.selectedContexts.add(card.dataset.id);
     });
-    $('btn-analyze').disabled = false;
+    if ($('btn-analyze')) $('btn-analyze').disabled = false;
   });
-  $('deselect-all-ctx').addEventListener('click', () => {
+  $('deselect-all-ctx')?.addEventListener('click', () => {
     document.querySelectorAll('.context-card').forEach(card => card.classList.remove('selected'));
     state.selectedContexts.clear();
-    $('btn-analyze').disabled = true;
+    if ($('btn-analyze')) $('btn-analyze').disabled = true;
   });
 
   // Filter buttons
@@ -722,22 +753,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Settings
-  $('btn-settings').addEventListener('click', openSettings);
-  $('close-settings').addEventListener('click', closeSettings);
-  $('cancel-settings').addEventListener('click', closeSettings);
-  $('save-settings').addEventListener('click', saveSettings);
+  $('btn-settings')?.addEventListener('click', openSettings);
+  $('close-settings')?.addEventListener('click', closeSettings);
+  $('cancel-settings')?.addEventListener('click', closeSettings);
+  $('save-settings')?.addEventListener('click', saveSettings);
 
   // Detail modal
-  $('close-detail').addEventListener('click', closeDetail);
-  $('close-detail-btn').addEventListener('click', closeDetail);
+  $('close-detail')?.addEventListener('click', closeDetail);
+  $('close-detail-btn')?.addEventListener('click', closeDetail);
 
   // Close modals on overlay click
-  $('settings-modal').addEventListener('click', e => { if (e.target.id === 'settings-modal') closeSettings(); });
-  $('detail-modal').addEventListener('click', e => { if (e.target.id === 'detail-modal') closeDetail(); });
+  $('settings-modal')?.addEventListener('click', e => { if (e.target.id === 'settings-modal') closeSettings(); });
+  $('detail-modal')?.addEventListener('click', e => { if (e.target.id === 'detail-modal') closeDetail(); });
 
   // Mode choice buttons
   $('mode-btn-netbox')?.addEventListener('click', () => selectMode('netbox'));
   $('mode-btn-file')?.addEventListener('click', () => selectMode('file'));
+  $('mode-choice-close')?.addEventListener('click', closeModeChoice);
+  // Close on overlay click
+  $('mode-choice-modal')?.addEventListener('click', e => { if (e.target.id === 'mode-choice-modal') closeModeChoice(); });
 
   // File upload form
   $('file-platform-select')?.addEventListener('change', (e) => {
@@ -802,6 +836,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ESC key
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeDetail(); closeSettings(); }
+    if (e.key === 'Escape') { closeDetail(); closeSettings(); closeModeChoice(); }
   });
 });

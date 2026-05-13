@@ -4,22 +4,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --bg:           #0a0d14;
-  --bg-card:      #111520;
-  --bg-card2:     #161b28;
-  --bg-hover:     #1c2236;
-  --border:       #1f2a40;
-  --border-light: #263047;
-  --primary:      #3b82f6;
-  --primary-dark: #2563eb;
-  --primary-glow: rgba(59,130,246,.18);
-  --green:        #22c55e;
+  --bg:           #0B1020;
+  --bg-card:      #121A2F;
+  --bg-card2:     #172036;
+  --bg-hover:     #1E2945;
+  --border:       rgba(255,255,255,0.05);
+  --border-light: rgba(255,255,255,0.08);
+  --primary:      #8B5CF6;
+  --primary-dark: #7C3AED;
+  --primary-glow: rgba(139,92,246,.18);
+  --green:        #22C55E;
   --green-bg:     rgba(34,197,94,.12);
-  --yellow:       #f59e0b;
+  --yellow:       #F59E0B;
   --yellow-bg:    rgba(245,158,11,.12);
-  --red:          #ef4444;
+  --red:          #EF4444;
   --red-bg:       rgba(239,68,68,.12);
-  --blue:         #60a5fa;
+  --blue:         #3B82F6;
   --text:         #e2e8f0;
   --text-muted:   #64748b;
   --text-dim:     #94a3b8;
@@ -478,47 +478,101 @@ body.app-layout .app-content {
 .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
 .filter-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-/* Findings Table */
-#findings-table-wrap {
+/* Findings Grid & Cards */
+.findings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
   width: 100%;
-  overflow-x: auto;
 }
 
-.findings-table {
-  width: 100%;
-  min-width: 820px;
-  border-collapse: collapse;
+.finding-card {
   background: var(--bg-card);
-  border-radius: var(--radius);
-  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all var(--transition);
+}
+
+.finding-card:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.finding-card.finding-failed {
+  border-left: 3px solid var(--red);
+}
+.finding-card.finding-warning {
+  border-left: 3px solid var(--yellow);
+}
+.finding-card.finding-approved {
+  border-left: 3px solid var(--green);
+}
+
+.finding-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.finding-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.finding-context-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: var(--bg-card2);
+  padding: 4px 8px;
+  border-radius: 4px;
   border: 1px solid var(--border);
 }
-.findings-table thead th {
-  padding: 12px 16px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--text-muted);
-  background: var(--bg-card2);
-  text-align: left;
+
+.finding-card-body {
+  flex: 1;
+}
+
+.finding-card-title {
+  font-size: 14px;
   font-weight: 600;
-  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.4;
 }
-.findings-table tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background var(--transition);
+
+.finding-card-item {
+  font-size: 13px;
+  color: var(--blue);
 }
-.findings-table tbody tr:hover { background: var(--bg-hover); }
-.findings-table tbody tr:last-child { border-bottom: none; }
-.findings-table td { padding: 13px 16px; vertical-align: middle; font-size: 13px; }
-.findings-table td.col-status { width: 110px; }
-.findings-table td.col-context { width: 140px; color: var(--text-dim); font-size: 12px; }
-.findings-table td.col-item { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--blue); }
-.findings-table td.col-summary { color: var(--text-dim); }
-.findings-table td.col-action { width: 100px; text-align: right; }
+
+.finding-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.finding-card-source {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
 .findings-empty {
   text-align: center; padding: 32px; color: var(--text-muted);
   font-size: 13px;
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
 }
 
 /* Status badges */
