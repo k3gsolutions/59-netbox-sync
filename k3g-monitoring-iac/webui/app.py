@@ -41,7 +41,7 @@ import re
 from pathlib import Path
 import json
 import mimetypes
-from typing import Optional
+from typing import Optional, List, Dict
 from datetime import datetime, timezone
 
 
